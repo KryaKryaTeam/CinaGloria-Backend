@@ -3,9 +3,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { AuthorizationProvider } from './AuthorizationProvider.shema';
 
 @Entity()
 export class UserSchema {
@@ -20,6 +22,12 @@ export class UserSchema {
 
   @Column({ name: 'avatar_url', default: 'https://....' })
   avatarUrl: string;
+
+  @Column({ name: 'telegram', nullable: true })
+  telegram: string;
+
+  @Column({ name: 'discord', nullable: true })
+  discord: string;
 
   // Additional data for autofill
   @Column({ name: 'first_name', nullable: true })
@@ -44,4 +52,10 @@ export class UserSchema {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  ///Relations
+  @OneToMany(() => AuthorizationProvider, (provider) => provider.userId, {
+    onDelete: 'CASCADE',
+  })
+  authorizationProviders: AuthorizationProvider[];
 }

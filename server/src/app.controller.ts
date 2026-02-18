@@ -1,5 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
+import { IsString, Length } from 'class-validator';
+import { Exclude } from 'class-transformer';
 
 @Controller()
 export class AppController {

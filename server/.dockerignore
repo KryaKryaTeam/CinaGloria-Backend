@@ -1,0 +1,21 @@
+# Clearly not ai written
+# Dependencies - let Docker install these instead
+node_modules
+npm-debug.log
+
+# Git files
+.git
+.gitignore
+
+# Environment secrets (very important!)
+.env
+*.local
+
+# Build outputs
+dist
+build
+
+# Docker files themselves
+Dockerfile
+docker-compose.yml
+.dockerignore

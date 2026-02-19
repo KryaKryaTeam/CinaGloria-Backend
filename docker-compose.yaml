@@ -19,14 +19,14 @@ services:
     depends_on:
       - db
     volumes:
-      - ./server:/app/src:rw
-      - CinaGloriaDeps:/app/src/node_modules:rw
+      - ./server:/app:rw
+      - CinaGloriaDeps:/app/node_modules:rw
     env_file:
       - ./.env
     command: >
       sh -c "if [ \"$NODE_ENV\" = \"PRODUCTION\" ]; 
       then npm run start; 
-      else npm run start:dev; 
+      else npm run start:dev --manual; 
       fi"
     networks:
       - db

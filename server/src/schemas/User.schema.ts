@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { AuthorizationProvider } from './AuthorizationProvider.shema';
+import { AuthorizationProvider } from './AuthorizationProvider.schema';
 
 @Entity()
 export class UserSchema {

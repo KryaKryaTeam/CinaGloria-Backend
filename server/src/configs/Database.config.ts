@@ -28,4 +28,8 @@ export const TypeormDatasource = (): TypeOrmModuleOptions => ({
   password: process.env.DB_PASSWORD ?? 'admin',
   database: process.env.DB_NAME ?? 'CinaGloria',
   synchronize: process.env.NODE_ENV != 'PRODUCTION',
+  migrationsRun: false,
+  migrationsTableName: 'migrations',
+  migrationsTransactionMode: 'all',
+  entities: ['../../src/**/*.schema{.ts,.js}'],
 });

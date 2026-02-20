@@ -2,6 +2,9 @@ import { RoleEnum } from 'src/types/RoleEnum';
 import { AuthProviderEntity } from './AuthProvider.entity';
 import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
+import { randomUUID } from 'crypto';
+import { Username } from '../objects/Username.object';
+import { AvatarURL } from '../objects/AvatarURL.object';
 
 interface IUserAdditionalData {
   telegram?: string;
@@ -14,9 +17,9 @@ interface IUserAdditionalData {
 
 interface IUserEntityConstructorProps {
   id: string;
-  username: string;
+  username: Username;
   email: string;
-  avatarUrl: string;
+  avatarUrl: AvatarURL;
   additionalData?: IUserAdditionalData;
   role: string;
   authorizationProvider: AuthProviderEntity[];
@@ -25,14 +28,31 @@ interface IUserEntityConstructorProps {
 export class UserEntity {
   public readonly id: string;
   public readonly email: string;
-  private _username: string;
-  private _avatarUrl: string;
+  private _username: Username;
+  private _avatarUrl: AvatarURL;
   private _additionalData: IUserAdditionalData = {};
   private _role: RoleEnum;
   private _authorizationProviders: AuthProviderEntity[];
 
   constructor(partial: IUserEntityConstructorProps) {
     Object.assign(this, partial);
+  }
+
+  public static create(
+    email: string,
+    username: Username,
+    avatarUrl: AvatarURL,
+  ) {
+    const ent = new UserEntity({
+      email,
+      id: randomUUID(),
+      role: RoleEnum.USER,
+      authorizationProvider: [],
+      avatarUrl,
+      username: username,
+    });
+
+    return ent;
   }
 
   async linkProvider(
@@ -75,7 +95,7 @@ export class UserEntity {
     if (!(await checkUnique(username)))
       throw new DomainError(DomainErrors.DUPLICATION);
 
-    this._username = username;
+    this._username = Username.create(username);
   }
   changePassword(password: string) {
     if (
@@ -96,7 +116,7 @@ export class UserEntity {
 
     providerForChange.setPasswordHash(password);
   }
-  changeAvatarURL(avatar_url: string) {
+  changeAvatarURL(avatar_url: AvatarURL) {
     this._avatarUrl = avatar_url;
   }
 
@@ -134,5 +154,21 @@ export class UserEntity {
 
   public get authorizationProviders() {
     return this._authorizationProviders;
+  }
+
+  public isAuthorizationDataCorrect(data: string) {
+    return (
+      this.authorizationProviders.findIndex((provider) =>
+        provider.isDataEqual(data),
+      ) !== -1
+    );
+  }
+
+  public hasAuthorizationProvider(type: AuthorizationProviderTypes) {
+    return (
+      this.authorizationProviders.findIndex((provider) =>
+        provider.isType(type),
+      ) !== -1
+    );
   }
 }

@@ -1,7 +1,9 @@
 import { Module, Provider } from '@nestjs/common';
-import { MapperTokens } from 'src/common/Tokens';
+import { CommandTokens, MapperTokens, ServiceTokens } from 'src/common/Tokens';
 import { AuthorizationProviderMapper } from './application/mappers/AuthorizationProviderMapper';
 import { UserMapper } from './application/mappers/UserMapper';
+import { LoginCommand } from './application/useCases/LoginCommand.command';
+import { AuthorizationProviderService } from './infrastructure/services/AuthorizationProviderService';
 
 const providers: Provider[] = [
   {
@@ -11,6 +13,14 @@ const providers: Provider[] = [
   {
     provide: MapperTokens.UserMapper,
     useClass: UserMapper,
+  },
+  {
+    provide: CommandTokens.LoginCommand,
+    useClass: LoginCommand,
+  },
+  {
+    provide: ServiceTokens.AuthorizationProviderService,
+    useClass: AuthorizationProviderService,
   },
 ];
 

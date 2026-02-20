@@ -4,6 +4,8 @@ import { UserSchema } from 'src/schemas/User.schema';
 import { AuthorizationProviderMapper } from './AuthorizationProviderMapper';
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { MapperTokens } from 'src/common/Tokens';
+import { Username } from 'src/authorization/domain/objects/Username.object';
+import { AvatarURL } from 'src/authorization/domain/objects/AvatarURL.object';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class UserMapper extends Mapper<UserSchema, UserEntity> {
@@ -20,9 +22,9 @@ export class UserMapper extends Mapper<UserSchema, UserEntity> {
       authorizationProvider: schema.authorizationProviders.map((schema) =>
         this.AuthProviderMapper.toEntity(schema),
       ),
-      avatarUrl: schema.avatarUrl,
+      avatarUrl: AvatarURL.create(schema.avatarUrl),
       email: schema.email,
-      username: schema.username,
+      username: Username.create(schema.username),
       additionalData: {
         age: schema.age,
         discord: schema.discord,
@@ -37,7 +39,8 @@ export class UserMapper extends Mapper<UserSchema, UserEntity> {
     const user = new UserSchema();
     user.id = entity.id;
     user.email = entity.email;
-    user.username = entity.username;
+    user.username = entity.username.value;
+    user.avatarUrl = entity.avatarURL.value;
     user.authorizationProviders = entity.authorizationProviders.map((ent) =>
       this.AuthProviderMapper.toSchema(ent),
     );

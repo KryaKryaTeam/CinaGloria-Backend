@@ -24,23 +24,23 @@ export class UserSchema {
   avatarUrl: string;
 
   @Column({ name: 'telegram', nullable: true })
-  telegram: string;
+  telegram?: string;
 
   @Column({ name: 'discord', nullable: true })
-  discord: string;
+  discord?: string;
 
   // Additional data for autofill
   @Column({ name: 'first_name', nullable: true })
-  firstName: string;
+  firstName?: string;
 
   @Column({ name: 'last_name', nullable: true })
-  lastName: string;
+  lastName?: string;
 
   @Column({ name: 'sur_name', nullable: true })
-  surName: string;
+  surName?: string;
 
   @Column({ type: 'int', nullable: true })
-  age: number;
+  age?: number;
 
   // Role
   @Column({ enum: RoleEnum, enumName: 'Role', default: RoleEnum.USER })

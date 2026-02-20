@@ -4,24 +4,28 @@ import { DataSource, EntityManager } from 'typeorm';
 
 @Injectable({ scope: Scope.REQUEST })
 export class DBContext implements IDBContext {
-  private manager: EntityManager;
+  private _manager: EntityManager;
 
   constructor(private readonly datasource: DataSource) {}
   async commitTransaction() {
-    if (this.manager) {
-      await this.manager.queryRunner!.commitTransaction();
+    if (this._manager) {
+      await this._manager.queryRunner!.commitTransaction();
 
-      await this.manager.release();
+      await this._manager.release();
     }
   }
   async rollbackTransaction() {
-    await this.manager.queryRunner!.rollbackTransaction();
+    await this._manager.queryRunner!.rollbackTransaction();
 
-    await this.manager.release();
+    await this._manager.release();
   }
   async startTransaction() {
-    this.manager = this.datasource.createQueryRunner().manager;
+    this._manager = this.datasource.createQueryRunner().manager;
 
-    await this.manager.queryRunner!.startTransaction();
+    await this._manager.queryRunner!.startTransaction();
+  }
+
+  get manager() {
+    return this._manager;
   }
 }

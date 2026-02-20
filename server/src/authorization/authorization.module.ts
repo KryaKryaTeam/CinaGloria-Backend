@@ -4,6 +4,8 @@ import { AuthorizationProviderMapper } from './application/mappers/Authorization
 import { UserMapper } from './application/mappers/UserMapper';
 import { LoginCommand } from './application/useCases/LoginCommand.command';
 import { AuthorizationProviderService } from './infrastructure/services/AuthorizationProviderService';
+import { DiscoveryModule, DiscoveryService } from '@nestjs/core';
+import { GoogleAuthorizationProvider } from './infrastructure/authorizationProviders/GoogleAuthorizationProvider';
 
 const providers: Provider[] = [
   {
@@ -22,10 +24,13 @@ const providers: Provider[] = [
     provide: ServiceTokens.AuthorizationProviderService,
     useClass: AuthorizationProviderService,
   },
+  DiscoveryService,
+  GoogleAuthorizationProvider,
 ];
 
 @Module({
   providers,
+  imports: [DiscoveryModule],
   exports: [...providers],
 })
 export class AuthorizationModule {}

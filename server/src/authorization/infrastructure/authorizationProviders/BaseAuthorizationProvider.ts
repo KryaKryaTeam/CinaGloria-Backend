@@ -1,4 +1,4 @@
-import { Inject, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { IAuthProviderRepository } from 'src/authorization/application/bounds/IAuthProviderRepository';
 import type { IUserRepository } from 'src/authorization/application/bounds/IUserRepository';
@@ -18,7 +18,8 @@ export interface IHandshakeOutput {
   authorizationData: string; // Hash of password or providerId
 }
 
-export abstract class BaseAuthorizationProvider<T> implements OnModuleInit {
+@Injectable()
+export abstract class BaseAuthorizationProvider<T> {
   protected abstract type: AuthorizationProviderTypes;
 
   @Inject(ReposTokens.UserRepository)
@@ -35,10 +36,6 @@ export abstract class BaseAuthorizationProvider<T> implements OnModuleInit {
 
   @Inject(ServiceTokens.AuthorizationProviderService)
   protected authorizartionProviderService: AuthorizationProviderService;
-
-  onModuleInit() {
-    this.authorizartionProviderService.addProvider(this.type, this);
-  }
 
   async authorization(loginData: T): Promise<UserEntity> {
     if (!(await this.validate(loginData)))

@@ -9,6 +9,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { Injectable } from '@nestjs/common';
 import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { gaxios } from 'google-auth-library';
+import { AuthorizationProvider } from '../services/AuthorizationProviderService';
 
 interface GoogleLoginData {
   token: string;
@@ -21,7 +22,10 @@ interface GoogleResponse {
   id: string;
 }
 
+console.log('FILE LOADED: GoogleAuthorizationProvider.ts');
+
 @Injectable()
+@AuthorizationProvider(AuthorizationProviderTypes.GOOGLE)
 export class GoogleAuthorizationProvider extends BaseAuthorizationProvider<GoogleLoginData> {
   private get OAuthClient() {
     return new OAuth2Client({
@@ -29,6 +33,7 @@ export class GoogleAuthorizationProvider extends BaseAuthorizationProvider<Googl
       clientSecret: this.configurationService.getOrThrow('google.secret'),
     });
   }
+
   protected type: AuthorizationProviderTypes =
     AuthorizationProviderTypes.GOOGLE;
   async validate(loginData: GoogleLoginData): Promise<boolean> {

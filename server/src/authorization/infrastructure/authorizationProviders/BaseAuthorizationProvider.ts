@@ -1,4 +1,4 @@
-import { Inject, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { IAuthProviderRepository } from 'src/authorization/application/bounds/IAuthProviderRepository';
 import type { IUserRepository } from 'src/authorization/application/bounds/IUserRepository';
@@ -12,13 +12,14 @@ import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersType
 import { AuthorizationProviderService } from '../services/AuthorizationProviderService';
 import { AvatarURL } from 'src/authorization/domain/objects/AvatarURL.object';
 
-interface handshakeOutput {
+export interface IHandshakeOutput {
   email: string;
   avatarURL: string;
   authorizationData: string; // Hash of password or providerId
 }
 
-export abstract class BaseAuthorizationProvider<T> implements OnModuleInit {
+@Injectable()
+export abstract class BaseAuthorizationProvider<T> {
   protected abstract type: AuthorizationProviderTypes;
 
   @Inject(ReposTokens.UserRepository)
@@ -35,10 +36,6 @@ export abstract class BaseAuthorizationProvider<T> implements OnModuleInit {
 
   @Inject(ServiceTokens.AuthorizationProviderService)
   protected authorizartionProviderService: AuthorizationProviderService;
-
-  onModuleInit() {
-    this.authorizartionProviderService.addProvider(this.type, this);
-  }
 
   async authorization(loginData: T): Promise<UserEntity> {
     if (!(await this.validate(loginData)))
@@ -58,9 +55,7 @@ export abstract class BaseAuthorizationProvider<T> implements OnModuleInit {
         AvatarURL.generate(this.configurationService.getOrThrow('avatar.list')),
       );
 
-      const provider = await this.createProvider(
-        handshakeData.authorizationData,
-      );
+      const provider = this.createProvider(handshakeData.authorizationData);
 
       await findUser.linkProvider(provider, async (provider) => {
         return (
@@ -79,7 +74,7 @@ export abstract class BaseAuthorizationProvider<T> implements OnModuleInit {
     return findUser;
   }
 
-  abstract createProvider(loginData: string): Promise<AuthProviderEntity>;
+  abstract createProvider(loginData: string): AuthProviderEntity;
   abstract validate(loginData: T): Promise<boolean>;
-  abstract handshake(loginData: T): Promise<handshakeOutput>;
+  abstract handshake(loginData: T): Promise<IHandshakeOutput>;
 }

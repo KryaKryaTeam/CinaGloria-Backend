@@ -4,6 +4,7 @@ import { TypeormDatasource } from './configs/Database.config';
 import DatabaseConfig from './configs/Database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from './common/common.module';
+import { AuthorizationModule } from './authorization/authorization.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { CommonModule } from './common/common.module';
     }),
     TypeOrmModule.forRoot(TypeormDatasource()),
     CommonModule,
+    AuthorizationModule,
   ],
 })
 export class AppModule {}

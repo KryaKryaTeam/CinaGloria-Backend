@@ -12,11 +12,19 @@ import { UserSchema } from './User.schema';
 
 @Entity()
 @TableInheritance({
-  column: { type: 'enum', enum: AuthorizationProviderTypes },
+  column: { type: 'enum', enum: AuthorizationProviderTypes, name: 'type' },
 })
 export class AuthorizationProvider {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({
+    type: 'enum',
+    enum: AuthorizationProviderTypes,
+    name: 'type', // Must match the name in TableInheritance
+    readonly: true,
+  })
+  type: AuthorizationProviderTypes;
 
   @ManyToOne(() => UserSchema, (user) => user.authorizationProviders, {
     lazy: true,

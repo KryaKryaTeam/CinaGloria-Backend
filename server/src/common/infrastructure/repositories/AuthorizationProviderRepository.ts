@@ -2,11 +2,10 @@ import { IAuthProviderRepository } from 'src/authorization/application/bounds/IA
 import { BaseRepository } from './BaseRepository';
 import { AuthProviderEntity } from 'src/authorization/domain/entities/AuthProvider.entity';
 import { AuthorizationProvider } from 'src/schemas/AuthorizationProvider.schema';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { MapperTokens } from 'src/common/Tokens';
 import { AuthorizationProviderMapper } from 'src/authorization/application/mappers/AuthorizationProviderMapper';
 
-@Injectable()
 export class AuthorizationProviderRepository
   extends BaseRepository<AuthorizationProvider>
   implements IAuthProviderRepository
@@ -14,7 +13,7 @@ export class AuthorizationProviderRepository
   @Inject(MapperTokens.AuthorizationProviderMapper)
   private authProviderMapper: AuthorizationProviderMapper;
 
-  protected _entitySchema: new () => AuthorizationProvider;
+  protected _entitySchema = AuthorizationProvider;
   async save(provider: AuthProviderEntity): Promise<void> {
     await this.repository.save(this.authProviderMapper.toSchema(provider));
   }
@@ -37,7 +36,7 @@ export class AuthorizationProviderRepository
     providerId: string,
   ): Promise<AuthProviderEntity | null> {
     const res = await this.repository
-      .createQueryBuilder()
+      .createQueryBuilder('provider')
       .where('provider.providerId = :id', { id: providerId })
       .getOne();
 

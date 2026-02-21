@@ -15,7 +15,7 @@ interface GithubLoginData {
 
 interface GithubAccessTokenResponse {
   access_token: string;
-  scopes: string[];
+  scope: string;
 }
 
 interface GithubProfileData {
@@ -50,9 +50,9 @@ export class GithubAuthorizationProvider extends BaseAuthorizationProvider<Githu
         {
           body: JSON.stringify({
             client_id:
-              this.configurationService.getOrThrow<string>('githib.clientId'),
+              this.configurationService.getOrThrow<string>('github.clientId'),
             client_secret:
-              this.configurationService.getOrThrow<string>('githib.secret'),
+              this.configurationService.getOrThrow<string>('github.secret'),
             code: loginData.token,
           }),
           headers: {
@@ -64,10 +64,10 @@ export class GithubAuthorizationProvider extends BaseAuthorizationProvider<Githu
       ).then((res) => res.json())) as GithubAccessTokenResponse;
 
       if (
-        !accessToken.scopes.includes('user:email') ||
-        !accessToken.scopes.includes('read:user')
+        !accessToken.scope.includes('user:email') ||
+        !accessToken.scope.includes('read:user')
       )
-        throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+        throw new DomainError(DomainErrors.UNEXPECTED_VALUE, 'MEOW NO SCOPES!');
 
       const profileData = (await fetch('https://api.github.com/user', {
         headers: {
@@ -89,6 +89,8 @@ export class GithubAuthorizationProvider extends BaseAuthorizationProvider<Githu
         },
       }).then((res) => res.json())) as GithubEmail[];
 
+      console.log(profileData, emails);
+
       const primaryEmail = emails.find(
         (email) => email.verified && email.primary,
       );
@@ -103,7 +105,10 @@ export class GithubAuthorizationProvider extends BaseAuthorizationProvider<Githu
       };
     } catch (err) {
       if (!(err instanceof DomainError)) {
-        throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+        throw new DomainError(
+          DomainErrors.UNEXPECTED_VALUE,
+          JSON.stringify(err),
+        );
       } else throw err;
     }
   }

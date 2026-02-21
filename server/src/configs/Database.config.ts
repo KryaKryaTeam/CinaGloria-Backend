@@ -1,5 +1,6 @@
 import { registerAs } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { join } from 'path';
 
 interface DatabaseConfig {
   password: string;
@@ -31,5 +32,6 @@ export const TypeormDatasource = (): TypeOrmModuleOptions => ({
   migrationsRun: false,
   migrationsTableName: 'migrations',
   migrationsTransactionMode: 'all',
-  entities: ['../../src/**/*.schema{.ts,.js}'],
+  entities: [join(__dirname, '/**/*.schema{.ts,.js}')],
+  autoLoadEntities: true,
 });

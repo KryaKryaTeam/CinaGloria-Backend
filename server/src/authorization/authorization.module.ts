@@ -6,6 +6,9 @@ import { LoginCommand } from './application/useCases/LoginCommand.command';
 import { AuthorizationProviderService } from './infrastructure/services/AuthorizationProviderService';
 import { DiscoveryModule, DiscoveryService } from '@nestjs/core';
 import { GoogleAuthorizationProvider } from './infrastructure/authorizationProviders/GoogleAuthorizationProvider';
+import { AuthController } from './infrastructure/controllers/auth.controller';
+import { GithubAuthorizationProvider } from './infrastructure/authorizationProviders/GithubAuthorizationProvider';
+import { CheckCommand } from './application/useCases/CheckCommand.command';
 
 const providers: Provider[] = [
   {
@@ -21,16 +24,22 @@ const providers: Provider[] = [
     useClass: LoginCommand,
   },
   {
+    provide: CommandTokens.CheckCommand,
+    useClass: CheckCommand,
+  },
+  {
     provide: ServiceTokens.AuthorizationProviderService,
     useClass: AuthorizationProviderService,
   },
   DiscoveryService,
   GoogleAuthorizationProvider,
+  GithubAuthorizationProvider,
 ];
 
 @Module({
   providers,
   imports: [DiscoveryModule],
   exports: [...providers],
+  controllers: [AuthController],
 })
 export class AuthorizationModule {}

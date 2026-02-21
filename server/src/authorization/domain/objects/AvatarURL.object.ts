@@ -13,7 +13,7 @@ export class AvatarURL {
     );
   }
   static create(value: string) {
-    if (!value.includes('http://') || !value.includes('https://'))
+    if (!value.includes('http://') && !value.includes('https://'))
       throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
 
     return new AvatarURL(value);

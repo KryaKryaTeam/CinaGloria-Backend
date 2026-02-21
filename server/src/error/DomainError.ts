@@ -10,6 +10,7 @@ export enum DomainErrors {
 export class DomainError extends Error {
   constructor(
     message: string | DomainErrors,
+    public readonly cause: string = 'UNDEFINED',
     public readonly code: string = 'DOMAIN_VIOLATION',
   ) {
     super(message);

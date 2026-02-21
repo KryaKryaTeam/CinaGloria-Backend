@@ -1,7 +1,8 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { IDBContext } from './IDBcontext';
 import { BaseTokens } from '../Tokens';
 
+@Injectable()
 export abstract class Command<Data, Result> {
   @Inject(BaseTokens.DBContext)
   protected DBContext: IDBContext;

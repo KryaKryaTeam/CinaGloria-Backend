@@ -89,8 +89,6 @@ export class GithubAuthorizationProvider extends BaseAuthorizationProvider<Githu
         },
       }).then((res) => res.json())) as GithubEmail[];
 
-      console.log(profileData, emails);
-
       const primaryEmail = emails.find(
         (email) => email.verified && email.primary,
       );

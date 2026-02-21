@@ -36,4 +36,8 @@ export class UserRepository
   async save(user: UserEntity): Promise<void> {
     await this.repository.save(this.userMapper.toSchema(user));
   }
+
+  async existsByEmail(email: string): Promise<boolean> {
+    return this.repository.exists({ where: { email } });
+  }
 }

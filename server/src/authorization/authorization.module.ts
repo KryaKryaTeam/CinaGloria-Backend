@@ -9,6 +9,7 @@ import { GoogleAuthorizationProvider } from './infrastructure/authorizationProvi
 import { AuthController } from './infrastructure/controllers/auth.controller';
 import { GithubAuthorizationProvider } from './infrastructure/authorizationProviders/GithubAuthorizationProvider';
 import { CheckCommand } from './application/useCases/CheckCommand.command';
+import { JWTTokenService } from './infrastructure/services/JWTToken.service';
 
 const providers: Provider[] = [
   {
@@ -34,6 +35,10 @@ const providers: Provider[] = [
   DiscoveryService,
   GoogleAuthorizationProvider,
   GithubAuthorizationProvider,
+  {
+    provide: ServiceTokens.JWTService,
+    useClass: JWTTokenService,
+  },
 ];
 
 @Module({

@@ -20,4 +20,5 @@ export enum CommandTokens {
 
 export enum ServiceTokens {
   AuthorizationProviderService = 'AUTHORIZATION_PROVIDER_SERVICE',
+  JWTService = 'JWT_SERVICE',
 }

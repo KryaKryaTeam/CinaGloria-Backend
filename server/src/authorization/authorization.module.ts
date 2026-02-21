@@ -4,6 +4,7 @@ import { AuthorizationProviderMapper } from './application/mappers/Authorization
 import { UserMapper } from './application/mappers/UserMapper';
 import { LoginCommand } from './application/useCases/LoginCommand.command';
 import { AuthorizationProviderService } from './infrastructure/services/AuthorizationProviderService';
+import { JWTTokenService } from './infrastructure/services/JWTToken.service';
 
 const providers: Provider[] = [
   {
@@ -21,6 +22,10 @@ const providers: Provider[] = [
   {
     provide: ServiceTokens.AuthorizationProviderService,
     useClass: AuthorizationProviderService,
+  },
+  {
+    provide: ServiceTokens.JWTService,
+    useClass: JWTTokenService,
   },
 ];
 

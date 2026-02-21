@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { AuthorizationProvider } from './AuthorizationProvider.schema';
 
-@Entity()
+@Entity({ name: 'user' })
 export class UserSchema {
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { AuthorizationProvider } from './AuthorizationProvider.schema';
 
-@Entity()
+@Entity({ name: 'user' })
 export class UserSchema {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -56,6 +56,8 @@ export class UserSchema {
   ///Relations
   @OneToMany(() => AuthorizationProvider, (provider) => provider.userId, {
     onDelete: 'CASCADE',
+    eager: true,
+    cascade: true,
   })
   authorizationProviders: AuthorizationProvider[];
 }

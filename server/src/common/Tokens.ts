@@ -16,6 +16,7 @@ export enum ReposTokens {
 
 export enum CommandTokens {
   LoginCommand = 'LOGIN_COMMAND',
+  CheckCommand = 'CHECK_COMMAND',
 }
 
 export enum ServiceTokens {

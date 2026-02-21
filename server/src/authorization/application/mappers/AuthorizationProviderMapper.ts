@@ -1,15 +1,10 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthProviderEntity } from 'src/authorization/domain/entities/AuthProvider.entity';
 import { Mapper } from 'src/common/infrastructure/Mapper';
-import {
-  AuthorizationProvider,
-  AuthorizationProviderGithub,
-  AuthorizationProviderGoogle,
-  AuthorizationProviderLocal,
-} from 'src/schemas/AuthorizationProvider.schema';
+import { AuthorizationProvider } from 'src/schemas/AuthorizationProvider.schema';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class AuthorizationProviderMapper extends Mapper<
   AuthorizationProvider,
   AuthProviderEntity
@@ -18,11 +13,11 @@ export class AuthorizationProviderMapper extends Mapper<
     let passwordHash: string | undefined;
     let providerId: string | undefined;
 
-    if (schema instanceof AuthorizationProviderLocal) {
+    if (schema.type == AuthorizationProviderTypes.LOCAL) {
       passwordHash = schema.passwordHash;
     } else if (
-      schema instanceof AuthorizationProviderGoogle ||
-      schema instanceof AuthorizationProviderGithub
+      schema.type == AuthorizationProviderTypes.GITHUB ||
+      schema.type == AuthorizationProviderTypes.GOOGLE
     ) {
       providerId = schema.providerId;
     }
@@ -37,17 +32,15 @@ export class AuthorizationProviderMapper extends Mapper<
   public toSchema(entity: AuthProviderEntity): AuthorizationProvider {
     const provider = new AuthorizationProvider();
 
-    provider.id = entity.id;
-    provider.type = entity.type;
-
-    if (entity.type == AuthorizationProviderTypes.LOCAL) {
-      (provider as AuthorizationProviderLocal).passwordHash =
-        entity.getPasswordHash();
+    if (entity.isType(AuthorizationProviderTypes.LOCAL)) {
+      provider.passwordHash = entity.getPasswordHash();
     } else {
-      (
-        provider as AuthorizationProviderGithub | AuthorizationProviderGoogle
-      ).providerId = entity.getProviderId();
+      provider.providerId = entity.getProviderId();
     }
+    provider.type = entity.type;
+    provider.id = entity.id;
+
+    console.log(provider);
 
     return provider;
   }

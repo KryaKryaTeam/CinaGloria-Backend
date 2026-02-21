@@ -4,6 +4,11 @@ import { AuthorizationProviderMapper } from './application/mappers/Authorization
 import { UserMapper } from './application/mappers/UserMapper';
 import { LoginCommand } from './application/useCases/LoginCommand.command';
 import { AuthorizationProviderService } from './infrastructure/services/AuthorizationProviderService';
+import { DiscoveryModule, DiscoveryService } from '@nestjs/core';
+import { GoogleAuthorizationProvider } from './infrastructure/authorizationProviders/GoogleAuthorizationProvider';
+import { AuthController } from './infrastructure/controllers/auth.controller';
+import { GithubAuthorizationProvider } from './infrastructure/authorizationProviders/GithubAuthorizationProvider';
+import { CheckCommand } from './application/useCases/CheckCommand.command';
 import { JWTTokenService } from './infrastructure/services/JWTToken.service';
 
 const providers: Provider[] = [
@@ -20,9 +25,16 @@ const providers: Provider[] = [
     useClass: LoginCommand,
   },
   {
+    provide: CommandTokens.CheckCommand,
+    useClass: CheckCommand,
+  },
+  {
     provide: ServiceTokens.AuthorizationProviderService,
     useClass: AuthorizationProviderService,
   },
+  DiscoveryService,
+  GoogleAuthorizationProvider,
+  GithubAuthorizationProvider,
   {
     provide: ServiceTokens.JWTService,
     useClass: JWTTokenService,
@@ -31,6 +43,8 @@ const providers: Provider[] = [
 
 @Module({
   providers,
+  imports: [DiscoveryModule],
   exports: [...providers],
+  controllers: [AuthController],
 })
 export class AuthorizationModule {}

@@ -17,12 +17,12 @@ interface IUserAdditionalData {
 
 interface IUserEntityConstructorProps {
   id: string;
-  username: Username;
   email: string;
-  avatarUrl: AvatarURL;
-  additionalData?: IUserAdditionalData;
-  role: string;
-  authorizationProvider: AuthProviderEntity[];
+  _username: Username;
+  _avatarUrl: AvatarURL;
+  _additionalData?: IUserAdditionalData;
+  _role: string;
+  _authorizationProviders: AuthProviderEntity[];
 }
 
 export class UserEntity {
@@ -32,7 +32,7 @@ export class UserEntity {
   private _avatarUrl: AvatarURL;
   private _additionalData: IUserAdditionalData = {};
   private _role: RoleEnum;
-  private _authorizationProviders: AuthProviderEntity[];
+  private _authorizationProviders: AuthProviderEntity[] = [];
 
   constructor(partial: IUserEntityConstructorProps) {
     Object.assign(this, partial);
@@ -46,10 +46,10 @@ export class UserEntity {
     const ent = new UserEntity({
       email,
       id: randomUUID(),
-      role: RoleEnum.USER,
-      authorizationProvider: [],
-      avatarUrl,
-      username: username,
+      _role: RoleEnum.USER,
+      _authorizationProviders: [],
+      _avatarUrl: avatarUrl,
+      _username: username,
     });
 
     return ent;
@@ -59,7 +59,7 @@ export class UserEntity {
     provider: AuthProviderEntity,
     checkProviderUnique: (providerId: string) => Promise<boolean>,
   ) {
-    if (this._authorizationProviders.find((ent) => ent.isType(provider.type)))
+    if (this._authorizationProviders?.find((ent) => ent.isType(provider.type)))
       throw new DomainError('This user already has provider with this type!');
 
     if (!provider.isType(AuthorizationProviderTypes.LOCAL))

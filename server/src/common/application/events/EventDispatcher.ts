@@ -1,10 +1,10 @@
-import { Inject, Injectable, Scope } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Event } from 'src/common/domain/Event';
 import { IEventDispatcher } from 'src/common/domain/IEventDispatcher';
 import { BaseTokens } from 'src/common/Tokens';
 import type { EventHandler } from './EventHandler';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class EventDispatcher implements IEventDispatcher {
   @Inject(BaseTokens.EventHandler)
   private eventHandler: EventHandler;

@@ -1,14 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Command } from 'src/common/application/Command';
-import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import type { IAuthorizationProviderService } from '../bounds/IAuthorizationProviderService';
 import type { IUserRepository } from '../bounds/IUserRepository';
 import { ReposTokens, ServiceTokens } from 'src/common/Tokens';
-
-interface LoginCommandProps {
-  type: AuthorizationProviderTypes;
-  loginData: unknown;
-}
+import { UserEntity } from 'src/authorization/domain/entities/User.entity';
+import { Username } from 'src/authorization/domain/objects/Username.object';
+import { AvatarURL } from 'src/authorization/domain/objects/AvatarURL.object';
 
 interface LoginCommandOutput {
   accessToken: string;
@@ -16,21 +13,23 @@ interface LoginCommandOutput {
 }
 
 @Injectable()
-export class LoginCommand extends Command<
-  LoginCommandProps,
-  LoginCommandOutput
-> {
+export class CheckCommand extends Command<null, LoginCommandOutput> {
   @Inject(ServiceTokens.AuthorizationProviderService)
   authorizationProviderService: IAuthorizationProviderService;
 
   @Inject(ReposTokens.UserRepository)
   userRepository: IUserRepository;
 
-  async implementation(data: LoginCommandProps): Promise<LoginCommandOutput> {
-    const user = await this.authorizationProviderService.authorize(
-      data.type,
-      data.loginData,
+  async implementation(): Promise<LoginCommandOutput> {
+    const user = UserEntity.create(
+      'admin@gmail.com',
+      Username.generate(['s', 'ss'], ['ss', 'sss']),
+      AvatarURL.generate(['https://example.com']),
     );
+
+    console.log(this.userRepository);
+
+    console.log(await this.userRepository.findByEmail('admin@gmail.com'));
 
     await this.userRepository.save(user);
 

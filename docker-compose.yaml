@@ -30,6 +30,8 @@ services:
       fi"
     networks:
       - db
+    ports:
+      - ${PORT}:${PORT}
 
 volumes:
   CinaGloriaDB:

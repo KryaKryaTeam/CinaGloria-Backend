@@ -39,7 +39,7 @@ export abstract class BaseAuthorizationProvider<T> {
 
   async authorization(loginData: T): Promise<UserEntity> {
     if (!(await this.validate(loginData)))
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      throw new DomainError(DomainErrors.UNEXPECTED_VALUE, 'Here');
 
     const handshakeData = await this.handshake(loginData);
 
@@ -65,6 +65,11 @@ export abstract class BaseAuthorizationProvider<T> {
 
       await this.userRepository.save(findUser);
     } else {
+      console.log(
+        findUser,
+        findUser.hasAuthorizationProvider(this.type),
+        findUser.isAuthorizationDataCorrect(handshakeData.authorizationData),
+      );
       if (
         !findUser.hasAuthorizationProvider(this.type) ||
         !findUser.isAuthorizationDataCorrect(handshakeData.authorizationData)

@@ -1,8 +1,8 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { IDBContext } from '../application/IDBcontext';
 import { DataSource, EntityManager } from 'typeorm';
 
-@Injectable({ scope: Scope.REQUEST })
+@Injectable()
 export class DBContext implements IDBContext {
   private _manager: EntityManager;
 
@@ -21,11 +21,10 @@ export class DBContext implements IDBContext {
   }
   async startTransaction() {
     this._manager = this.datasource.createQueryRunner().manager;
-
     await this._manager.queryRunner!.startTransaction();
   }
 
   get manager() {
-    return this._manager;
+    return this._manager ?? this.datasource.manager;
   }
 }

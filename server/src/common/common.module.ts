@@ -1,4 +1,4 @@
-import { Global, Module, Provider } from '@nestjs/common';
+import { forwardRef, Global, Module, Provider } from '@nestjs/common';
 import { BaseTokens, ReposTokens } from './Tokens';
 import { EventDispatcher } from './application/events/EventDispatcher';
 import { EventHandler } from './application/events/EventHandler';
@@ -6,6 +6,9 @@ import { DBContext } from './infrastructure/DBContext';
 import { UserRepository } from './infrastructure/repositories/UserRepository';
 import { AuthorizationProviderRepository } from './infrastructure/repositories/AuthorizationProviderRepository';
 import { AuthorizationModule } from 'src/authorization/authorization.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserSchema } from 'src/schemas/User.schema';
+import { AuthorizationProvider } from 'src/schemas/AuthorizationProvider.schema';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -22,6 +25,9 @@ const providers: Provider[] = [
 @Module({
   providers,
   exports: providers,
-  imports: [AuthorizationModule],
+  imports: [
+    TypeOrmModule.forFeature([UserSchema, AuthorizationProvider]),
+    forwardRef(() => AuthorizationModule),
+  ],
 })
 export class CommonModule {}

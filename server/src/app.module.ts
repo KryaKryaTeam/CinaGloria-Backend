@@ -7,11 +7,20 @@ import { CommonModule } from './common/common.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import UsernameConfig from './configs/Username.config';
 import AvatarConfig from './configs/Avatar.config';
+import GoogleConfig from './configs/Google.config';
+import GithubConfig from './configs/Github.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [TypeormDatasource, DatabaseConfig, UsernameConfig, AvatarConfig],
+      load: [
+        TypeormDatasource,
+        DatabaseConfig,
+        UsernameConfig,
+        AvatarConfig,
+        GoogleConfig,
+        GithubConfig,
+      ],
       isGlobal: true,
     }),
     TypeOrmModule.forRoot(TypeormDatasource()),

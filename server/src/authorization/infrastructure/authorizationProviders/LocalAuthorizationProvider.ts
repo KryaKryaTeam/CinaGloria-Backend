@@ -11,8 +11,8 @@ import { ConfigService } from '@nestjs/config';
 import { Inject } from '@nestjs/common';
 import { ServiceTokens } from 'src/common/Tokens';
 import type { IHashService } from 'src/authorization/application/bounds/IHashService';
-import { UserRepository } from 'src/common/infrastructure/repositories/UserRepository';
 import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { connect } from 'http2';
 
 interface LocalLoginData {
   email: string;

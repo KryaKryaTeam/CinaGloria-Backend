@@ -1,3 +1,4 @@
+import { hash } from 'crypto';
 import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 
@@ -36,6 +37,7 @@ export class AuthProviderEntity {
 
   isDataEqual(data: string) {
     if (this.type == AuthorizationProviderTypes.LOCAL) {
+      console.log(data, this.passwordHash);
       return data == this.passwordHash;
     } else {
       return data == this.providerId;

@@ -30,24 +30,23 @@ export class LocalAuthorizationProvider extends BaseAuthorizationProvider<LocalL
   createProvider(loginData: string): AuthProviderEntity {
     return new AuthProviderEntity({
       id: randomUUID(),
-      passwordHash: '',
-      providerId: loginData,
+      passwordHash: loginData,
+      providerId: '',
       type: AuthorizationProviderTypes.LOCAL,
     });
   }
 
+  // eslint-disable-next-line @typescript-eslint/require-await
   async handshake(loginData: LocalLoginData): Promise<IHandshakeOutput> {
     const passwordHash = this.hashService.hash(loginData.password);
 
-    return new Promise((resolve) =>
-      resolve({
-        email: loginData.email,
-        avatarURL: AvatarURL.generate(
-          this.configService.getOrThrow('avatar.list'),
-        ).value,
-        authorizationData: passwordHash,
-      }),
-    );
+    return {
+      email: loginData.email,
+      avatarURL: AvatarURL.generate(
+        this.configService.getOrThrow('avatar.list'),
+      ).value,
+      authorizationData: passwordHash,
+    };
   }
 
   async validate(loginData: LocalLoginData): Promise<boolean> {
@@ -61,8 +60,7 @@ export class LocalAuthorizationProvider extends BaseAuthorizationProvider<LocalL
       throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
     }
 
-    if (!(await this.userRepository.existsByEmail(loginData.email)))
-      return false;
+    // if (await this.userRepository.existsByEmail(loginData.email)) return false;
 
     return true;
   }

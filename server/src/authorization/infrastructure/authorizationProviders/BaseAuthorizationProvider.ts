@@ -74,7 +74,10 @@ export abstract class BaseAuthorizationProvider<T> {
         !findUser.hasAuthorizationProvider(this.type) ||
         !findUser.isAuthorizationDataCorrect(handshakeData.authorizationData)
       )
-        throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+        throw new DomainError(
+          DomainErrors.UNEXPECTED_VALUE,
+          'asdja;ksdfkasjdf',
+        );
     }
     return findUser;
   }

@@ -38,6 +38,7 @@ export class UserRepository
   }
 
   async existsByEmail(email: string): Promise<boolean> {
+    console.log(await this.repository.exists({ where: { email } }));
     return await this.repository.exists({ where: { email } });
   }
 }

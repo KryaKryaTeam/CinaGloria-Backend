@@ -20,7 +20,8 @@ services:
       - db
     volumes:
       - ./server:/app:rw
-      - CinaGloriaDeps:/app/node_modules:rw
+      - /app/node_modules
+      - CinaGloriaDeps:/app/node_modules:ro
     env_file:
       - ./.env
     command: >

@@ -21,6 +21,8 @@ export default registerAs(
   }),
 );
 
+const isProduction = process.env.NODE_ENV?.toUpperCase() === 'PRODUCTION';
+
 export const TypeormDatasource = (): TypeOrmModuleOptions => ({
   type: 'postgres',
   port: Number(process.env.DB_PORT ?? '5432'),
@@ -28,8 +30,10 @@ export const TypeormDatasource = (): TypeOrmModuleOptions => ({
   username: process.env.DB_USER ?? 'admin',
   password: process.env.DB_PASSWORD ?? 'admin',
   database: process.env.DB_NAME ?? 'CinaGloria',
-  synchronize: process.env.NODE_ENV != 'PRODUCTION',
-  migrationsRun: false,
+  migrationsRun: true,
+  migrations: [
+    join(__dirname, '/db/migrations/*', isProduction ? '.js' : '.ts'),
+  ],
   migrationsTableName: 'migrations',
   migrationsTransactionMode: 'all',
   entities: [join(__dirname, '/**/*.schema{.ts,.js}')],

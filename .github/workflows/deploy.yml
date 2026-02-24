@@ -27,14 +27,16 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
+      - name: Lowercase registry name
+        run: |
+          echo "IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/cina-gloria" | tr '[:upper:]' '[:lower:]' >> $GITHUB_ENV
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: ./server
           file: ./server/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/CinaGloria:latest-dev
+          tags: ${{ env.IMAGE_NAME }}:latest-dev
   deploy:
     runs-on: server1
     needs: build-and-push

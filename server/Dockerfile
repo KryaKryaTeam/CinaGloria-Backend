@@ -1,9 +1,9 @@
 # Stage 1: Build
 FROM node:20-alpine AS builder
 WORKDIR /app
-COPY server/package*.json ./
+COPY package*.json ./
 RUN npm install
-COPY server/ .
+COPY . .
 RUN npm run build
 
 # Stage 2: Run

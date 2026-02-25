@@ -1,0 +1,92 @@
+# @format
+name: Build and Push to GHCR
+
+on:
+  push:
+    branches: [dev]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux/amd64
+            suffix: amd64
+          - os: ARM64
+            platform: linux/arm64
+            suffix: arm64
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest-dev-${{ matrix.suffix }}
+            type=sha,format=short,suffix=-${{ matrix.suffix }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./server
+          file: ./server/Dockerfile
+          push: true
+          platforms: ${{ matrix.platform }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: false
+
+  create-manifest:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    permissions:
+      packages: write
+    steps:
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and push multi-arch manifests
+        run: |
+          LOWER_IMAGE=$(echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" | tr '[:upper:]' '[:lower:]')
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+
+          docker manifest create $LOWER_IMAGE:latest-dev \
+            --amend $LOWER_IMAGE:latest-dev-amd64 \
+            --amend $LOWER_IMAGE:latest-dev-arm64
+          docker manifest push $LOWER_IMAGE:latest-dev
+
+          docker manifest create $LOWER_IMAGE:sha-$SHORT_SHA \
+            --amend $LOWER_IMAGE:sha-$SHORT_SHA-amd64 \
+            --amend $LOWER_IMAGE:sha-$SHORT_SHA-arm64
+          docker manifest push $LOWER_IMAGE:sha-$SHORT_SHA
+
+  deploy:
+    runs-on: server1
+    needs: create-manifest
+    steps:
+      - name: deploy
+        run: ~/deploy.sh

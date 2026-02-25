@@ -7,21 +7,14 @@ import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { ReposTokens } from 'src/common/Tokens';
 import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { IJWTPair } from 'src/types/JWTPair';
-import { RoleEnum } from 'src/types/RoleEnum';
-
-interface IJWTPayload {
-  sub: string;
-  role: RoleEnum;
-  avatar: string;
-  username: string;
-  email: string;
-}
+import { IJWTPayload } from 'src/types/JWTPayload';
 
 @Injectable()
 export class JWTTokenService implements IJWTTokenService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configurationService: ConfigService,
+
     @Inject(ReposTokens.UserRepository)
     private readonly userRepository: IUserRepository,
   ) {}
@@ -34,7 +27,8 @@ export class JWTTokenService implements IJWTTokenService {
 
     const refresh = this.jwtService.sign(payload, {
       expiresIn: '15d',
-      secret: this.configurationService.getOrThrow<string>('jwt.access_secret'),
+      secret:
+        this.configurationService.getOrThrow<string>('jwt.refresh_secret'),
     });
 
     return { accessToken: access, refreshToken: refresh };
@@ -42,7 +36,8 @@ export class JWTTokenService implements IJWTTokenService {
 
   async refresh(refresh: string): Promise<IJWTPair> {
     const decode = this.jwtService.verify<IJWTPayload>(refresh, {
-      secret: this.configurationService.getOrThrow<string>('jwt.access_secret'),
+      secret:
+        this.configurationService.getOrThrow<string>('jwt.refresh_secret'),
     });
 
     const updatedUser = await this.userRepository.findById(decode.sub);
@@ -54,6 +49,8 @@ export class JWTTokenService implements IJWTTokenService {
       avatar: updatedUser.avatarURL.value,
       email: updatedUser.email,
       username: updatedUser.username.value,
+      provider: decode.provider,
+      iat: decode.iat,
     });
   }
 
@@ -67,5 +64,9 @@ export class JWTTokenService implements IJWTTokenService {
     } catch {
       throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
     }
+  }
+
+  decode(access: string): IJWTPayload {
+    return this.jwtService.decode(access);
   }
 }

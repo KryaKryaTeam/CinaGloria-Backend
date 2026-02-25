@@ -9,6 +9,8 @@ import UsernameConfig from './configs/Username.config';
 import AvatarConfig from './configs/Avatar.config';
 import GoogleConfig from './configs/Google.config';
 import GithubConfig from './configs/Github.config';
+import CookieConfig from './configs/Cookie.config';
+import JWTConfig from './configs/JWT.config';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import GithubConfig from './configs/Github.config';
         AvatarConfig,
         GoogleConfig,
         GithubConfig,
+        CookieConfig,
+        JWTConfig,
       ],
       isGlobal: true,
     }),

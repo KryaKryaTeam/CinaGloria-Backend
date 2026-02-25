@@ -17,7 +17,10 @@ services:
   app:
     build:
       context: ./server
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
     depends_on:
       - db
     volumes:
@@ -25,11 +28,11 @@ services:
       - /app/node_modules
     env_file:
       - ./.env
-    # command: >
-    #   sh -c "if [ \"$NODE_ENV\" = \"PRODUCTION\" ];
-    #   then npm run start;
-    #   else npm run start:dev --manual;
-    #   fi"
+    command: >
+      sh -c "if [ \"$NODE_ENV\" = \"PRODUCTION\" ];
+      then npm run start;
+      else npm run start:dev --manual;
+      fi"
     networks:
       - db
     ports:
@@ -37,6 +40,5 @@ services:
 
 volumes:
   CinaGloriaDB:
-  CinaGloriaDeps:
 networks:
   db:

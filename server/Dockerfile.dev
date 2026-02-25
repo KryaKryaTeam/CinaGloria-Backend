@@ -1,0 +1,16 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install dependencies first (for caching)
+COPY package*.json ./
+RUN npm install
+
+# Copy the rest of the source code
+COPY . .
+
+# Expose the application port
+EXPOSE 3000
+
+# Start in development mode with hot-reloading
+CMD ["npm", "run", "start:dev"]

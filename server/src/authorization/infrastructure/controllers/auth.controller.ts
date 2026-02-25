@@ -14,6 +14,9 @@ import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import type { Response as ExpressResponse } from 'express';
 import { ConfigService } from '@nestjs/config';
+import { CreateUserLocal } from '../dtos/CreateUserLocal';
+import { ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { LoginResponse } from '../dtos/LoginResponse';
 
 @Controller('auth')
 export class AuthController {
@@ -28,10 +31,26 @@ export class AuthController {
 
   @Post('/login')
   @Version('1')
+  @ApiQuery({
+    name: 'provider',
+    enum: AuthorizationProviderTypes,
+    enumName: 'Authorization Providers',
+    description: 'Specify which authorization provider to use',
+    required: true,
+  })
+  @ApiQuery({
+    name: 'code',
+    required: false,
+    description: 'Code for OAuth provider',
+  })
+  @ApiBody({ type: CreateUserLocal, required: false })
+  @ApiResponse({ type: LoginResponse, status: 201 })
   async login(
-    @Query('provider') provider: string,
-    @Query('code') code: string,
-    @Body() body: object,
+    @Query('provider')
+    provider: string,
+    @Query('code')
+    code: string,
+    @Body() body: CreateUserLocal,
     @Response({ passthrough: true }) res: ExpressResponse,
   ) {
     if (!provider)
@@ -49,12 +68,5 @@ export class AuthController {
     );
 
     return { accessToken: result.accessToken };
-  }
-
-  @Post('/check')
-  @Version('1')
-  async check() {
-    await this.checkCommand.execute(null);
-    return { status: 'OK!' }; // Return objects for consistent JSON responses
   }
 }

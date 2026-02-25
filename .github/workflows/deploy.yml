@@ -89,4 +89,4 @@ jobs:
     needs: create-manifest
     steps:
       - name: deploy
-        run: ~/deploy.sh
+        run: home/backend-service/deploy.sh

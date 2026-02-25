@@ -13,7 +13,6 @@ import { JWTTokenService } from './infrastructure/services/JWTToken.service';
 import { HashService } from './infrastructure/services/Hash.service';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalAuthorizationProvider } from './infrastructure/authorizationProviders/LocalAuthorizationProvider';
-import { JwtModule } from '@nestjs/jwt';
 
 const providers: Provider[] = [
   {

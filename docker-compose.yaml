@@ -15,13 +15,14 @@ services:
     networks:
       - db
   app:
-    build: ./server
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
     depends_on:
       - db
     volumes:
       - ./server:/app:rw
       - /app/node_modules
-      - CinaGloriaDeps:/app/node_modules:ro
     env_file:
       - ./.env
     command: >

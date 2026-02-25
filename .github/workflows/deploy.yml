@@ -85,7 +85,7 @@ jobs:
           docker manifest push $LOWER_IMAGE:sha-$SHORT_SHA
 
   deploy:
-    runs-on: server1
+    runs-on: [self-hosted, ARM]
     needs: create-manifest
     steps:
       - name: deploy

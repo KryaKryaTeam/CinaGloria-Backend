@@ -34,4 +34,5 @@ export const TypeormDatasource = (): TypeOrmModuleOptions => ({
   migrationsTransactionMode: 'all',
   entities: [join(__dirname, '..', '**', '*.schema{.ts,.js}')],
   autoLoadEntities: true,
+  logging: ['migration'],
 });

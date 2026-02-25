@@ -17,7 +17,11 @@ async function bootstrap() {
     .setTitle('My API')
     .setVersion('1.0')
     .addBearerAuth()
-    .addServer('https://bots.swedka121.com/')
+    .addServer('https://bots.swedka121.com/app/', 'Public preview server')
+    .addServer(
+      process.env.NODE_ENV != 'PRODUCTION' ? 'http://localhost:4000/' : 'none',
+      'Your local server',
+    )
     .build();
   const doc = SwaggerModule.createDocument(app, config);
   app.use('/docs', apiReference({ content: doc }));

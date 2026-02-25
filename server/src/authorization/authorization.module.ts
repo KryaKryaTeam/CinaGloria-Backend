@@ -10,7 +10,9 @@ import { AuthController } from './infrastructure/controllers/auth.controller';
 import { GithubAuthorizationProvider } from './infrastructure/authorizationProviders/GithubAuthorizationProvider';
 import { CheckCommand } from './application/useCases/CheckCommand.command';
 import { JWTTokenService } from './infrastructure/services/JWTToken.service';
+import { HashService } from './infrastructure/services/Hash.service';
 import { JwtModule } from '@nestjs/jwt';
+import { LocalAuthorizationProvider } from './infrastructure/authorizationProviders/LocalAuthorizationProvider';
 
 const providers: Provider[] = [
   {
@@ -33,9 +35,18 @@ const providers: Provider[] = [
     provide: ServiceTokens.AuthorizationProviderService,
     useClass: AuthorizationProviderService,
   },
+  {
+    provide: ServiceTokens.JWTService,
+    useClass: JWTTokenService,
+  },
+  {
+    provide: ServiceTokens.HashService,
+    useClass: HashService,
+  },
   DiscoveryService,
   GoogleAuthorizationProvider,
   GithubAuthorizationProvider,
+  LocalAuthorizationProvider,
   {
     provide: ServiceTokens.JWTService,
     useClass: JWTTokenService,

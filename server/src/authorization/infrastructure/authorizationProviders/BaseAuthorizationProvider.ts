@@ -11,6 +11,7 @@ import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import { AuthorizationProviderService } from '../services/AuthorizationProviderService';
 import { AvatarURL } from 'src/authorization/domain/objects/AvatarURL.object';
+import type { IHashService } from 'src/authorization/application/bounds/IHashService';
 
 export interface IHandshakeOutput {
   email: string;
@@ -37,6 +38,9 @@ export abstract class BaseAuthorizationProvider<T> {
   @Inject(ServiceTokens.AuthorizationProviderService)
   protected authorizartionProviderService: AuthorizationProviderService;
 
+  @Inject(ServiceTokens.HashService)
+  protected hashService: IHashService;
+
   async authorization(loginData: T): Promise<UserEntity> {
     if (!(await this.validate(loginData)))
       throw new DomainError(DomainErrors.UNEXPECTED_VALUE, 'Here');
@@ -52,10 +56,17 @@ export abstract class BaseAuthorizationProvider<T> {
           this.configurationService.getOrThrow('username.animals'),
           this.configurationService.getOrThrow('username.adjectives'),
         ),
-        AvatarURL.generate(this.configurationService.getOrThrow('avatar.list')),
+        AvatarURL.create(handshakeData.avatarURL) ??
+          AvatarURL.generate(
+            this.configurationService.getOrThrow('avatar.list'),
+          ),
       );
 
-      const provider = this.createProvider(handshakeData.authorizationData);
+      let hashed_LOCAL = handshakeData.authorizationData;
+
+      if (this.type == AuthorizationProviderTypes.LOCAL)
+        hashed_LOCAL = this.hashService.hash(hashed_LOCAL);
+      const provider = this.createProvider(hashed_LOCAL);
 
       await findUser.linkProvider(provider, async (provider) => {
         return (
@@ -68,13 +79,22 @@ export abstract class BaseAuthorizationProvider<T> {
       console.log(
         findUser,
         findUser.hasAuthorizationProvider(this.type),
-        findUser.isAuthorizationDataCorrect(handshakeData.authorizationData),
+        findUser.isAuthorizationDataCorrect(
+          handshakeData.authorizationData,
+          this.hashService,
+        ),
       );
       if (
         !findUser.hasAuthorizationProvider(this.type) ||
-        !findUser.isAuthorizationDataCorrect(handshakeData.authorizationData)
+        !findUser.isAuthorizationDataCorrect(
+          handshakeData.authorizationData,
+          this.hashService,
+        )
       )
-        throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+        throw new DomainError(
+          DomainErrors.UNEXPECTED_VALUE,
+          'asdja;ksdfkasjdf',
+        );
     }
     return findUser;
   }

@@ -1,3 +1,4 @@
+import { IHashService } from 'src/authorization/application/bounds/IHashService';
 import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 
@@ -34,9 +35,9 @@ export class AuthProviderEntity {
     return this.type == type;
   }
 
-  isDataEqual(data: string) {
+  isDataEqual(data: string, hashService: IHashService) {
     if (this.type == AuthorizationProviderTypes.LOCAL) {
-      return data == this.passwordHash;
+      return hashService.compare(data, this.passwordHash as string);
     } else {
       return data == this.providerId;
     }

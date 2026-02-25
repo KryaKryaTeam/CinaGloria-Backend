@@ -5,6 +5,7 @@ import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersType
 import { randomUUID } from 'crypto';
 import { Username } from '../objects/Username.object';
 import { AvatarURL } from '../objects/AvatarURL.object';
+import { IHashService } from 'src/authorization/application/bounds/IHashService';
 
 interface IUserAdditionalData {
   telegram?: string;
@@ -156,10 +157,10 @@ export class UserEntity {
     return this._authorizationProviders;
   }
 
-  public isAuthorizationDataCorrect(data: string) {
+  public isAuthorizationDataCorrect(data: string, hashService: IHashService) {
     return (
       this.authorizationProviders.findIndex((provider) =>
-        provider.isDataEqual(data),
+        provider.isDataEqual(data, hashService),
       ) !== -1
     );
   }

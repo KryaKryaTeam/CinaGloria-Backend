@@ -11,6 +11,7 @@ interface INotification {
   to: UserEntity;
   status: NotificationStatus;
   targets: string[];
+  createdAt: Date;
 }
 
 export class Notification {
@@ -21,6 +22,7 @@ export class Notification {
   public readonly to: UserEntity;
   private _status: NotificationStatus;
   public readonly targets: string[];
+  public readonly createdAt: Date;
 
   private constructor(partial: Partial<Notification>) {
     Object.assign(this, partial);
@@ -39,6 +41,7 @@ export class Notification {
     return new Notification({
       id: randomUUID(),
       status: NotificationStatus.sended,
+      createdAt: new Date(),
       ...obj,
     });
   }

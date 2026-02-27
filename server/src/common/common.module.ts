@@ -9,6 +9,8 @@ import { AuthorizationModule } from 'src/authorization/authorization.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserSchema } from 'src/schemas/User.schema';
 import { AuthorizationProvider } from 'src/schemas/AuthorizationProvider.schema';
+import { NotificationRepository } from './infrastructure/repositories/NotificationRepository';
+import { NotificationModule } from 'src/notification/notification.module';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -19,6 +21,10 @@ const providers: Provider[] = [
     provide: ReposTokens.AuthorizationProviderRepository,
     useClass: AuthorizationProviderRepository,
   },
+  {
+    provide: ReposTokens.NotificationRepository,
+    useClass: NotificationRepository,
+  },
 ];
 
 @Global()
@@ -28,6 +34,7 @@ const providers: Provider[] = [
   imports: [
     TypeOrmModule.forFeature([UserSchema, AuthorizationProvider]),
     forwardRef(() => AuthorizationModule),
+    forwardRef(() => NotificationModule),
   ],
 })
 export class CommonModule {}

@@ -7,11 +7,13 @@ export enum BaseTokens {
 export enum MapperTokens {
   AuthorizationProviderMapper = 'AUTHORIZATION_PROVIDER_MAPPER',
   UserMapper = 'USER_MAPPER',
+  NotificationMapper = 'NOTIFICATION_MAPPER',
 }
 
 export enum ReposTokens {
   UserRepository = 'USER_REPOSITORY',
   AuthorizationProviderRepository = 'AUTHORIZATION_PROVIDER_REPOSITORY',
+  NotificationRepository = 'NOTIFICATION_REPOSITORY',
 }
 
 export enum CommandTokens {

@@ -8,5 +8,6 @@ export class Entity {
   }
   public pullEvents(eventDispatcher: IEventDispatcher) {
     this.events.forEach((ev) => eventDispatcher.addEvent(ev));
+    this.events = [];
   }
 }

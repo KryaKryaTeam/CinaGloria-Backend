@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { AuthorizationProvider } from './AuthorizationProvider.schema';
+import { NotificationSchema } from './Notification.schema';
 
 @Entity({ name: 'user' })
 export class UserSchema {
@@ -60,4 +61,11 @@ export class UserSchema {
     cascade: true,
   })
   authorizationProviders: AuthorizationProvider[];
+
+  @OneToMany(() => NotificationSchema, (notification) => notification.to, {
+    onDelete: 'CASCADE',
+    eager: true,
+    cascade: true,
+  })
+  notifications: NotificationSchema[];
 }

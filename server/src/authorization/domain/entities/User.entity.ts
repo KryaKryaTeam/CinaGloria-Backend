@@ -6,6 +6,9 @@ import { randomUUID } from 'crypto';
 import { Username } from '../objects/Username.object';
 import { AvatarURL } from '../objects/AvatarURL.object';
 import { IHashService } from 'src/authorization/application/bounds/IHashService';
+import { Entity } from 'src/common/domain/Entity';
+import { SendNotificationEvent } from 'src/notification/domain/events/SendNotificationEvent';
+import { Notification } from 'src/notification/domain/entities/Notification';
 
 interface IUserAdditionalData {
   telegram?: string;
@@ -26,7 +29,7 @@ interface IUserEntityConstructorProps {
   _authorizationProviders: AuthProviderEntity[];
 }
 
-export class UserEntity {
+export class UserEntity extends Entity {
   public readonly id: string;
   public readonly email: string;
   private _username: Username;
@@ -36,6 +39,7 @@ export class UserEntity {
   private _authorizationProviders: AuthProviderEntity[] = [];
 
   constructor(partial: IUserEntityConstructorProps) {
+    super();
     Object.assign(this, partial);
   }
 
@@ -52,6 +56,18 @@ export class UserEntity {
       _avatarUrl: avatarUrl,
       _username: username,
     });
+
+    ent.addEvent(
+      new SendNotificationEvent(
+        Notification.create({
+          title: 'Welcome to CinaGloria',
+          content: '###Hello!',
+          from: 'System',
+          targets: ['ws'],
+          to: ent,
+        }),
+      ),
+    );
 
     return ent;
   }

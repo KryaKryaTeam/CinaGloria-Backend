@@ -23,4 +23,5 @@ export enum ServiceTokens {
   AuthorizationProviderService = 'AUTHORIZATION_PROVIDER_SERVICE',
   JWTService = 'JWT_SERVICE',
   HashService = 'HASH_SERVICE',
+  NotificationService = 'NOTIFICATION_SERVICE',
 }

@@ -12,6 +12,7 @@ import GoogleConfig from './configs/Google.config';
 import GithubConfig from './configs/Github.config';
 import CookieConfig from './configs/Cookie.config';
 import JWTConfig from './configs/JWT.config';
+import WsConfig from './configs/Ws.config';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import JWTConfig from './configs/JWT.config';
         GoogleConfig,
         GithubConfig,
         CookieConfig,
+        WsConfig,
         JWTConfig,
       ],
       isGlobal: true,

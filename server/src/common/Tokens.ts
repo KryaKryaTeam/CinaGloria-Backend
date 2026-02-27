@@ -19,6 +19,7 @@ export enum ReposTokens {
 export enum CommandTokens {
   LoginCommand = 'LOGIN_COMMAND',
   CheckCommand = 'CHECK_COMMAND',
+  GenerateTicketCommand = 'GENERATE_T',
 }
 
 export enum ServiceTokens {
@@ -26,4 +27,5 @@ export enum ServiceTokens {
   JWTService = 'JWT_SERVICE',
   HashService = 'HASH_SERVICE',
   NotificationService = 'NOTIFICATION_SERVICE',
+  WsTicketService = 'WS_TICKET_SERVICE',
 }

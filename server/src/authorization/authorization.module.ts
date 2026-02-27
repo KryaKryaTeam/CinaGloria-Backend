@@ -13,6 +13,7 @@ import { JWTTokenService } from './infrastructure/services/JWTToken.service';
 import { HashService } from './infrastructure/services/Hash.service';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalAuthorizationProvider } from './infrastructure/authorizationProviders/LocalAuthorizationProvider';
+import { AuthGuard } from './infrastructure/guards/auth/auth.guard';
 
 const providers: Provider[] = [
   {
@@ -58,7 +59,7 @@ const providers: Provider[] = [
     ...providers,
     {
       provide: APP_GUARD,
-      useClass: JWTTokenService,
+      useClass: AuthGuard,
     },
   ],
   imports: [DiscoveryModule, JwtModule.register({})],

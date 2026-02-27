@@ -26,5 +26,5 @@ export abstract class Command<Data, Result> {
       throw err;
     }
   }
-  abstract implementation(data: Data): Promise<Result>;
+  abstract implementation(data: Data): Promise<Result> | Result;
 }

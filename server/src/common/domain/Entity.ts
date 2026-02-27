@@ -1,8 +1,8 @@
 import { Event } from './Event';
 import { IEventDispatcher } from './IEventDispatcher';
 
-export abstract class Entity {
-  protected events: Event<unknown>[];
+export class Entity {
+  protected events: Event<unknown>[] = [];
   protected addEvent(event: Event<unknown>) {
     this.events.push(event);
   }

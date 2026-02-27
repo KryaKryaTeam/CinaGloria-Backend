@@ -26,19 +26,14 @@ export class Notification {
     Object.assign(this, partial);
   }
 
-  public static create(
-    obj: {
-      title: string;
-      content: string;
-      from: string;
-      to: UserEntity;
-      targets: string[];
-    },
-    avalibleProviders: string[],
-  ) {
+  public static create(obj: {
+    title: string;
+    content: string;
+    from: string;
+    to: UserEntity;
+    targets: string[];
+  }) {
     if (obj.title.length < 5 || obj.title.length > 100)
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
-    if (!obj.targets.every((val) => avalibleProviders.includes(val)))
       throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
 
     return new Notification({

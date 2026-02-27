@@ -5,6 +5,7 @@ import DatabaseConfig from './configs/Database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from './common/common.module';
 import { AuthorizationModule } from './authorization/authorization.module';
+import { NotificationModule } from './notification/notification.module';
 import UsernameConfig from './configs/Username.config';
 import AvatarConfig from './configs/Avatar.config';
 import GoogleConfig from './configs/Google.config';
@@ -30,6 +31,7 @@ import JWTConfig from './configs/JWT.config';
     TypeOrmModule.forRoot(TypeormDatasource()),
     CommonModule,
     AuthorizationModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}

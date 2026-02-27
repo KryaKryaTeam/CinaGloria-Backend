@@ -6,12 +6,18 @@ import { UserMapper } from 'src/authorization/application/mappers/UserMapper';
 import { AuthProviderEntity } from 'src/authorization/domain/entities/AuthProvider.entity';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { Username } from 'src/authorization/domain/objects/Username.object';
-import { MapperTokens, ReposTokens, ServiceTokens } from 'src/common/Tokens';
+import {
+  BaseTokens,
+  MapperTokens,
+  ReposTokens,
+  ServiceTokens,
+} from 'src/common/Tokens';
 import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import { AuthorizationProviderService } from '../services/AuthorizationProviderService';
 import { AvatarURL } from 'src/authorization/domain/objects/AvatarURL.object';
 import type { IHashService } from 'src/authorization/application/bounds/IHashService';
+import type { IEventDispatcher } from 'src/common/domain/IEventDispatcher';
 
 export interface IHandshakeOutput {
   email: string;
@@ -41,6 +47,9 @@ export abstract class BaseAuthorizationProvider<T> {
   @Inject(ServiceTokens.HashService)
   protected hashService: IHashService;
 
+  @Inject(BaseTokens.EventDispatcher)
+  protected eventDispatcher: IEventDispatcher;
+
   async authorization(loginData: T): Promise<UserEntity> {
     if (!(await this.validate(loginData)))
       throw new DomainError(DomainErrors.UNEXPECTED_VALUE, 'Here');
@@ -62,6 +71,8 @@ export abstract class BaseAuthorizationProvider<T> {
           ),
       );
 
+      findUser.pullEvents(this.eventDispatcher);
+
       let hashed_LOCAL = handshakeData.authorizationData;
 
       if (this.type == AuthorizationProviderTypes.LOCAL)
@@ -76,14 +87,6 @@ export abstract class BaseAuthorizationProvider<T> {
 
       await this.userRepository.save(findUser);
     } else {
-      console.log(
-        findUser,
-        findUser.hasAuthorizationProvider(this.type),
-        findUser.isAuthorizationDataCorrect(
-          handshakeData.authorizationData,
-          this.hashService,
-        ),
-      );
       if (
         !findUser.hasAuthorizationProvider(this.type) ||
         !findUser.isAuthorizationDataCorrect(

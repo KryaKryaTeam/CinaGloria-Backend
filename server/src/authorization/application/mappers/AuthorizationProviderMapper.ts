@@ -40,8 +40,6 @@ export class AuthorizationProviderMapper extends Mapper<
     provider.type = entity.type;
     provider.id = entity.id;
 
-    console.log(provider);
-
     return provider;
   }
 }

@@ -15,6 +15,7 @@ export class NotificationSendEventHandler {
     eventHandler.addListener(
       EventType.SEND_NOTIFICATION,
       async (payload: Notification) => {
+        console.log('SENDING NOTIFICATION:', payload);
         await this.notificationService.sendNotification(payload);
       },
     );

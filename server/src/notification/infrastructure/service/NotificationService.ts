@@ -1,8 +1,8 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { DiscoveryService } from '@nestjs/core';
 import { INotificationService } from 'src/notification/application/bounds/INotificationService';
 import { Notification } from 'src/notification/domain/entities/Notification';
-import { BaseNotificationTarget } from '../targets/BaseNotificationtarget';
+import { BaseNotificationTarget } from '../targets/BaseNotificationTarget';
 
 export const NotificationTarget = DiscoveryService.createDecorator();
 
@@ -10,7 +10,11 @@ export const NotificationTarget = DiscoveryService.createDecorator();
 export class NotificationService implements INotificationService, OnModuleInit {
   private avalibleTargets: Map<string, BaseNotificationTarget> = new Map();
 
+  private logger = new Logger(NotificationService.name);
+
+  @Inject()
   private discoveryService: DiscoveryService;
+
   onModuleInit() {
     const providers = this.discoveryService.getProviders();
     providers.forEach((el) => {
@@ -20,6 +24,8 @@ export class NotificationService implements INotificationService, OnModuleInit {
       );
 
       if (target == null) return;
+
+      this.logger.log(`New notification target added: ${target as string}`);
 
       this.avalibleTargets.set(
         target as string,

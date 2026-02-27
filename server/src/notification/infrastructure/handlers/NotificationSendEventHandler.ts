@@ -20,6 +20,7 @@ export class NotificationSendEventHandler {
       EventType.SEND_NOTIFICATION,
       async (payload: Notification) => {
         await this.notificationRepository.save(payload);
+        console.log('SENDING NOTIFICATION!', payload);
         await this.notificationService.sendNotification(payload);
       },
     );

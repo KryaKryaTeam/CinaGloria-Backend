@@ -4,10 +4,16 @@ import {
   BaseNotificationTarget,
   INotificationData,
 } from './BaseNotificationTarget';
+import { Inject } from '@nestjs/common';
+import { NotificationGateway } from '../gateways/WsNotification.gateway';
 
 @NotificationTarget('ws')
 export class WSTarget extends BaseNotificationTarget {
-  protected async _send(data: INotificationData): Promise<void> {}
+  @Inject()
+  private gateway: NotificationGateway;
+  protected _send(data: INotificationData): Promise<void> | void {
+    this.gateway.sendNotificationToUser(data);
+  }
   protected prepare(notification: Notification): INotificationData {
     return {
       title: notification.title,

@@ -10,6 +10,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { TicketService } from './infrastructure/service/TicketService';
 import { WSContorller } from './infrastructure/controllers/WebsocketContorller';
 import { GenerateTicketCommand } from './application/commands/GenerateTicketCommand';
+import { NotificationGateway } from './infrastructure/gateways/WsNotification.gateway';
 
 const providers: Provider[] = [
   DiscoveryService,
@@ -31,6 +32,7 @@ const providers: Provider[] = [
   },
   NotificationSendEventHandler,
   WSTarget,
+  NotificationGateway,
 ];
 
 @Module({

@@ -9,7 +9,7 @@ export interface INotificationData {
 
 @Injectable()
 export abstract class BaseNotificationTarget {
-  protected abstract _send(data: INotificationData): Promise<void>;
+  protected abstract _send(data: INotificationData): Promise<void> | void;
   protected abstract prepare(notification: Notification): INotificationData;
 
   public async send(notification: Notification): Promise<void> {

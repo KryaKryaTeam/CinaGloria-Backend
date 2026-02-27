@@ -84,9 +84,9 @@ jobs:
             --amend $LOWER_IMAGE:sha-$SHORT_SHA-arm64
           docker manifest push $LOWER_IMAGE:sha-$SHORT_SHA
 
-  deploy:
-    runs-on: [self-hosted, ARM]
-    needs: create-manifest
-    steps:
-      - name: deploy
-        run: /home/backend-service/deploy.sh
+  # deploy:
+  #   runs-on: [self-hosted, ARM]
+  #   needs: create-manifest
+  #   steps:
+  #     - name: deploy
+  #       run: /home/backend-service/deploy.sh

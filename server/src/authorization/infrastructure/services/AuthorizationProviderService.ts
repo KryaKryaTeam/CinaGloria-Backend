@@ -43,7 +43,7 @@ export class AuthorizationProviderService
   async authorize(
     type: AuthorizationProviderTypes,
     loginData: unknown,
-  ): Promise<UserEntity> {
+  ): Promise<{ user: UserEntity; existsUser: boolean }> {
     const provider = this.providers.get(type);
     if (!provider) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
     return await provider.authorization(loginData);

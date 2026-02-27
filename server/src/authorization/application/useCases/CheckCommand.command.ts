@@ -27,10 +27,6 @@ export class CheckCommand extends Command<null, LoginCommandOutput> {
       AvatarURL.generate(['https://example.com']),
     );
 
-    console.log(this.userRepository);
-
-    console.log(await this.userRepository.findByEmail('admin@gmail.com'));
-
     await this.userRepository.save(user);
 
     return {

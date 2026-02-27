@@ -16,6 +16,7 @@ export class Auto1771693464336 implements MigrationInterface {
     await queryRunner.query(
       `ALTER TABLE "authorization_provider" ADD CONSTRAINT "FK_a2e45af8406489ff058f4f83f12" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`,
     );
+    await queryRunner.query(`DROP TABLE "user_schema"`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {

@@ -31,7 +31,7 @@ services:
     command: >
       sh -c "if [ \"$NODE_ENV\" = \"PRODUCTION\" ];
       then npm run start;
-      else npm run start:dev --manual;
+      else npx nest start --watch;
       fi"
     networks:
       - db

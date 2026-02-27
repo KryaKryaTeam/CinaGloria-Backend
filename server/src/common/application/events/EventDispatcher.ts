@@ -9,20 +9,23 @@ export class EventDispatcher implements IEventDispatcher {
   @Inject(BaseTokens.EventHandler)
   private eventHandler: EventHandler;
 
-  private eventList: Event<unknown>[];
+  private eventList: Event<unknown>[] = [];
   addEvent(event: Event<unknown>) {
     this.eventList.push(event);
   }
+
   dispatchEvents() {
     this.eventList.forEach((el) => {
       setImmediate(() => {
-        this.dispatchEvent(el);
+        this.dispatchEvent(el).catch((err) => {
+          console.log(err);
+        });
       });
     });
     this.eventList = [];
   }
 
-  private dispatchEvent(event: Event<unknown>) {
-    this.eventHandler.handle(event);
+  private async dispatchEvent(event: Event<unknown>) {
+    await this.eventHandler.handle(event);
   }
 }

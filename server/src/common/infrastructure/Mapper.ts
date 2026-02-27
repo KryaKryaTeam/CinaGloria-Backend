@@ -1,4 +1,4 @@
-export abstract class Mapper<T, K> {
-  public abstract toEntity(schema: T): K;
-  public abstract toSchema(entity: K): T;
+export abstract class Mapper<Schema, Entity> {
+  public abstract toEntity(schema: Schema): Entity;
+  public abstract toSchema(entity: Entity): Schema;
 }

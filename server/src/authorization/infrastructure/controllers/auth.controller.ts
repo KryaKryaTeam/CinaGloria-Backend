@@ -67,6 +67,9 @@ export class AuthController {
       this.configurationService.getOrThrow('cookie'),
     );
 
-    return { accessToken: result.accessToken };
+    return {
+      accessToken: result.accessToken,
+      userExistsBefore: result.userExists,
+    };
   }
 }

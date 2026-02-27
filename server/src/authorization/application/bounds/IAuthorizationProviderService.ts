@@ -5,5 +5,5 @@ export interface IAuthorizationProviderService {
   authorize(
     type: AuthorizationProviderTypes,
     loginData: unknown,
-  ): Promise<UserEntity>;
+  ): Promise<{ user: UserEntity; existsUser: boolean }>;
 }

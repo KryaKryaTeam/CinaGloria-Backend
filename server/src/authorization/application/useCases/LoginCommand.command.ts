@@ -14,6 +14,7 @@ interface LoginCommandProps {
 interface LoginCommandOutput {
   accessToken: string;
   refreshToken: string;
+  userExists: boolean;
 }
 
 @Injectable()
@@ -31,10 +32,11 @@ export class LoginCommand extends Command<
   private readonly jwtService: IJWTTokenService;
 
   async implementation(data: LoginCommandProps): Promise<LoginCommandOutput> {
-    const user = await this.authorizationProviderService.authorize(
-      data.type,
-      data.loginData,
-    );
+    const { user, existsUser } =
+      await this.authorizationProviderService.authorize(
+        data.type,
+        data.loginData,
+      );
 
     await this.userRepository.save(user);
 
@@ -50,6 +52,7 @@ export class LoginCommand extends Command<
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
+      userExists: existsUser,
     };
   }
 }

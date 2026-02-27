@@ -41,7 +41,9 @@ export abstract class BaseAuthorizationProvider<T> {
   @Inject(ServiceTokens.HashService)
   protected hashService: IHashService;
 
-  async authorization(loginData: T): Promise<UserEntity> {
+  async authorization(
+    loginData: T,
+  ): Promise<{ user: UserEntity; existsUser: boolean }> {
     if (!(await this.validate(loginData)))
       throw new DomainError(DomainErrors.UNEXPECTED_VALUE, 'Here');
 
@@ -49,7 +51,10 @@ export abstract class BaseAuthorizationProvider<T> {
 
     let findUser = await this.userRepository.findByEmail(handshakeData.email);
 
+    let existsUser: boolean;
     if (!findUser) {
+      existsUser = false;
+
       findUser = UserEntity.create(
         handshakeData.email,
         Username.generate(
@@ -76,6 +81,7 @@ export abstract class BaseAuthorizationProvider<T> {
 
       await this.userRepository.save(findUser);
     } else {
+      existsUser = true;
       console.log(
         findUser,
         findUser.hasAuthorizationProvider(this.type),
@@ -96,7 +102,7 @@ export abstract class BaseAuthorizationProvider<T> {
           'asdja;ksdfkasjdf',
         );
     }
-    return findUser;
+    return { user: findUser, existsUser };
   }
 
   abstract createProvider(loginData: string): AuthProviderEntity;

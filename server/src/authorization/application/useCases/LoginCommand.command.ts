@@ -41,12 +41,8 @@ export class LoginCommand extends Command<
     await this.userRepository.save(user);
 
     const tokens = this.jwtService.sign({
-      email: user.email,
-      provider: data.type,
       role: user.role,
       sub: user.id,
-      avatar: user.avatarURL.value,
-      username: user.username.value,
     });
 
     return {

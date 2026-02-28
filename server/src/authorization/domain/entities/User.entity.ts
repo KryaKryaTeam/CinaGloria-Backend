@@ -29,6 +29,29 @@ interface IUserEntityConstructorProps {
   _authorizationProviders: AuthProviderEntity[];
 }
 
+export interface IPublicProfile {
+  id: string;
+  username: string;
+  avatarURL: string;
+  role: RoleEnum;
+  contacts: {
+    telegram?: string;
+    discord?: string;
+  };
+}
+
+export interface IPrivateProfile extends IPublicProfile {
+  email: string;
+  authorizationProviders: string[];
+  age?: number;
+  fullName?: {
+    value: string;
+    firstName?: string;
+    lastName?: string;
+    surName?: string;
+  };
+}
+
 export class UserEntity extends Entity {
   public readonly id: string;
   public readonly email: string;
@@ -150,16 +173,12 @@ export class UserEntity extends Entity {
   }
 
   public get isProfileFull() {
-    if (!this._additionalData.discord && !this._additionalData.telegram)
+    if (!this._additionalData.discord || !this._additionalData.telegram)
       return false;
 
     if (!this._additionalData.age) return false;
 
-    if (
-      !this._additionalData.firstName ||
-      !this._additionalData.lastName ||
-      !this._additionalData.surName
-    )
+    if (!this._additionalData.firstName || !this._additionalData.lastName)
       return false;
 
     return true;
@@ -171,6 +190,40 @@ export class UserEntity extends Entity {
 
   public get authorizationProviders() {
     return this._authorizationProviders;
+  }
+
+  public get publicProfile(): IPublicProfile {
+    return {
+      id: this.id,
+      username: this._username.value,
+      avatarURL: this.avatarURL.value,
+      role: this.role,
+      contacts: {
+        discord: this._additionalData.discord,
+        telegram: this._additionalData.telegram,
+      },
+    };
+  }
+
+  public get privateProfile(): IPrivateProfile {
+    return {
+      ...this.publicProfile,
+      authorizationProviders: this._authorizationProviders.map((el) => el.type),
+      email: this.email,
+      age: this._additionalData.age,
+      fullName: {
+        value: this.fullName,
+        firstName: this._additionalData.firstName,
+        lastName: this._additionalData.lastName,
+        surName: this._additionalData.surName,
+      },
+    };
+  }
+
+  public get fullName() {
+    const { firstName, lastName, surName } = this._additionalData;
+
+    return [firstName, lastName, surName].filter(Boolean).join('');
   }
 
   public isAuthorizationDataCorrect(data: string, hashService: IHashService) {

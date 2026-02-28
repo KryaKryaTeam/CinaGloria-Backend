@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Inject,
@@ -7,7 +8,7 @@ import {
   Req,
   Version,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { GetPublicProfileRes } from '../dtos/GetPublicProfileRes';
 import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { Secure } from '../guards/auth/auth.guard';
@@ -17,6 +18,8 @@ import { GetPrivateProfileQuery } from 'src/authorization/application/useCases/G
 import { GetPublicProfileQuery } from 'src/authorization/application/useCases/GetPublicProfileQuery';
 import { CommandTokens } from 'src/common/Tokens';
 import type { Request as ExpressRequest } from 'express';
+import { UpdateUserAdditionalDataDto } from '../dtos/UpdateUserAdditionalData';
+import { UpdateAdditionalDataCommand } from 'src/authorization/application/useCases/UpdateAdditionalDataCommand';
 
 @Controller('user')
 export class UserController {
@@ -25,6 +28,9 @@ export class UserController {
 
   @Inject(CommandTokens.GetPrivateProfileQuery)
   private readonly getPrivateProfileQuery: GetPrivateProfileQuery;
+
+  @Inject(CommandTokens.UpdateUserAdditionalDataCommand)
+  private readonly updateUserAdditionalDataCommand: UpdateAdditionalDataCommand;
 
   @Inject()
   private readonly configurationService: ConfigService;
@@ -58,9 +64,18 @@ export class UserController {
 
   @Put('/additional')
   @Version('1')
+  @ApiBody({ type: UpdateUserAdditionalDataDto, required: true })
   @ApiBearerAuth('main')
   @Secure(true)
-  async updateUserAdditionalData() {}
+  async updateUserAdditionalData(
+    @Body() body: UpdateUserAdditionalDataDto,
+    @Req() req: ExpressRequest,
+  ) {
+    await this.updateUserAdditionalDataCommand.execute({
+      data: body,
+      id: req['user_id'] as string,
+    });
+  }
 
   @Put('/username')
   @Version('1')

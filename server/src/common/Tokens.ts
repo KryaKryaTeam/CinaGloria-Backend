@@ -29,3 +29,7 @@ export enum ServiceTokens {
   NotificationService = 'NOTIFICATION_SERVICE',
   WsTicketService = 'WS_TICKET_SERVICE',
 }
+
+export enum MetadataTokens {
+  USER_KEY = 'USER_METADATA',
+}

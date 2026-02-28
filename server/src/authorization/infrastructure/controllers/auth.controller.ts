@@ -17,6 +17,8 @@ import { ConfigService } from '@nestjs/config';
 import { CreateUserLocal } from '../dtos/CreateUserLocal';
 import { ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { LoginResponse } from '../dtos/LoginResponse';
+import { RoleEnum } from 'src/types/RoleEnum';
+import { RoleGuard } from '../guards/role/role.guard';
 
 @Controller('auth')
 export class AuthController {

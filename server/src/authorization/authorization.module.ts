@@ -14,6 +14,7 @@ import { HashService } from './infrastructure/services/Hash.service';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalAuthorizationProvider } from './infrastructure/authorizationProviders/LocalAuthorizationProvider';
 import { AuthGuard } from './infrastructure/guards/auth/auth.guard';
+import { RoleGuard } from './infrastructure/guards/role/role.guard';
 
 const providers: Provider[] = [
   {
@@ -60,6 +61,10 @@ const providers: Provider[] = [
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard,
     },
   ],
   imports: [DiscoveryModule, JwtModule.register({})],

@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Get,
   Inject,
   Post,
   Put,
@@ -22,21 +21,13 @@ import type {
 } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { CreateUserLocal } from '../dtos/CreateUserLocal';
-import {
-  ApiBasicAuth,
-  ApiBearerAuth,
-  ApiBody,
-  ApiQuery,
-  ApiResponse,
-} from '@nestjs/swagger';
+import { ApiBasicAuth, ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { LoginResponse } from '../dtos/LoginResponse';
 import { RefreshResponse } from '../dtos/RefreshResponse';
 import { RefreshCommand } from 'src/authorization/application/useCases/RefreshCommand.command';
 import { Secure } from '../guards/auth/auth.guard';
 import { GetPublicProfileQuery } from 'src/authorization/application/useCases/GetPublicProfileQuery';
-import { GetPublicProfileRes } from '../dtos/GetPublicProfileRes';
 import { GetPrivateProfileQuery } from 'src/authorization/application/useCases/GetPrivateProfileQuery';
-import { GetPrivateProfileRes } from '../dtos/GetPrivateProfileRes';
 
 @Controller('auth')
 export class AuthController {
@@ -121,51 +112,6 @@ export class AuthController {
       accessToken: result.accessToken,
     };
   }
-
-  @Get('/user/private')
-  @Version('1')
-  @ApiBearerAuth('main')
-  @Secure(true)
-  @ApiResponse({ type: GetPrivateProfileRes, status: 200 })
-  async getUserPrivateData(@Req() req: ExpressRequest) {
-    if (!req['user_id']) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
-
-    return await this.getPrivateProfileQuery.execute(req['user_id'] as string);
-  }
-
-  @Get('/user/public')
-  @Version('1')
-  @ApiQuery({
-    type: 'string',
-    required: true,
-    format: 'uuid',
-    name: 'id',
-    description: 'Id of requested user',
-  })
-  @ApiResponse({ type: GetPublicProfileRes, status: 200 })
-  async getUserPublicData(@Query('id') id: string) {
-    if (!id) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
-
-    return await this.getPublicProfileQuery.execute(id);
-  }
-
-  @Put('/user')
-  @Version('1')
-  @ApiBasicAuth('main')
-  @Secure(true)
-  async updateUserAdditionalData() {}
-
-  @Put('/user/username')
-  @Version('1')
-  @ApiBasicAuth('main')
-  @Secure(true)
-  async updateUsername() {}
-
-  @Put('/user/avatar')
-  @Version('1')
-  @ApiBasicAuth('main')
-  @Secure(true)
-  async updateAvatar() {}
 
   @Put('/password')
   @Version('1')

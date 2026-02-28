@@ -29,6 +29,21 @@ export class UserFullNameRes {
   surName?: string;
 }
 
+export class UserAge {
+  @ApiProperty({
+    example: 14,
+    default: 'The numeric value of age',
+  })
+  value?: number;
+
+  @ApiProperty({
+    example: new Date(),
+    description: 'The date of birthday; ISO 8601 date string',
+    format: 'date',
+  })
+  birthDay?: Date;
+}
+
 export class GetPrivateProfileRes
   extends GetPublicProfileRes
   implements IPrivateProfile
@@ -50,8 +65,8 @@ export class GetPrivateProfileRes
   })
   authorizationProviders: string[];
 
-  @ApiPropertyOptional({ example: 25 })
-  age?: number;
+  @ApiPropertyOptional({ type: UserAge })
+  age?: UserAge;
 
   @ApiPropertyOptional({ type: UserFullNameRes })
   fullName?: UserFullNameRes;

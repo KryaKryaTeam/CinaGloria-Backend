@@ -16,6 +16,8 @@ import { AuthGuard } from './infrastructure/guards/auth/auth.guard';
 import { RefreshCommand } from './application/useCases/RefreshCommand.command';
 import { GetPublicProfileQuery } from './application/useCases/GetPublicProfileQuery';
 import { GetPrivateProfileQuery } from './application/useCases/GetPrivateProfileQuery';
+import { UserController } from './infrastructure/controllers/user.controller';
+import { UpdateAdditionalDataCommand } from './application/useCases/UpdateAdditionalDataCommand';
 
 const providers: Provider[] = [
   {
@@ -54,6 +56,10 @@ const providers: Provider[] = [
     provide: CommandTokens.GetPrivateProfileQuery,
     useClass: GetPrivateProfileQuery,
   },
+  {
+    provide: CommandTokens.UpdateUserAdditionalDataCommand,
+    useClass: UpdateAdditionalDataCommand,
+  },
   DiscoveryService,
   GoogleAuthorizationProvider,
   GithubAuthorizationProvider,
@@ -74,6 +80,6 @@ const providers: Provider[] = [
   ],
   imports: [DiscoveryModule, JwtModule.register({})],
   exports: [...providers],
-  controllers: [AuthController],
+  controllers: [AuthController, UserController],
 })
 export class AuthorizationModule {}

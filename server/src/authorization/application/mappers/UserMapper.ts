@@ -26,7 +26,7 @@ export class UserMapper extends Mapper<UserSchema, UserEntity> {
       email: schema.email,
       _username: Username.create(schema.username),
       _additionalData: {
-        age: schema.age,
+        birthDay: schema.birthDay,
         discord: schema.discord,
         firstName: schema.firstName,
         lastName: schema.lastName,
@@ -46,7 +46,7 @@ export class UserMapper extends Mapper<UserSchema, UserEntity> {
     );
     user.discord = entity.additionalData.discord;
     user.telegram = entity.additionalData.telegram;
-    user.age = entity.additionalData.age;
+    user.birthDay = entity.additionalData.birthDay;
     user.firstName = entity.additionalData.firstName;
     user.lastName = entity.additionalData.lastName;
     user.surName = entity.additionalData.surName;

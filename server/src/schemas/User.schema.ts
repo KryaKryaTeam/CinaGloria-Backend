@@ -24,13 +24,14 @@ export class UserSchema {
   @Column({ name: 'avatar_url', default: 'https://....' })
   avatarUrl: string;
 
+  // Additional data for autofill
+
   @Column({ name: 'telegram', nullable: true })
   telegram?: string;
 
   @Column({ name: 'discord', nullable: true })
   discord?: string;
 
-  // Additional data for autofill
   @Column({ name: 'first_name', nullable: true })
   firstName?: string;
 
@@ -40,8 +41,8 @@ export class UserSchema {
   @Column({ name: 'sur_name', nullable: true })
   surName?: string;
 
-  @Column({ type: 'int', nullable: true })
-  age?: number;
+  @Column({ name: 'birth_day', type: 'date', nullable: true })
+  birthDay?: Date;
 
   // Role
   @Column({ enum: RoleEnum, enumName: 'Role', default: RoleEnum.USER })

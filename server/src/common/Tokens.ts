@@ -23,6 +23,7 @@ export enum CommandTokens {
   RefreshCommand = 'REFRESH_COMMAND',
   GetPublicProfileQuery = 'GET_PUBLIC_PROFILE_QUERY',
   GetPrivateProfileQuery = 'GET_PUBLIC_PRIVATE_QUERY',
+  UpdateUserAdditionalDataCommand = 'UPDATE_USER_ADDITIONAL_DATA_COMMAND',
 }
 
 export enum ServiceTokens {

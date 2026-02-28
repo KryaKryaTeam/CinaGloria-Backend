@@ -19,7 +19,8 @@ export enum ReposTokens {
 export enum CommandTokens {
   LoginCommand = 'LOGIN_COMMAND',
   CheckCommand = 'CHECK_COMMAND',
-  GenerateTicketCommand = 'GENERATE_T',
+  GenerateTicketCommand = 'GENERATE_TICKET_COMMAND',
+  RefreshCommand = 'REFRESH_COMMAND',
 }
 
 export enum ServiceTokens {

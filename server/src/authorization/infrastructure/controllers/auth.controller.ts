@@ -1,30 +1,46 @@
 import {
   Body,
   Controller,
+  Get,
   Inject,
   Post,
+  Put,
   Query,
+  Req,
+  Res,
   Response,
+  UnauthorizedException,
   Version,
 } from '@nestjs/common';
-import { CheckCommand } from 'src/authorization/application/useCases/CheckCommand.command';
 import { LoginCommand } from 'src/authorization/application/useCases/LoginCommand.command';
 import { CommandTokens } from 'src/common/Tokens';
 import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
-import type { Response as ExpressResponse } from 'express';
+import type {
+  Response as ExpressResponse,
+  Request as ExpressRequest,
+} from 'express';
 import { ConfigService } from '@nestjs/config';
 import { CreateUserLocal } from '../dtos/CreateUserLocal';
-import { ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBasicAuth,
+  ApiBearerAuth,
+  ApiBody,
+  ApiQuery,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { LoginResponse } from '../dtos/LoginResponse';
+import { RefreshResponse } from '../dtos/RefreshResponse';
+import { RefreshCommand } from 'src/authorization/application/useCases/RefreshCommand.command';
+import { Secure } from '../guards/auth/auth.guard';
 
 @Controller('auth')
 export class AuthController {
   @Inject(CommandTokens.LoginCommand)
   private readonly loginCommand: LoginCommand;
 
-  @Inject(CommandTokens.CheckCommand)
-  private readonly checkCommand: CheckCommand;
+  @Inject(CommandTokens.RefreshCommand)
+  private readonly refreshCommand: RefreshCommand;
 
   @Inject()
   private readonly configurationService: ConfigService;
@@ -72,4 +88,62 @@ export class AuthController {
       userExistsBefore: result.userExists,
     };
   }
+
+  @Post('/refresh')
+  @Version('1')
+  @ApiResponse({ type: RefreshResponse, status: 200 })
+  async refresh(
+    @Req() req: ExpressRequest,
+    @Res({ passthrough: true }) res: ExpressResponse,
+  ) {
+    const { refresh } = req.cookies as { refresh: string };
+    if (!refresh) throw new UnauthorizedException();
+
+    const result = await this.refreshCommand.execute(refresh);
+
+    res.cookie(
+      'refresh',
+      result.refreshToken,
+      this.configurationService.getOrThrow('cookie'),
+    );
+
+    return {
+      accessToken: result.accessToken,
+    };
+  }
+
+  @Get('/user/private')
+  @Version('1')
+  @ApiBearerAuth('main')
+  @Secure(true)
+  async getUserPrivateData() {}
+
+  @Get('/user/public')
+  @Version('1')
+  @ApiQuery({
+    type: 'string',
+    required: true,
+    format: 'uuid',
+    name: 'id',
+    description: 'Id of requested user',
+  })
+  async getUserPublicData(@Query() id: string) {}
+
+  @Put('/user')
+  @Version('1')
+  @ApiBasicAuth('main')
+  @Secure(true)
+  async updateUserAdditionalData() {}
+
+  @Put('/password')
+  @Version('1')
+  @ApiBasicAuth('main')
+  @Secure(true)
+  async changePassword() {}
+
+  @Get('/providers')
+  @Version('1')
+  @ApiBasicAuth('main')
+  @Secure(true)
+  async getAuthorizationProviders() {}
 }

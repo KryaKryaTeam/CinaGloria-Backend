@@ -33,6 +33,8 @@ import { LoginResponse } from '../dtos/LoginResponse';
 import { RefreshResponse } from '../dtos/RefreshResponse';
 import { RefreshCommand } from 'src/authorization/application/useCases/RefreshCommand.command';
 import { Secure } from '../guards/auth/auth.guard';
+import { GetPublicProfileQuery } from 'src/authorization/application/useCases/GetPublicProfileQuery';
+import { GetPublicProfileRes } from '../dtos/GetPublicProfileRes';
 
 @Controller('auth')
 export class AuthController {
@@ -41,6 +43,9 @@ export class AuthController {
 
   @Inject(CommandTokens.RefreshCommand)
   private readonly refreshCommand: RefreshCommand;
+
+  @Inject(CommandTokens.GetPublicProfileQuery)
+  private readonly getPublicProfileQuery: GetPublicProfileQuery;
 
   @Inject()
   private readonly configurationService: ConfigService;
@@ -127,7 +132,12 @@ export class AuthController {
     name: 'id',
     description: 'Id of requested user',
   })
-  async getUserPublicData(@Query() id: string) {}
+  @ApiResponse({ type: GetPublicProfileRes, status: 200 })
+  async getUserPublicData(@Query('id') id: string) {
+    if (!id) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+
+    return await this.getPublicProfileQuery.execute(id);
+  }
 
   @Put('/user')
   @Version('1')

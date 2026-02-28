@@ -14,6 +14,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { LocalAuthorizationProvider } from './infrastructure/authorizationProviders/LocalAuthorizationProvider';
 import { AuthGuard } from './infrastructure/guards/auth/auth.guard';
 import { RefreshCommand } from './application/useCases/RefreshCommand.command';
+import { GetPublicProfileQuery } from './application/useCases/GetPublicProfileQuery';
 
 const providers: Provider[] = [
   {
@@ -43,6 +44,10 @@ const providers: Provider[] = [
   {
     provide: ServiceTokens.HashService,
     useClass: HashService,
+  },
+  {
+    provide: CommandTokens.GetPublicProfileQuery,
+    useClass: GetPublicProfileQuery,
   },
   DiscoveryService,
   GoogleAuthorizationProvider,

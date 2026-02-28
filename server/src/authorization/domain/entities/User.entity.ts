@@ -40,6 +40,18 @@ export interface IPublicProfile {
   };
 }
 
+export interface IPrivateProfile extends IPublicProfile {
+  email: string;
+  authorizationProviders: string[];
+  age?: number;
+  fullName?: {
+    value: string;
+    firstName?: string;
+    lastName?: string;
+    surName?: string;
+  };
+}
+
 export class UserEntity extends Entity {
   public readonly id: string;
   public readonly email: string;
@@ -189,6 +201,21 @@ export class UserEntity extends Entity {
       contacts: {
         discord: this._additionalData.discord,
         telegram: this._additionalData.telegram,
+      },
+    };
+  }
+
+  public get privateProfile(): IPrivateProfile {
+    return {
+      ...this.publicProfile,
+      authorizationProviders: this._authorizationProviders.map((el) => el.type),
+      email: this.email,
+      age: this._additionalData.age,
+      fullName: {
+        value: this.fullName,
+        firstName: this._additionalData.firstName,
+        lastName: this._additionalData.lastName,
+        surName: this._additionalData.surName,
       },
     };
   }

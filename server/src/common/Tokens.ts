@@ -22,6 +22,7 @@ export enum CommandTokens {
   GenerateTicketCommand = 'GENERATE_TICKET_COMMAND',
   RefreshCommand = 'REFRESH_COMMAND',
   GetPublicProfileQuery = 'GET_PUBLIC_PROFILE_QUERY',
+  GetPrivateProfileQuery = 'GET_PUBLIC_PRIVATE_QUERY',
 }
 
 export enum ServiceTokens {

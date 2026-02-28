@@ -35,6 +35,8 @@ import { RefreshCommand } from 'src/authorization/application/useCases/RefreshCo
 import { Secure } from '../guards/auth/auth.guard';
 import { GetPublicProfileQuery } from 'src/authorization/application/useCases/GetPublicProfileQuery';
 import { GetPublicProfileRes } from '../dtos/GetPublicProfileRes';
+import { GetPrivateProfileQuery } from 'src/authorization/application/useCases/GetPrivateProfileQuery';
+import { GetPrivateProfileRes } from '../dtos/GetPrivateProfileRes';
 
 @Controller('auth')
 export class AuthController {
@@ -46,6 +48,9 @@ export class AuthController {
 
   @Inject(CommandTokens.GetPublicProfileQuery)
   private readonly getPublicProfileQuery: GetPublicProfileQuery;
+
+  @Inject(CommandTokens.GetPrivateProfileQuery)
+  private readonly getPrivateProfileQuery: GetPrivateProfileQuery;
 
   @Inject()
   private readonly configurationService: ConfigService;
@@ -121,7 +126,12 @@ export class AuthController {
   @Version('1')
   @ApiBearerAuth('main')
   @Secure(true)
-  async getUserPrivateData() {}
+  @ApiResponse({ type: GetPrivateProfileRes, status: 200 })
+  async getUserPrivateData(@Req() req: ExpressRequest) {
+    if (!req['user_id']) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+
+    return await this.getPrivateProfileQuery.execute(req['user_id'] as string);
+  }
 
   @Get('/user/public')
   @Version('1')
@@ -145,15 +155,21 @@ export class AuthController {
   @Secure(true)
   async updateUserAdditionalData() {}
 
+  @Put('/user/username')
+  @Version('1')
+  @ApiBasicAuth('main')
+  @Secure(true)
+  async updateUsername() {}
+
+  @Put('/user/avatar')
+  @Version('1')
+  @ApiBasicAuth('main')
+  @Secure(true)
+  async updateAvatar() {}
+
   @Put('/password')
   @Version('1')
   @ApiBasicAuth('main')
   @Secure(true)
   async changePassword() {}
-
-  @Get('/providers')
-  @Version('1')
-  @ApiBasicAuth('main')
-  @Secure(true)
-  async getAuthorizationProviders() {}
 }

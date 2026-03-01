@@ -20,6 +20,10 @@ import { CommandTokens } from 'src/common/Tokens';
 import type { Request as ExpressRequest } from 'express';
 import { UpdateUserAdditionalDataDto } from '../dtos/UpdateUserAdditionalData';
 import { UpdateAdditionalDataCommand } from 'src/authorization/application/useCases/UpdateAdditionalDataCommand';
+import { UpdateUsernameCommand } from 'src/authorization/application/useCases/UpdateUsernameCommand';
+import { UpdateUsernameReq } from '../dtos/UpdateUsernameReq';
+import { UpdateAvatarCommand } from 'src/authorization/application/useCases/UpdateAvatarCommand';
+import { UpdateAvatarReq } from '../dtos/UpdateAvatarReq';
 
 @Controller('user')
 export class UserController {
@@ -31,6 +35,12 @@ export class UserController {
 
   @Inject(CommandTokens.UpdateUserAdditionalDataCommand)
   private readonly updateUserAdditionalDataCommand: UpdateAdditionalDataCommand;
+
+  @Inject(CommandTokens.UpdateUsernameCommand)
+  private readonly updateUsernameCommand: UpdateUsernameCommand;
+
+  @Inject(CommandTokens.UpdateAvatarCommand)
+  private readonly updateAvatarCommand: UpdateAvatarCommand;
 
   @Inject()
   private readonly configurationService: ConfigService;
@@ -81,11 +91,29 @@ export class UserController {
   @Version('1')
   @ApiBearerAuth('main')
   @Secure(true)
-  async updateUsername() {}
+  @ApiBody({ type: UpdateUsernameReq })
+  async updateUsername(
+    @Req() req: ExpressRequest,
+    @Body() body: UpdateUsernameReq,
+  ) {
+    await this.updateUsernameCommand.execute({
+      id: req['user_id'] as string,
+      username: body.username,
+    });
+  }
 
   @Put('/avatar')
   @Version('1')
   @ApiBearerAuth('main')
   @Secure(true)
-  async updateAvatar() {}
+  @ApiBody({ type: UpdateAvatarReq })
+  async updateAvatar(
+    @Req() req: ExpressRequest,
+    @Body() body: UpdateAvatarReq,
+  ) {
+    await this.updateAvatarCommand.execute({
+      id: req['user_id'] as string,
+      avatar: body.avatar,
+    });
+  }
 }

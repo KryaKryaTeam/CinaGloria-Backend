@@ -18,6 +18,8 @@ import { GetPublicProfileQuery } from './application/useCases/GetPublicProfileQu
 import { GetPrivateProfileQuery } from './application/useCases/GetPrivateProfileQuery';
 import { UserController } from './infrastructure/controllers/user.controller';
 import { UpdateAdditionalDataCommand } from './application/useCases/UpdateAdditionalDataCommand';
+import { UpdateUsernameCommand } from './application/useCases/UpdateUsernameCommand';
+import { UpdateAvatarCommand } from './application/useCases/UpdateAvatarCommand';
 
 const providers: Provider[] = [
   {
@@ -59,6 +61,14 @@ const providers: Provider[] = [
   {
     provide: CommandTokens.UpdateUserAdditionalDataCommand,
     useClass: UpdateAdditionalDataCommand,
+  },
+  {
+    provide: CommandTokens.UpdateUsernameCommand,
+    useClass: UpdateUsernameCommand,
+  },
+  {
+    provide: CommandTokens.UpdateAvatarCommand,
+    useClass: UpdateAvatarCommand,
   },
   DiscoveryService,
   GoogleAuthorizationProvider,

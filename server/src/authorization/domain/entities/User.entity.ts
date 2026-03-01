@@ -237,7 +237,9 @@ export class UserEntity extends Entity {
       email: this.email,
       age: {
         value: this.age,
-        birthDay: this._additionalData.birthDay,
+        birthDay: this._additionalData.birthDay
+          ? new Date(this._additionalData.birthDay)
+          : undefined,
       },
       fullName: {
         value: this.fullName,

@@ -26,8 +26,6 @@ import { LoginResponse } from '../dtos/LoginResponse';
 import { RefreshResponse } from '../dtos/RefreshResponse';
 import { RefreshCommand } from 'src/authorization/application/useCases/RefreshCommand.command';
 import { Secure } from '../guards/auth/auth.guard';
-import { GetPublicProfileQuery } from 'src/authorization/application/useCases/GetPublicProfileQuery';
-import { GetPrivateProfileQuery } from 'src/authorization/application/useCases/GetPrivateProfileQuery';
 
 @Controller('auth')
 export class AuthController {
@@ -36,12 +34,6 @@ export class AuthController {
 
   @Inject(CommandTokens.RefreshCommand)
   private readonly refreshCommand: RefreshCommand;
-
-  @Inject(CommandTokens.GetPublicProfileQuery)
-  private readonly getPublicProfileQuery: GetPublicProfileQuery;
-
-  @Inject(CommandTokens.GetPrivateProfileQuery)
-  private readonly getPrivateProfileQuery: GetPrivateProfileQuery;
 
   @Inject()
   private readonly configurationService: ConfigService;

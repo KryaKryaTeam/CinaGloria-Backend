@@ -13,6 +13,7 @@ import GithubConfig from './configs/Github.config';
 import CookieConfig from './configs/Cookie.config';
 import JWTConfig from './configs/JWT.config';
 import WsConfig from './configs/Ws.config';
+import MailConfig from './configs/Mail.config';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import WsConfig from './configs/Ws.config';
         CookieConfig,
         WsConfig,
         JWTConfig,
+        MailConfig,
       ],
       isGlobal: true,
     }),

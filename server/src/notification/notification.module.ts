@@ -11,6 +11,8 @@ import { TicketService } from './infrastructure/service/TicketService';
 import { WSContorller } from './infrastructure/controllers/WebsocketContorller';
 import { GenerateTicketCommand } from './application/commands/GenerateTicketCommand';
 import { NotificationGateway } from './infrastructure/gateways/WsNotification.gateway';
+import { EmailNotificationTarget } from './infrastructure/targets/EmailTarget';
+import { CacheModule } from '@nestjs/cache-manager';
 
 const providers: Provider[] = [
   DiscoveryService,
@@ -30,6 +32,7 @@ const providers: Provider[] = [
     provide: CommandTokens.GenerateTicketCommand,
     useClass: GenerateTicketCommand,
   },
+  EmailNotificationTarget,
   NotificationSendEventHandler,
   WSTarget,
   NotificationGateway,
@@ -41,6 +44,7 @@ const providers: Provider[] = [
     DiscoveryModule,
     forwardRef(() => AuthorizationModule),
     JwtModule.register({}),
+    CacheModule.register({ ttl: 3600 * 6 }),
   ],
   exports: [...providers],
   controllers: [WSContorller],

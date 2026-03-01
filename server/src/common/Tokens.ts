@@ -24,6 +24,7 @@ export enum CommandTokens {
   GetPublicProfileQuery = 'GET_PUBLIC_PROFILE_QUERY',
   GetPrivateProfileQuery = 'GET_PUBLIC_PRIVATE_QUERY',
   UpdateUserAdditionalDataCommand = 'UPDATE_USER_ADDITIONAL_DATA_COMMAND',
+  UpdateUsernameCommand = 'UPDATE_USERNAME_COMMAND',
 }
 
 export enum ServiceTokens {

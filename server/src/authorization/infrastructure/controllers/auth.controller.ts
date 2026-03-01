@@ -113,6 +113,13 @@ export class AuthController {
     };
   }
 
+  @Put('/logout')
+  @Version('1')
+  @Secure(true)
+  logout(@Res({ passthrough: true }) res: ExpressResponse) {
+    res.cookie('refresh', null);
+  }
+
   @Put('/password')
   @Version('1')
   @ApiBasicAuth('main')

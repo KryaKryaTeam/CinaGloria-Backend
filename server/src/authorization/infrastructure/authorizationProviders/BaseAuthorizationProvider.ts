@@ -47,6 +47,9 @@ export abstract class BaseAuthorizationProvider<T> {
   @Inject(ServiceTokens.HashService)
   protected hashService: IHashService;
 
+  @Inject(BaseTokens.EventDispatcher)
+  private eventDispatcher: IEventDispatcher;
+
   async authorization(
     loginData: T,
   ): Promise<{ user: UserEntity; existsUser: boolean }> {
@@ -89,6 +92,7 @@ export abstract class BaseAuthorizationProvider<T> {
 
       await this.userRepository.save(findUser);
     } else {
+      existsUser = true;
       if (
         !findUser.hasAuthorizationProvider(this.type) ||
         !findUser.isAuthorizationDataCorrect(

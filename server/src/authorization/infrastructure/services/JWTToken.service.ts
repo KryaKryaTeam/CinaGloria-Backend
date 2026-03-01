@@ -46,11 +46,6 @@ export class JWTTokenService implements IJWTTokenService {
     return this.sign({
       sub: updatedUser.id,
       role: updatedUser.role,
-      avatar: updatedUser.avatarURL.value,
-      email: updatedUser.email,
-      username: updatedUser.username.value,
-      provider: decode.provider,
-      iat: decode.iat,
     });
   }
 

@@ -9,14 +9,15 @@ import { IHashService } from 'src/authorization/application/bounds/IHashService'
 import { Entity } from 'src/common/domain/Entity';
 import { SendNotificationEvent } from 'src/notification/domain/events/SendNotificationEvent';
 import { Notification } from 'src/notification/domain/entities/Notification';
+import { Age } from '../objects/Age.object';
 
-interface IUserAdditionalData {
+export interface IUserAdditionalData {
   telegram?: string;
   discord?: string;
   firstName?: string;
   lastName?: string;
   surName?: string;
-  age?: number;
+  birthDay?: Date;
 }
 
 interface IUserEntityConstructorProps {
@@ -27,6 +28,32 @@ interface IUserEntityConstructorProps {
   _additionalData?: IUserAdditionalData;
   _role: string;
   _authorizationProviders: AuthProviderEntity[];
+}
+
+export interface IPublicProfile {
+  id: string;
+  username: string;
+  avatarURL: string;
+  role: RoleEnum;
+  contacts: {
+    telegram?: string;
+    discord?: string;
+  };
+}
+
+export interface IPrivateProfile extends IPublicProfile {
+  email: string;
+  authorizationProviders: string[];
+  age?: {
+    value?: number | null;
+    birthDay?: Date;
+  };
+  fullName?: {
+    value: string;
+    firstName?: string;
+    lastName?: string;
+    surName?: string;
+  };
 }
 
 export class UserEntity extends Entity {
@@ -150,16 +177,12 @@ export class UserEntity extends Entity {
   }
 
   public get isProfileFull() {
-    if (!this._additionalData.discord && !this._additionalData.telegram)
+    if (!this._additionalData.discord || !this._additionalData.telegram)
       return false;
 
-    if (!this._additionalData.age) return false;
+    if (!this._additionalData.birthDay) return false;
 
-    if (
-      !this._additionalData.firstName ||
-      !this._additionalData.lastName ||
-      !this._additionalData.surName
-    )
+    if (!this._additionalData.firstName || !this._additionalData.lastName)
       return false;
 
     return true;
@@ -169,8 +192,74 @@ export class UserEntity extends Entity {
     return this._additionalData;
   }
 
+  public set additionalData(data: IUserAdditionalData) {
+    if (data.birthDay) Age.fromDate(data.birthDay);
+
+    if (this._additionalData.birthDay != null && data.birthDay)
+      throw new DomainError(DomainErrors.IMMUTABLE_VALUE);
+
+    if (data.telegram && data.telegram[0] != '@')
+      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+
+    this._additionalData.birthDay =
+      data.birthDay ?? this._additionalData.birthDay;
+    this._additionalData.discord = data.discord ?? this._additionalData.discord;
+    this._additionalData.firstName =
+      data.firstName ?? this._additionalData.firstName;
+    this._additionalData.lastName =
+      data.lastName ?? this._additionalData.lastName;
+    this._additionalData.surName = data.surName ?? this._additionalData.surName;
+    this._additionalData.telegram =
+      data.telegram ?? this._additionalData.telegram;
+  }
+
   public get authorizationProviders() {
     return this._authorizationProviders;
+  }
+
+  public get publicProfile(): IPublicProfile {
+    return {
+      id: this.id,
+      username: this._username.value,
+      avatarURL: this.avatarURL.value,
+      role: this.role,
+      contacts: {
+        discord: this._additionalData.discord,
+        telegram: this._additionalData.telegram,
+      },
+    };
+  }
+
+  public get privateProfile(): IPrivateProfile {
+    return {
+      ...this.publicProfile,
+      authorizationProviders: this._authorizationProviders.map((el) => el.type),
+      email: this.email,
+      age: {
+        value: this.age,
+        birthDay: this._additionalData.birthDay
+          ? new Date(this._additionalData.birthDay)
+          : undefined,
+      },
+      fullName: {
+        value: this.fullName,
+        firstName: this._additionalData.firstName,
+        lastName: this._additionalData.lastName,
+        surName: this._additionalData.surName,
+      },
+    };
+  }
+
+  private get age() {
+    if (!this._additionalData.birthDay) return null;
+
+    return Age.fromDate(this._additionalData.birthDay).value;
+  }
+
+  public get fullName() {
+    const { firstName, lastName, surName } = this._additionalData;
+
+    return [firstName, lastName, surName].filter(Boolean).join(' ');
   }
 
   public isAuthorizationDataCorrect(data: string, hashService: IHashService) {

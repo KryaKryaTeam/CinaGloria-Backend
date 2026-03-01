@@ -5,4 +5,5 @@ export interface IUserRepository {
   findById(userId: string): Promise<UserEntity | null>;
   findByEmail(email: string): Promise<UserEntity | null>;
   existsByEmail(email: string): Promise<boolean>;
+  existsByUsername(username: string): Promise<boolean>;
 }

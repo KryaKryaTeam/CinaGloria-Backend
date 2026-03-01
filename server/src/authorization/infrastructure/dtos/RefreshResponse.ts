@@ -1,8 +1,6 @@
 import { ApiResponseProperty } from '@nestjs/swagger';
 
-export class LoginResponse {
+export class RefreshResponse {
   @ApiResponseProperty({ type: 'string' })
   accessToken: string;
-  @ApiResponseProperty({ type: 'boolean' })
-  userExistsBefore: boolean;
 }

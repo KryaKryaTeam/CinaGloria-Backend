@@ -8,13 +8,19 @@ import { APP_GUARD, DiscoveryModule, DiscoveryService } from '@nestjs/core';
 import { GoogleAuthorizationProvider } from './infrastructure/authorizationProviders/GoogleAuthorizationProvider';
 import { AuthController } from './infrastructure/controllers/auth.controller';
 import { GithubAuthorizationProvider } from './infrastructure/authorizationProviders/GithubAuthorizationProvider';
-import { CheckCommand } from './application/useCases/CheckCommand.command';
 import { JWTTokenService } from './infrastructure/services/JWTToken.service';
 import { HashService } from './infrastructure/services/Hash.service';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalAuthorizationProvider } from './infrastructure/authorizationProviders/LocalAuthorizationProvider';
 import { AuthGuard } from './infrastructure/guards/auth/auth.guard';
 import { RoleGuard } from './infrastructure/guards/role/role.guard';
+import { RefreshCommand } from './application/useCases/RefreshCommand.command';
+import { GetPublicProfileQuery } from './application/useCases/GetPublicProfileQuery';
+import { GetPrivateProfileQuery } from './application/useCases/GetPrivateProfileQuery';
+import { UserController } from './infrastructure/controllers/user.controller';
+import { UpdateAdditionalDataCommand } from './application/useCases/UpdateAdditionalDataCommand';
+import { UpdateUsernameCommand } from './application/useCases/UpdateUsernameCommand';
+import { UpdateAvatarCommand } from './application/useCases/UpdateAvatarCommand';
 
 const providers: Provider[] = [
   {
@@ -30,8 +36,8 @@ const providers: Provider[] = [
     useClass: LoginCommand,
   },
   {
-    provide: CommandTokens.CheckCommand,
-    useClass: CheckCommand,
+    provide: CommandTokens.RefreshCommand,
+    useClass: RefreshCommand,
   },
   {
     provide: ServiceTokens.AuthorizationProviderService,
@@ -44,6 +50,26 @@ const providers: Provider[] = [
   {
     provide: ServiceTokens.HashService,
     useClass: HashService,
+  },
+  {
+    provide: CommandTokens.GetPublicProfileQuery,
+    useClass: GetPublicProfileQuery,
+  },
+  {
+    provide: CommandTokens.GetPrivateProfileQuery,
+    useClass: GetPrivateProfileQuery,
+  },
+  {
+    provide: CommandTokens.UpdateUserAdditionalDataCommand,
+    useClass: UpdateAdditionalDataCommand,
+  },
+  {
+    provide: CommandTokens.UpdateUsernameCommand,
+    useClass: UpdateUsernameCommand,
+  },
+  {
+    provide: CommandTokens.UpdateAvatarCommand,
+    useClass: UpdateAvatarCommand,
   },
   DiscoveryService,
   GoogleAuthorizationProvider,
@@ -69,6 +95,6 @@ const providers: Provider[] = [
   ],
   imports: [DiscoveryModule, JwtModule.register({})],
   exports: [...providers],
-  controllers: [AuthController],
+  controllers: [AuthController, UserController],
 })
 export class AuthorizationModule {}

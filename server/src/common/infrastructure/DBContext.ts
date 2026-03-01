@@ -25,6 +25,8 @@ export class DBContext implements IDBContext {
   }
 
   get manager() {
+    if (this._manager && this._manager.queryRunner?.isReleased)
+      return this.datasource.manager;
     return this._manager ?? this.datasource.manager;
   }
 }

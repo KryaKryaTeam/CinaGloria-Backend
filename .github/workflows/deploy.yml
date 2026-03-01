@@ -84,9 +84,12 @@ jobs:
             --amend $LOWER_IMAGE:sha-$SHORT_SHA-arm64
           docker manifest push $LOWER_IMAGE:sha-$SHORT_SHA
 
-  # deploy:
-  #   runs-on: [self-hosted, ARM]
-  #   needs: create-manifest
-  #   steps:
-  #     - name: deploy
-  #       run: /home/backend-service/deploy.sh
+  deploy:
+      runs-on: ARM64  # Використовуємо ту саму мітку, що й для білду ARM64
+      needs: create-manifest
+      steps:
+        - name: Execute local deploy script
+          run: |
+            echo "Starting deployment on ARM64 runner..."
+            chmod +x /home/backend-service/deploy.sh
+            /home/backend-service/deploy.sh

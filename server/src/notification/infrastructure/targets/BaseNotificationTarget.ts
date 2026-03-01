@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Notification } from 'src/notification/domain/entities/Notification';
 
 export interface INotificationData {
@@ -9,11 +10,16 @@ export interface INotificationData {
 
 @Injectable()
 export abstract class BaseNotificationTarget {
+  @Inject()
+  protected readonly configurationService: ConfigService;
+
   protected abstract _send(data: INotificationData): Promise<void> | void;
-  protected abstract prepare(notification: Notification): INotificationData;
+  protected abstract prepare(
+    notification: Notification,
+  ): INotificationData | Promise<INotificationData>;
 
   public async send(notification: Notification): Promise<void> {
-    const preparedData = this.prepare(notification);
+    const preparedData = await this.prepare(notification);
 
     await this._send(preparedData);
   }

@@ -13,7 +13,7 @@ import {
   UnauthorizedException,
   Version,
 } from '@nestjs/common';
-import { LoginCommand } from 'src/authorization/application/useCases/LoginCommand.command';
+import { LoginCommand } from 'src/authorization/application/useCases/LoginCommand';
 import { CommandTokens } from 'src/common/Tokens';
 import { DomainError, DomainErrors } from 'src/error/DomainError';
 import type {
@@ -25,7 +25,7 @@ import { CreateUserLocal } from '../dtos/CreateUserLocal';
 import { ApiBasicAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { LoginResponse } from '../dtos/LoginResponse';
 import { RefreshResponse } from '../dtos/RefreshResponse';
-import { RefreshCommand } from 'src/authorization/application/useCases/RefreshCommand.command';
+import { RefreshCommand } from 'src/authorization/application/useCases/RefreshCommand';
 import { Secure } from '../guards/auth/auth.guard';
 import { GetCSRFToken } from 'src/authorization/application/useCases/GetCSRFToken';
 import { LoginQueryParams } from '../dtos/LoginQueryParams';

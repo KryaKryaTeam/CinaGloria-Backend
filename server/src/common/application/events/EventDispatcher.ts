@@ -17,7 +17,7 @@ export class EventDispatcher implements IEventDispatcher {
   dispatchEvents() {
     this.eventList.forEach((el) => {
       setImmediate(() => {
-        this.dispatchEvent(el).catch((err) => {});
+        this.dispatchEvent(el).catch(() => {});
       });
     });
     this.eventList = [];

@@ -63,7 +63,7 @@ export class EmailNotificationTarget extends BaseNotificationTarget {
       url: 'https://api.mailgun.net',
     });
 
-    const msg = await mail.messages.create(
+    await mail.messages.create(
       this.configurationService.getOrThrow<string>('mail.domain'),
       {
         from: `CinaGloria <no-reply@${this.configurationService.getOrThrow<string>('mail.domain')}>`,

@@ -26,6 +26,7 @@ export enum CommandTokens {
   UpdateUserAdditionalDataCommand = 'UPDATE_USER_ADDITIONAL_DATA_COMMAND',
   UpdateUsernameCommand = 'UPDATE_USERNAME_COMMAND',
   UpdateAvatarCommand = 'UPDATE_AVATAR_COMMAND',
+  GetCSRFToken = 'GET_CSRF_TOKEN',
 }
 
 export enum ServiceTokens {

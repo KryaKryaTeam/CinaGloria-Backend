@@ -19,5 +19,5 @@ export abstract class Query<Data, Result> {
     return result;
   }
 
-  abstract implementation(data: Data): Promise<Result>;
+  abstract implementation(data: Data): Promise<Result> | Result;
 }

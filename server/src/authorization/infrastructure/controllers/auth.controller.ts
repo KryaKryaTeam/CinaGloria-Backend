@@ -16,19 +16,19 @@ import {
 import { LoginCommand } from 'src/authorization/application/useCases/LoginCommand.command';
 import { CommandTokens } from 'src/common/Tokens';
 import { DomainError, DomainErrors } from 'src/error/DomainError';
-import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import type {
   Response as ExpressResponse,
   Request as ExpressRequest,
 } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { CreateUserLocal } from '../dtos/CreateUserLocal';
-import { ApiBasicAuth, ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiBasicAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
 import { LoginResponse } from '../dtos/LoginResponse';
 import { RefreshResponse } from '../dtos/RefreshResponse';
 import { RefreshCommand } from 'src/authorization/application/useCases/RefreshCommand.command';
 import { Secure } from '../guards/auth/auth.guard';
 import { GetCSRFToken } from 'src/authorization/application/useCases/GetCSRFToken';
+import { LoginQueryParams } from '../dtos/LoginQueryParams';
 
 @Controller('auth')
 export class AuthController {
@@ -46,32 +46,10 @@ export class AuthController {
 
   @Post('/login')
   @Version('1')
-  @ApiQuery({
-    name: 'provider',
-    enum: AuthorizationProviderTypes,
-    enumName: 'Authorization Providers',
-    description: 'Specify which authorization provider to use',
-    required: true,
-  })
-  @ApiQuery({
-    name: 'state',
-    required: true,
-    description: 'CSRF protection code',
-  })
-  @ApiQuery({
-    name: 'code',
-    required: false,
-    description: 'Code for OAuth provider',
-  })
   @ApiBody({ type: CreateUserLocal, required: false })
   @ApiResponse({ type: LoginResponse, status: 201 })
   async login(
-    @Query('provider')
-    provider: string,
-    @Query('code')
-    code: string,
-    @Query('state')
-    state: string,
+    @Query() { state, code, provider }: LoginQueryParams,
     @Body() body: CreateUserLocal,
     @Response({ passthrough: true }) res: ExpressResponse,
     @Request() req: ExpressRequest,
@@ -87,7 +65,7 @@ export class AuthController {
 
     const result = await this.loginCommand.execute({
       loginData: { token: code, ...body },
-      type: provider as AuthorizationProviderTypes,
+      type: provider,
     });
 
     res.cookie(
@@ -144,7 +122,7 @@ export class AuthController {
 
   @Put('/password')
   @Version('1')
-  @ApiBasicAuth('main')
   @Secure(true)
+  @ApiBasicAuth('main')
   async changePassword() {}
 }

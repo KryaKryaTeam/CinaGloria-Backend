@@ -100,10 +100,7 @@ export abstract class BaseAuthorizationProvider<T> {
           this.hashService,
         )
       )
-        throw new DomainError(
-          DomainErrors.UNEXPECTED_VALUE,
-          'asdja;ksdfkasjdf',
-        );
+        throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
     }
     return { user: findUser, existsUser };
   }

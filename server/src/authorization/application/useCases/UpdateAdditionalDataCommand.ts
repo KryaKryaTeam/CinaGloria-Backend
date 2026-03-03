@@ -4,9 +4,10 @@ import { Command } from 'src/common/application/Command';
 import { ReposTokens } from 'src/common/Tokens';
 import type { IUserRepository } from '../bounds/IUserRepository';
 import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { PropsWithUserId } from 'src/types/PropsWithUserId';
 
 export class UpdateAdditionalDataCommand extends Command<
-  { data: IUserAdditionalData; id: string },
+  PropsWithUserId<{ data: IUserAdditionalData }>,
   void
 > {
   @Inject(ReposTokens.UserRepository)

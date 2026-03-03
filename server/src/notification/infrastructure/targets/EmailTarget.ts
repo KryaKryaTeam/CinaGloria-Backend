@@ -63,8 +63,6 @@ export class EmailNotificationTarget extends BaseNotificationTarget {
       url: 'https://api.mailgun.net',
     });
 
-    console.log(data.content);
-
     const msg = await mail.messages.create(
       this.configurationService.getOrThrow<string>('mail.domain'),
       {
@@ -74,7 +72,5 @@ export class EmailNotificationTarget extends BaseNotificationTarget {
         subject: data.title,
       },
     );
-
-    console.log(msg.status, '<-- This is status');
   }
 }

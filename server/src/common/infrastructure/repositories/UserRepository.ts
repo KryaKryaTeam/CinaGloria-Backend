@@ -21,8 +21,6 @@ export class UserRepository
     });
     if (!res) return null;
 
-    console.log(res);
-
     return this.userMapper.toEntity(res);
   }
   async findById(userId: string): Promise<UserEntity | null> {

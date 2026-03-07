@@ -17,13 +17,23 @@ export class EventDispatcher implements IEventDispatcher {
   dispatchEvents() {
     this.eventList.forEach((el) => {
       setImmediate(() => {
-        this.dispatchEvent(el).catch((err) => {});
+        this.dispatchEvent(el).catch(() => {});
       });
     });
     this.eventList = [];
+  }
+
+  getEventsCount() {
+    return this.eventList.length;
   }
 
   private async dispatchEvent(event: Event<unknown>) {
     await this.eventHandler.handle(event);
   }
 }
+
+export const createMockEventDispatcher = () => ({
+  addEvent: jest.fn(),
+  dispatchEvents: jest.fn(),
+  getEventsCount: jest.fn().mockReturnValue(0),
+});

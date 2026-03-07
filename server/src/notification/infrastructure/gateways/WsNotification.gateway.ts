@@ -11,6 +11,11 @@ import type { ITicketService } from 'src/notification/application/bounds/ITicket
 
 @WebSocketGateway(Number(process.env.WEBSOCKET_PORT) ?? 4001, {
   namespace: 'notification',
+  path: '/ws',
+  cors: {
+    origin: process.env.ALLOWED_ORIGIN ?? 'http://localhost:3000',
+    credentials: true,
+  },
 })
 export class NotificationGateway implements OnGatewayConnection {
   @WebSocketServer()

@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
   Inject,
   Post,
@@ -15,7 +17,6 @@ import {
 } from '@nestjs/common';
 import { LoginCommand } from 'src/authorization/application/useCases/LoginCommand';
 import { CommandTokens } from 'src/common/Tokens';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
 import type {
   Response as ExpressResponse,
   Request as ExpressRequest,
@@ -29,11 +30,15 @@ import { RefreshCommand } from 'src/authorization/application/useCases/RefreshCo
 import { Secure } from '../guards/auth/auth.guard';
 import { GetCSRFToken } from 'src/authorization/application/useCases/GetCSRFToken';
 import { LoginQueryParams } from '../dtos/LoginQueryParams';
+import { RegistrationCommand } from 'src/authorization/application/useCases/RegistrationCommand';
 
 @Controller('auth')
 export class AuthController {
   @Inject(CommandTokens.LoginCommand)
   private readonly loginCommand: LoginCommand;
+
+  @Inject(CommandTokens.RegistarationCommand)
+  private readonly registrationCommand: RegistrationCommand;
 
   @Inject(CommandTokens.RefreshCommand)
   private readonly refreshCommand: RefreshCommand;
@@ -55,15 +60,45 @@ export class AuthController {
     @Request() req: ExpressRequest,
   ) {
     if (!provider || !state)
-      throw new DomainError(
-        DomainErrors.UNEXPECTED_VALUE,
-        'Provider or state!',
-      );
+      throw new BadRequestException('Provider or state!');
 
     const csrfProtected = req.cookies.csrf == state;
-    if (!csrfProtected) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (!csrfProtected) throw new ForbiddenException('CSRF Protection failed');
 
     const result = await this.loginCommand.execute({
+      loginData: { token: code, ...body },
+      type: provider,
+    });
+
+    res.cookie(
+      'refresh',
+      result.refreshToken,
+      this.configurationService.getOrThrow('cookie'),
+    );
+
+    return {
+      accessToken: result.accessToken,
+      userExistsBefore: result.userExists,
+    };
+  }
+
+  @Post('/registration')
+  @Version('1')
+  @ApiBody({ type: CreateUserLocal, required: false })
+  @ApiResponse({ type: LoginResponse, status: 201 })
+  async registration(
+    @Query() { state, code, provider }: LoginQueryParams,
+    @Body() body: CreateUserLocal,
+    @Response({ passthrough: true }) res: ExpressResponse,
+    @Request() req: ExpressRequest,
+  ) {
+    if (!provider || !state)
+      throw new BadRequestException('Provider or state!');
+
+    const csrfProtected = req.cookies.csrf == state;
+    if (!csrfProtected) throw new ForbiddenException('CSRF Protection failed');
+
+    const result = await this.registrationCommand.execute({
       loginData: { token: code, ...body },
       type: provider,
     });

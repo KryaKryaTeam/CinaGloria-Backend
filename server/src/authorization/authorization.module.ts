@@ -22,6 +22,7 @@ import { UpdateAdditionalDataCommand } from './application/useCases/UpdateAdditi
 import { UpdateUsernameCommand } from './application/useCases/UpdateUsernameCommand';
 import { UpdateAvatarCommand } from './application/useCases/UpdateAvatarCommand';
 import { GetCSRFToken } from './application/useCases/GetCSRFToken';
+import { RegistrationCommand } from './application/useCases/RegistrationCommand';
 
 const providers: Provider[] = [
   {
@@ -35,6 +36,10 @@ const providers: Provider[] = [
   {
     provide: CommandTokens.LoginCommand,
     useClass: LoginCommand,
+  },
+  {
+    provide: CommandTokens.RegistarationCommand,
+    useClass: RegistrationCommand,
   },
   {
     provide: CommandTokens.RefreshCommand,

@@ -1,26 +1,25 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject } from '@nestjs/common';
 import { Command } from 'src/common/application/Command';
-import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
-import type { IAuthorizationProviderService } from '../bounds/IAuthorizationProviderService';
-import type { IUserRepository } from '../bounds/IUserRepository';
 import { ReposTokens, ServiceTokens } from 'src/common/Tokens';
+import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import type { IJWTTokenService } from '../bounds/IJWTTokenService';
+import type { IUserRepository } from '../bounds/IUserRepository';
+import type { IAuthorizationProviderService } from '../bounds/IAuthorizationProviderService';
 
-interface LoginCommandProps {
+interface RegistrationCommandProps {
   type: AuthorizationProviderTypes;
   loginData: unknown;
 }
 
-interface LoginCommandOutput {
+interface RegistrationCommandOutput {
   accessToken: string;
   refreshToken: string;
   userExists: boolean;
 }
 
-@Injectable()
-export class LoginCommand extends Command<
-  LoginCommandProps,
-  LoginCommandOutput
+export class RegistrationCommand extends Command<
+  RegistrationCommandProps,
+  RegistrationCommandOutput
 > {
   @Inject(ServiceTokens.AuthorizationProviderService)
   private readonly authorizationProviderService: IAuthorizationProviderService;
@@ -31,14 +30,16 @@ export class LoginCommand extends Command<
   @Inject(ServiceTokens.JWTService)
   private readonly jwtService: IJWTTokenService;
 
-  async implementation(data: LoginCommandProps): Promise<LoginCommandOutput> {
+  async implementation(
+    data: RegistrationCommandProps,
+  ): Promise<RegistrationCommandOutput> {
     if (data.type == AuthorizationProviderTypes.LOCAL) {
       if (
-        !(await this.userRepository.existsByEmail(
+        await this.userRepository.existsByEmail(
           (data.loginData as { email: string }).email,
-        ))
+        )
       )
-        throw new BadRequestException('User with this email is undefined');
+        throw new BadRequestException('User with this email is already exists');
     }
 
     const { user, existsUser } =

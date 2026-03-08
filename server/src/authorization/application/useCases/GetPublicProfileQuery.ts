@@ -1,9 +1,8 @@
 import { IPublicProfile } from 'src/authorization/domain/entities/User.entity';
 import { Query } from 'src/common/application/Query';
 import type { IUserRepository } from '../bounds/IUserRepository';
-import { Inject } from '@nestjs/common';
+import { BadRequestException, Inject } from '@nestjs/common';
 import { ReposTokens } from 'src/common/Tokens';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
 
 export class GetPublicProfileQuery extends Query<string, IPublicProfile> {
   @Inject(ReposTokens.UserRepository)
@@ -12,7 +11,7 @@ export class GetPublicProfileQuery extends Query<string, IPublicProfile> {
   async implementation(data: string): Promise<IPublicProfile> {
     const user = await this.userRepository.findById(data);
 
-    if (!user) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (!user) throw new BadRequestException('User with this id is unedfined!');
 
     return user.publicProfile;
   }

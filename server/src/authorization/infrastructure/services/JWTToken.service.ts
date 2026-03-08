@@ -1,11 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import type { IJWTTokenService } from 'src/authorization/application/bounds/IJWTTokenService';
 import type { IUserRepository } from 'src/authorization/application/bounds/IUserRepository';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { ReposTokens } from 'src/common/Tokens';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { IJWTPair } from 'src/types/JWTPair';
 import { IJWTPayload } from 'src/types/JWTPayload';
 
@@ -41,7 +40,7 @@ export class JWTTokenService implements IJWTTokenService {
     });
 
     const updatedUser = await this.userRepository.findById(decode.sub);
-    if (!updatedUser) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (!updatedUser) throw new UnauthorizedException('Invalid refresh token');
 
     return this.sign({
       sub: updatedUser.id,
@@ -57,7 +56,7 @@ export class JWTTokenService implements IJWTTokenService {
       });
       return true;
     } catch {
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      throw new UnauthorizedException('Access token is invalid!');
     }
   }
 

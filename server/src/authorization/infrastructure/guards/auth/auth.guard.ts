@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   Inject,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { Request as ExpressRequest } from 'express';
@@ -32,12 +33,16 @@ export class AuthGuard implements CanActivate {
     if (!isSecure) return true;
 
     const authorizatioHeader = request.headers.authorization;
-    if (!authorizatioHeader) return false;
+    if (!authorizatioHeader)
+      throw new UnauthorizedException('Authorization heder is undefined!');
 
     const parts = authorizatioHeader.split(' ');
-    if (parts[0] != 'Bearer') return false;
-
-    if (!this.jwtService.checkAccess(parts[1])) return false;
+    if (parts[0] != 'Bearer')
+      throw new UnauthorizedException(
+        'Unexcpected type of token! Try add Bearer to JWT',
+      );
+    if (!this.jwtService.checkAccess(parts[1]))
+      throw new UnauthorizedException('Authorization token is unverified!');
 
     const decoded = this.jwtService.decode(parts[1]);
 

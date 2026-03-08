@@ -1,5 +1,5 @@
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { IHashService } from 'src/authorization/application/bounds/IHashService';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 
 interface IAuthProviderConstructorProps {
@@ -20,13 +20,13 @@ export class AuthProviderEntity {
       partial.type == AuthorizationProviderTypes.LOCAL &&
       (!partial.passwordHash || partial.providerId)
     )
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      throw new BadRequestException('Incorrect data for this provider');
 
     if (
       partial.type != AuthorizationProviderTypes.LOCAL &&
       (partial.passwordHash || !partial.providerId)
     )
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      throw new BadRequestException('Incorrect data for this provider');
 
     Object.assign(this, partial);
   }
@@ -45,16 +45,16 @@ export class AuthProviderEntity {
 
   setPasswordHash(hash: string) {
     if (this.type != AuthorizationProviderTypes.LOCAL)
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+      throw new ForbiddenException();
     this.passwordHash = hash;
   }
 
   setProviderId(id: string) {
     if (this.type == AuthorizationProviderTypes.LOCAL)
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+      throw new ForbiddenException();
 
     if (this.providerId && typeof this.providerId !== 'undefined')
-      throw new DomainError(DomainErrors.IMMUTABLE_VALUE);
+      throw new ForbiddenException();
 
     this.providerId = id;
   }
@@ -62,12 +62,12 @@ export class AuthProviderEntity {
   getProviderId() {
     if (this.type != AuthorizationProviderTypes.LOCAL)
       return this.providerId as string;
-    throw new DomainError(DomainErrors.RESTRICTED_QUERY);
+    throw new ForbiddenException();
   }
 
   getPasswordHash() {
     if (this.type == AuthorizationProviderTypes.LOCAL)
       return this.passwordHash as string;
-    throw new DomainError(DomainErrors.RESTRICTED_QUERY);
+    throw new ForbiddenException();
   }
 }

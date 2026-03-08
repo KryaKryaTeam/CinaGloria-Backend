@@ -88,7 +88,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: ExpressResponse,
   ) {
     const { refresh } = req.cookies as { refresh: string };
-    if (!refresh) throw new UnauthorizedException();
+    if (!refresh) throw new UnauthorizedException('Invalid refresh token');
 
     const result = await this.refreshCommand.execute(refresh);
 

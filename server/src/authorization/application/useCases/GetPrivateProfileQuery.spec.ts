@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GetPrivateProfileQuery } from './GetPrivateProfileQuery';
 import { BaseTokens, ReposTokens } from 'src/common/Tokens';
-import { DomainError } from 'src/error/DomainError';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
+import { BadRequestException } from '@nestjs/common';
 
 describe('GetPrivateProfileQuery', () => {
   let query: GetPrivateProfileQuery;
@@ -58,7 +58,9 @@ describe('GetPrivateProfileQuery', () => {
     // Репозиторій повертає null
     mockUserRepository.findById.mockResolvedValue(null);
 
-    await expect(query.implementation(userId)).rejects.toThrow(DomainError);
+    await expect(query.implementation(userId)).rejects.toThrow(
+      BadRequestException,
+    );
     await expect(query.implementation(userId)).rejects.toThrow();
   });
 });

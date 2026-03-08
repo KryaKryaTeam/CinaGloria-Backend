@@ -2,8 +2,8 @@ import { UserEntity } from './User.entity';
 import { Username } from '../objects/Username.object';
 import { AvatarURL } from '../objects/AvatarURL.object';
 import { RoleEnum } from 'src/types/RoleEnum';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { EventDispatcher } from 'src/common/application/events/EventDispatcher';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 
 describe('UserEntity', () => {
   const validEmail = 'dev@cinagloria.com';
@@ -43,7 +43,7 @@ describe('UserEntity', () => {
       const nonAdmin = createDefaultUser();
 
       expect(() => user.setRoleTo(nonAdmin, RoleEnum.ADMIN)).toThrow(
-        new DomainError(DomainErrors.RESTRICTED_CHANGE),
+        ForbiddenException,
       );
     });
 
@@ -53,7 +53,7 @@ describe('UserEntity', () => {
       Object.assign(admin, { _role: RoleEnum.ADMIN });
 
       expect(() => user.setRoleTo(admin, RoleEnum.USER)).toThrow(
-        new DomainError(DomainErrors.NO_CHANGE),
+        ForbiddenException,
       );
     });
   });
@@ -72,21 +72,21 @@ describe('UserEntity', () => {
       const user = createDefaultUser();
       await expect(
         user.changeUsername('short', checkUniqueTrue),
-      ).rejects.toThrow(DomainErrors.RESTRICTED_CHANGE);
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw error if username starts with underscore', async () => {
       const user = createDefaultUser();
       await expect(
         user.changeUsername('_invalid_start', checkUniqueTrue),
-      ).rejects.toThrow(DomainErrors.RESTRICTED_CHANGE);
+      ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw error if username is not unique', async () => {
       const user = createDefaultUser();
       await expect(
         user.changeUsername('already_taken', checkUniqueFalse),
-      ).rejects.toThrow(DomainErrors.DUPLICATION);
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -105,7 +105,7 @@ describe('UserEntity', () => {
       const user = createDefaultUser();
       expect(() => {
         user.additionalData = { telegram: 'john_doe' };
-      }).toThrow(DomainErrors.RESTRICTED_CHANGE);
+      }).toThrow(BadRequestException);
     });
 
     it('should throw error if trying to change birthDay after it was set', () => {
@@ -114,7 +114,7 @@ describe('UserEntity', () => {
 
       expect(() => {
         user.additionalData = { birthDay: new Date('1991-01-01') };
-      }).toThrow(DomainErrors.IMMUTABLE_VALUE);
+      }).toThrow(ForbiddenException);
     });
 
     it('should return isProfileFull correctly', () => {
@@ -138,7 +138,7 @@ describe('UserEntity', () => {
       const user = createDefaultUser();
       // Немає великої літери, цифр та символів
       expect(() => user.changePassword('weakpass')).toThrow(
-        DomainErrors.RESTRICTED_CHANGE,
+        BadRequestException,
       );
     });
 
@@ -146,7 +146,7 @@ describe('UserEntity', () => {
       const user = createDefaultUser();
       // Пароль сильний: Велика літера, цифра, символ, 8+ знаків
       expect(() => user.changePassword('StrongPass123!')).toThrow(
-        DomainErrors.UNEXPECTED_VALUE,
+        BadRequestException,
       );
     });
   });

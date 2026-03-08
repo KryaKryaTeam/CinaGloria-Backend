@@ -1,7 +1,7 @@
 import { AuthProviderEntity } from './AuthProvider.entity';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { IHashService } from 'src/authorization/application/bounds/IHashService';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 
 describe('AuthProviderEntity', () => {
   const mockHashService: jest.Mocked<IHashService> = {
@@ -31,7 +31,7 @@ describe('AuthProviderEntity', () => {
             passwordHash: 'hash',
             providerId: 'external-id',
           }),
-      ).toThrow(DomainError);
+      ).toThrow(BadRequestException);
     });
 
     it('should create an OAUTH provider (e.g. GOOGLE) with providerId', () => {
@@ -54,7 +54,7 @@ describe('AuthProviderEntity', () => {
             providerId: 'github-id',
             passwordHash: 'some-hash',
           }),
-      ).toThrow(DomainError);
+      ).toThrow(BadRequestException);
     });
   });
 
@@ -115,9 +115,7 @@ describe('AuthProviderEntity', () => {
         passwordHash: '',
       });
 
-      expect(() => oauth.setPasswordHash('hash')).toThrow(
-        DomainErrors.RESTRICTED_CHANGE,
-      );
+      expect(() => oauth.setPasswordHash('hash')).toThrow(ForbiddenException);
     });
 
     it('should throw if trying to overwrite existing providerId', () => {
@@ -128,9 +126,7 @@ describe('AuthProviderEntity', () => {
         passwordHash: '',
       });
 
-      expect(() => oauth.setProviderId('id-2')).toThrow(
-        DomainErrors.IMMUTABLE_VALUE,
-      );
+      expect(() => oauth.setProviderId('id-2')).toThrow(ForbiddenException);
     });
   });
 });

@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UpdateAvatarCommand } from './UpdateAvatarCommand';
 import { BaseTokens, ReposTokens } from 'src/common/Tokens';
-import { DomainError } from 'src/error/DomainError';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
+import { BadRequestException } from '@nestjs/common';
 
 describe('UpdateAvatarCommand', () => {
   let command: UpdateAvatarCommand;
@@ -74,7 +74,7 @@ describe('UpdateAvatarCommand', () => {
     // він має викинути помилку до того, як дійде до збереження
     await expect(
       command.implementation({ id: userId, avatar: invalidAvatar }),
-    ).rejects.toThrow(DomainError);
+    ).rejects.toThrow(BadRequestException);
 
     expect(mockUserRepository.save).not.toHaveBeenCalled();
   });

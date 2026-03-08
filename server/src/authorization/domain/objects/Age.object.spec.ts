@@ -1,5 +1,5 @@
+import { BadRequestException } from '@nestjs/common';
 import { Age } from './Age.object';
-import { DomainError } from 'src/error/DomainError';
 
 describe('Age Value Object', () => {
   describe('constructor', () => {
@@ -9,11 +9,11 @@ describe('Age Value Object', () => {
     });
 
     it('should throw DomainError if age is less than 14', () => {
-      expect(() => new Age(13)).toThrow(DomainError);
+      expect(() => new Age(13)).toThrow(BadRequestException);
     });
 
     it('should throw DomainError if age is more than 120', () => {
-      expect(() => new Age(121)).toThrow(DomainError);
+      expect(() => new Age(121)).toThrow(BadRequestException);
     });
   });
 

@@ -1,4 +1,4 @@
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { BadRequestException } from '@nestjs/common';
 
 export class AvatarURL {
   private _value: string;
@@ -13,8 +13,8 @@ export class AvatarURL {
     );
   }
   static create(value: string) {
-    if (!value.includes('http://') && !value.includes('https://'))
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (!value.startsWith('http://') && !value.startsWith('https://'))
+      throw new BadRequestException('URL should start with protocol');
 
     return new AvatarURL(value);
   }

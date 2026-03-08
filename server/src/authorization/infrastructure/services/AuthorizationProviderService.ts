@@ -2,8 +2,13 @@ import { IAuthorizationProviderService } from 'src/authorization/application/bou
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import { BaseAuthorizationProvider } from '../authorizationProviders/BaseAuthorizationProvider';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
-import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
 import { DiscoveryService } from '@nestjs/core';
 
 export const AuthorizationProvider = DiscoveryService.createDecorator();
@@ -45,7 +50,10 @@ export class AuthorizationProviderService
     loginData: unknown,
   ): Promise<{ user: UserEntity; existsUser: boolean }> {
     const provider = this.providers.get(type);
-    if (!provider) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (!provider)
+      throw new BadRequestException(
+        'This type of authorization provider is out of service!',
+      );
     return await provider.authorization(loginData);
   }
   addProvider(

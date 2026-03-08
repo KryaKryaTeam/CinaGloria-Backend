@@ -1,12 +1,10 @@
-import { DomainError, DomainErrors } from 'src/error/DomainError';
-
+import { BadRequestException } from '@nestjs/common';
 export class Age {
   private _value: number;
 
   constructor(value: number) {
     if (value < 14 || value > 120)
-      throw new DomainError(
-        DomainErrors.UNEXPECTED_VALUE,
+      throw new BadRequestException(
         'User should be older than 14 and younger than 120',
       );
 

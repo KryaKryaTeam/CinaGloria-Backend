@@ -1,9 +1,8 @@
-import { Inject } from '@nestjs/common';
+import { BadRequestException, Inject } from '@nestjs/common';
 import { IUserAdditionalData } from 'src/authorization/domain/entities/User.entity';
 import { Command } from 'src/common/application/Command';
 import { ReposTokens } from 'src/common/Tokens';
 import type { IUserRepository } from '../bounds/IUserRepository';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { PropsWithUserId } from 'src/types/PropsWithUserId';
 
 export class UpdateAdditionalDataCommand extends Command<
@@ -18,7 +17,8 @@ export class UpdateAdditionalDataCommand extends Command<
     id: string;
   }): Promise<void> {
     const user = await this.userRepository.findById(data.id);
-    if (!user) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+
+    if (!user) throw new BadRequestException('User with this id is unedfined!');
 
     user.additionalData = data.data;
     await this.userRepository.save(user);

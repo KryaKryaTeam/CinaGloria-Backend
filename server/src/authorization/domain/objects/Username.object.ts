@@ -1,4 +1,4 @@
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { BadRequestException } from '@nestjs/common';
 
 export class Username {
   private readonly _value: string;
@@ -16,10 +16,12 @@ export class Username {
 
   public static create(value: string): Username {
     if (value.length < 8 || value.length > 50)
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+      throw new BadRequestException(
+        'Username should be longer than 8 and shorter than 50 symbols',
+      );
 
     if (value.startsWith('_'))
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+      throw new BadRequestException('Username shouldn`t start with _');
 
     return new Username(value);
   }

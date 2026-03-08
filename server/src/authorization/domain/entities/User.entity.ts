@@ -10,6 +10,7 @@ import { Entity } from 'src/common/domain/Entity';
 import { SendNotificationEvent } from 'src/notification/domain/events/SendNotificationEvent';
 import { Notification } from 'src/notification/domain/entities/Notification';
 import { Age } from '../objects/Age.object';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 
 export interface IUserAdditionalData {
   telegram?: string;
@@ -136,10 +137,9 @@ Ready to ship?
   }
 
   setRoleTo(requester: UserEntity, role: RoleEnum) {
-    if (!requester.hasRole(RoleEnum.ADMIN))
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+    if (!requester.hasRole(RoleEnum.ADMIN)) throw new ForbiddenException();
 
-    if (this.hasRole(role)) throw new DomainError(DomainErrors.NO_CHANGE);
+    if (this.hasRole(role)) throw new ForbiddenException();
 
     this._role = role;
   }
@@ -149,13 +149,15 @@ Ready to ship?
     checkUnique: (username: string) => Promise<boolean>,
   ) {
     if (username.length < 8 || username.length > 50)
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+      throw new BadRequestException(
+        'Username should be longer than 8 and shorter than 50',
+      );
 
     if (username.startsWith('_'))
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+      throw new BadRequestException('Username shouldn`t starts with _');
 
     if (!(await checkUnique(username)))
-      throw new DomainError(DomainErrors.DUPLICATION);
+      throw new BadRequestException('Duplicated data');
 
     this._username = Username.create(username);
   }
@@ -165,14 +167,16 @@ Ready to ship?
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
       )
     )
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+      throw new BadRequestException('Password is incorrect');
 
     const providerForChange = this._authorizationProviders.find((e) =>
       e.isType(AuthorizationProviderTypes.LOCAL),
     );
 
     if (!providerForChange)
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      throw new BadRequestException(
+        'Can`t change password for user without Local provider',
+      );
 
     //here should be hash service
 
@@ -214,10 +218,10 @@ Ready to ship?
     if (data.birthDay) Age.fromDate(data.birthDay);
 
     if (this._additionalData.birthDay != null && data.birthDay)
-      throw new DomainError(DomainErrors.IMMUTABLE_VALUE);
+      throw new ForbiddenException();
 
     if (data.telegram && data.telegram[0] != '@')
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+      throw new BadRequestException('Incorrect contact data');
 
     this._additionalData.birthDay =
       data.birthDay ?? this._additionalData.birthDay;

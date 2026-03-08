@@ -1,4 +1,5 @@
 export enum EventType {
   CHANGE_ROLE = 'CHANGE_ROLE-event',
+  USER_CREATED = 'USER_CREATED-event',
   SEND_NOTIFICATION = 'SEND_NOTIFICATION-event',
 }

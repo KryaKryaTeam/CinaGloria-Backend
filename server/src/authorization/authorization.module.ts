@@ -23,6 +23,7 @@ import { UpdateUsernameCommand } from './application/useCases/UpdateUsernameComm
 import { UpdateAvatarCommand } from './application/useCases/UpdateAvatarCommand';
 import { GetCSRFToken } from './application/useCases/GetCSRFToken';
 import { RegistrationCommand } from './application/useCases/RegistrationCommand';
+import { UserCreatedHandler } from './infrastructure/handlers/UserCreatedEventHandler';
 
 const providers: Provider[] = [
   {
@@ -85,6 +86,7 @@ const providers: Provider[] = [
   GoogleAuthorizationProvider,
   GithubAuthorizationProvider,
   LocalAuthorizationProvider,
+  UserCreatedHandler,
   {
     provide: ServiceTokens.JWTService,
     useClass: JWTTokenService,

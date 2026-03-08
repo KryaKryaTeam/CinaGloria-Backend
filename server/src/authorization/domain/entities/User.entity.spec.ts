@@ -32,7 +32,7 @@ describe('UserEntity', () => {
     it('should allow admin to change user role', () => {
       const user = createDefaultUser();
       const admin = createDefaultUser();
-      Object.assign(admin, { _role: RoleEnum.ADMIN });
+      admin.__forceSetRole(RoleEnum.ADMIN);
 
       user.setRoleTo(admin, RoleEnum.ORGANIZER);
       expect(user.role).toBe(RoleEnum.ORGANIZER);
@@ -50,7 +50,7 @@ describe('UserEntity', () => {
     it('should throw error if role is already set to the same value', () => {
       const user = createDefaultUser();
       const admin = createDefaultUser();
-      Object.assign(admin, { _role: RoleEnum.ADMIN });
+      admin.__forceSetRole(RoleEnum.ADMIN);
 
       expect(() => user.setRoleTo(admin, RoleEnum.USER)).toThrow(
         ForbiddenException,

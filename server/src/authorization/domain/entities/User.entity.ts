@@ -7,10 +7,9 @@ import { Username } from '../objects/Username.object';
 import { AvatarURL } from '../objects/AvatarURL.object';
 import { IHashService } from 'src/authorization/application/bounds/IHashService';
 import { Entity } from 'src/common/domain/Entity';
-import { SendNotificationEvent } from 'src/notification/domain/events/SendNotificationEvent';
-import { Notification } from 'src/notification/domain/entities/Notification';
 import { Age } from '../objects/Age.object';
 import { BadRequestException, ForbiddenException } from '@nestjs/common';
+import { UserCreated } from '../events/UserCreated.event';
 
 export interface IUserAdditionalData {
   telegram?: string;
@@ -86,31 +85,14 @@ export class UserEntity extends Entity {
     });
 
     ent.addEvent(
-      new SendNotificationEvent(
-        Notification.create({
-          title: 'Welcome to CinaGloria',
-          content: `# Welcome to the Arena, Code-Runner!
-
-We are thrilled to have you on **CinaGloria** — the ultimate battleground for developers, innovators, and dreamers. Whether you are here to crush a 48-hour hackathon or build the next big thing, we've got your back.
-
-### Your Journey Starts Here:
-* **Join a Tournament:** Browse active hackathons and pick your challenge.
-* **Form a Squad:** Find teammates with complementary skills or go solo.
-* **Review Tasks:** Deep dive into problem statements and technical requirements.
-* **Submit & Win:** Upload your project before the deadline and face the **Jury**.
-
-### Important for Competitors:
-Your security during the tournament is vital. We will send you a **verification code** for sensitive actions (like submitting a final project or managing team access).
-
-> **Jury Note:** Be sure to read the evaluation criteria for each tournament. Points are often awarded for both technical complexity and original presentation.
-
-If you hit a bug or need help with the platform, reach out to the **Krya Krya Team**.
-
-Ready to ship?
-**The CinaGloria Team**`,
-          from: 'System',
-          targets: ['ws', 'email'],
-          to: ent,
+      new UserCreated(
+        new UserEntity({
+          email,
+          id: randomUUID(),
+          _role: RoleEnum.USER,
+          _authorizationProviders: [],
+          _avatarUrl: avatarUrl,
+          _username: username,
         }),
       ),
     );
@@ -298,5 +280,9 @@ Ready to ship?
         provider.isType(type),
       ) !== -1
     );
+  }
+
+  __forceSetRole(role: RoleEnum) {
+    this._role = role;
   }
 }

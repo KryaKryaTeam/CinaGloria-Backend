@@ -230,9 +230,7 @@ export class UserEntity extends Entity {
   }
   changePassword(password: string) {
     if (
-      !password.match(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      )
+      !password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)
     )
       throw new BadRequestException('Password is incorrect');
 

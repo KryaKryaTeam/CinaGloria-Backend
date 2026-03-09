@@ -76,7 +76,8 @@ export abstract class BaseAuthorizationProvider<T> {
           ),
       );
 
-      findUser.pullEvents(this.eventDispatcher);
+      if (this.type != AuthorizationProviderTypes.LOCAL)
+        findUser.pullEvents(this.eventDispatcher);
 
       let hashed_LOCAL = handshakeData.authorizationData;
 
@@ -90,7 +91,8 @@ export abstract class BaseAuthorizationProvider<T> {
         );
       });
 
-      await this.userRepository.save(findUser);
+      if (this.type != AuthorizationProviderTypes.LOCAL)
+        await this.userRepository.save(findUser);
     } else {
       existsUser = true;
       if (

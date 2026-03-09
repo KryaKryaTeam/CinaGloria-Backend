@@ -23,6 +23,9 @@ import { UpdateUsernameCommand } from './application/useCases/UpdateUsernameComm
 import { UpdateAvatarCommand } from './application/useCases/UpdateAvatarCommand';
 import { GetCSRFToken } from './application/useCases/GetCSRFToken';
 import { RegistrationCommand } from './application/useCases/RegistrationCommand';
+import { UserCreatedHandler } from './infrastructure/handlers/UserCreatedEventHandler';
+import { CacheModule } from '@nestjs/cache-manager';
+import { ValidateRegistrationCommand } from './application/useCases/ValidateRegistrationCommand';
 
 const providers: Provider[] = [
   {
@@ -81,10 +84,15 @@ const providers: Provider[] = [
     provide: CommandTokens.GetCSRFToken,
     useClass: GetCSRFToken,
   },
+  {
+    provide: CommandTokens.ValidateRegistrationCommand,
+    useClass: ValidateRegistrationCommand,
+  },
   DiscoveryService,
   GoogleAuthorizationProvider,
   GithubAuthorizationProvider,
   LocalAuthorizationProvider,
+  UserCreatedHandler,
   {
     provide: ServiceTokens.JWTService,
     useClass: JWTTokenService,
@@ -103,7 +111,7 @@ const providers: Provider[] = [
       useClass: RoleGuard,
     },
   ],
-  imports: [DiscoveryModule, JwtModule.register({})],
+  imports: [DiscoveryModule, JwtModule.register({}), CacheModule.register()],
   exports: [...providers],
   controllers: [AuthController, UserController],
 })

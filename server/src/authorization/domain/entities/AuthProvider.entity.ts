@@ -2,11 +2,11 @@ import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { IHashService } from 'src/authorization/application/bounds/IHashService';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 
-interface IAuthProviderConstructorProps {
+export interface IAuthProviderConstructorProps {
   id: string;
   type: AuthorizationProviderTypes;
-  passwordHash: string;
-  providerId: string;
+  passwordHash: string | undefined;
+  providerId: string | undefined;
 }
 
 export class AuthProviderEntity {
@@ -14,6 +14,15 @@ export class AuthProviderEntity {
   public readonly type: AuthorizationProviderTypes;
   private passwordHash?: string;
   private providerId?: string;
+
+  toJSON(): IAuthProviderConstructorProps {
+    return {
+      id: this.id,
+      type: this.type,
+      passwordHash: this.passwordHash,
+      providerId: this.providerId,
+    };
+  }
 
   constructor(partial: IAuthProviderConstructorProps) {
     if (

@@ -47,7 +47,7 @@ export class LocalAuthorizationProvider extends BaseAuthorizationProvider<LocalL
     if (!loginData.password || !loginData.email) return false;
 
     if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/.test(
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(
         loginData.password,
       )
     ) {

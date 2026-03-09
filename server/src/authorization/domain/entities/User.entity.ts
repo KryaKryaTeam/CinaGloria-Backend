@@ -1,5 +1,8 @@
 import { RoleEnum } from 'src/types/RoleEnum';
-import { AuthProviderEntity } from './AuthProvider.entity';
+import {
+  AuthProviderEntity,
+  IAuthProviderConstructorProps,
+} from './AuthProvider.entity';
 import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import { randomUUID } from 'crypto';
@@ -10,6 +13,8 @@ import { Entity } from 'src/common/domain/Entity';
 import { Age } from '../objects/Age.object';
 import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { UserCreated } from '../events/UserCreated.event';
+import { IEventJSON } from 'src/common/domain/Event';
+import { getEventClass } from 'src/common/domain/EventRegister';
 
 export interface IUserAdditionalData {
   telegram?: string;
@@ -56,6 +61,24 @@ export interface IPrivateProfile extends IPublicProfile {
   };
 }
 
+export interface IUserEntityJSON {
+  id: string;
+  email: string;
+  username: string;
+  avatarURL: string;
+  role: RoleEnum;
+  contact: {
+    telegram: string;
+    discord: string;
+  };
+  birthDay: string;
+  firstName: string;
+  lastName: string;
+  surName: string;
+  authorizationProvider: IAuthProviderConstructorProps[];
+  events: IEventJSON<unknown>[];
+}
+
 export class UserEntity extends Entity {
   public readonly id: string;
   public readonly email: string;
@@ -75,9 +98,11 @@ export class UserEntity extends Entity {
     username: Username,
     avatarUrl: AvatarURL,
   ) {
+    const id = randomUUID();
+
     const ent = new UserEntity({
       email,
-      id: randomUUID(),
+      id: id,
       _role: RoleEnum.USER,
       _authorizationProviders: [],
       _avatarUrl: avatarUrl,
@@ -88,7 +113,7 @@ export class UserEntity extends Entity {
       new UserCreated(
         new UserEntity({
           email,
-          id: randomUUID(),
+          id: id,
           _role: RoleEnum.USER,
           _authorizationProviders: [],
           _avatarUrl: avatarUrl,
@@ -98,6 +123,66 @@ export class UserEntity extends Entity {
     );
 
     return ent;
+  }
+
+  static load(plain: IUserEntityJSON): UserEntity {
+    const ent = new UserEntity({
+      id: plain.id,
+      email: plain.email,
+      _username: Username.create(plain.username),
+      _avatarUrl: AvatarURL.create(plain.avatarURL),
+      _role: plain.role,
+      _authorizationProviders: plain.authorizationProvider.map(
+        (el) => new AuthProviderEntity(el),
+      ),
+      _additionalData: {
+        birthDay: plain.birthDay ? new Date(plain.birthDay) : undefined,
+        discord: plain.contact?.discord,
+        telegram: plain.contact?.telegram,
+        firstName: plain.firstName,
+        lastName: plain.lastName,
+        surName: plain.surName,
+      },
+    });
+
+    if (plain.events && Array.isArray(plain.events)) {
+      plain.events.forEach((eventJson) => {
+        const EventClass = getEventClass(eventJson.eventType);
+        if (EventClass) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          const eventInstance = Object.create(EventClass.prototype);
+          Object.assign(eventInstance, eventJson.payload);
+          ent.addEvent(eventInstance);
+        }
+      });
+    }
+
+    return ent;
+  }
+
+  toJSON(): IUserEntityJSON {
+    return {
+      id: this.id,
+      email: this.email,
+      username: this._username.value,
+      avatarURL: this._avatarUrl.value,
+      role: this._role,
+      contact: {
+        telegram: this._additionalData.telegram || '',
+        discord: this._additionalData.discord || '',
+      },
+      birthDay: this._additionalData.birthDay?.toISOString() || '',
+      firstName: this._additionalData.firstName || '',
+      lastName: this._additionalData.lastName || '',
+      surName: this._additionalData.surName || '',
+      authorizationProvider: this._authorizationProviders.map((p) =>
+        p.toJSON(),
+      ),
+      events: this.events.map((ev) => ({
+        eventType: ev.constructor.name,
+        payload: ev,
+      })),
+    };
   }
 
   async linkProvider(

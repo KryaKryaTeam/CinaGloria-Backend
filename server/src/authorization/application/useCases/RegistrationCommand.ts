@@ -5,6 +5,10 @@ import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersType
 import type { IJWTTokenService } from '../bounds/IJWTTokenService';
 import type { IUserRepository } from '../bounds/IUserRepository';
 import type { IAuthorizationProviderService } from '../bounds/IAuthorizationProviderService';
+import { Cache } from '@nestjs/cache-manager';
+import { randomInt, randomUUID } from 'crypto';
+import { SendNotificationEvent } from 'src/notification/domain/events/SendNotificationEvent';
+import { Notification } from 'src/notification/domain/entities/Notification';
 
 interface RegistrationCommandProps {
   type: AuthorizationProviderTypes;
@@ -12,9 +16,7 @@ interface RegistrationCommandProps {
 }
 
 interface RegistrationCommandOutput {
-  accessToken: string;
-  refreshToken: string;
-  userExists: boolean;
+  requestId: string;
 }
 
 export class RegistrationCommand extends Command<
@@ -30,35 +32,48 @@ export class RegistrationCommand extends Command<
   @Inject(ServiceTokens.JWTService)
   private readonly jwtService: IJWTTokenService;
 
+  @Inject(Cache)
+  private readonly cacheService: Cache;
+
   async implementation(
     data: RegistrationCommandProps,
   ): Promise<RegistrationCommandOutput> {
-    if (data.type == AuthorizationProviderTypes.LOCAL) {
-      if (
-        await this.userRepository.existsByEmail(
-          (data.loginData as { email: string }).email,
-        )
-      )
-        throw new BadRequestException('User with this email is already exists');
+    if (data.type !== AuthorizationProviderTypes.LOCAL) {
+      throw new BadRequestException(
+        'This endpoint service only Local Provider',
+      );
     }
 
-    const { user, existsUser } =
-      await this.authorizationProviderService.authorize(
-        data.type,
-        data.loginData,
-      );
+    const loginData = data.loginData as { email: string };
+    if (await this.userRepository.existsByEmail(loginData.email)) {
+      throw new BadRequestException('User with this email is already exists');
+    }
 
-    await this.userRepository.save(user);
+    const { user } = await this.authorizationProviderService.authorize(
+      data.type,
+      data.loginData,
+    );
+    const requestId = randomUUID();
+    const code = randomInt(100000, 1000000).toString();
 
-    const tokens = this.jwtService.sign({
-      role: user.role,
-      sub: user.id,
-    });
+    await this.cacheService.set(
+      `registration:${requestId}`,
+      { user: user.toJSON(), code },
+      900000,
+    );
 
-    return {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-      userExists: existsUser,
-    };
+    this.eventDispatcher.addEvent(
+      new SendNotificationEvent(
+        Notification.create({
+          to: user,
+          content: `code:${code}`,
+          from: 'System',
+          targets: ['email'],
+          title: 'Verification Code',
+        }),
+      ),
+    );
+
+    return { requestId };
   }
 }

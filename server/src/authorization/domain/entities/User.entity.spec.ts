@@ -2,8 +2,19 @@ import { UserEntity } from './User.entity';
 import { Username } from '../objects/Username.object';
 import { AvatarURL } from '../objects/AvatarURL.object';
 import { RoleEnum } from 'src/types/RoleEnum';
-import { EventDispatcher } from 'src/common/application/events/EventDispatcher';
+import {
+  createMockEventDispatcher,
+  EventDispatcher,
+} from 'src/common/application/events/EventDispatcher';
 import { BadRequestException, ForbiddenException } from '@nestjs/common';
+import { UserCreated } from '../events/UserCreated.event';
+import { RegisterEvent } from 'src/common/domain/EventRegister';
+import { AuthProviderEntity } from './AuthProvider.entity';
+import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
+import { Event } from 'src/common/domain/Event';
+
+// Реєструємо івент для тестів регідрації
+RegisterEvent(UserCreated);
 
 describe('UserEntity', () => {
   const validEmail = 'dev@cinagloria.com';
@@ -148,6 +159,141 @@ describe('UserEntity', () => {
       expect(() => user.changePassword('StrongPass123!')).toThrow(
         BadRequestException,
       );
+    });
+  });
+  describe('UserEntity - Extended Tests', () => {
+    const validEmail = 'dev@cinagloria.com';
+    const validUsername = Username.create('code_runner_777');
+    const validAvatar = AvatarURL.create('https://avatar.com/1.png');
+
+    const createDefaultUser = () =>
+      UserEntity.create(validEmail, validUsername, validAvatar);
+
+    // --- Існуючі тести (Creation, Role Management, etc.) залишаються без змін ---
+
+    describe('Serialization & Rehydration (toJSON & load)', () => {
+      it('should correctly serialize to JSON and reload to Entity', () => {
+        const user = createDefaultUser();
+        user.additionalData = {
+          firstName: 'Neo',
+          telegram: '@matrix',
+          birthDay: new Date('1999-03-31'),
+        };
+
+        // 1. Серіалізація
+        const json = user.toJSON();
+
+        expect(json.email).toBe(validEmail);
+        expect(json.username).toBe('code_runner_777');
+        expect(json.firstName).toBe('Neo');
+        expect(json.contact.telegram).toBe('@matrix');
+        // Перевіряємо, чи івент UserCreated потрапив у JSON
+        expect(json.events).toContainEqual(
+          expect.objectContaining({ eventType: 'UserCreated' }),
+        );
+
+        // 2. Регідрація (відновлення)
+        const reloadedUser = UserEntity.load(json);
+
+        expect(reloadedUser).toBeInstanceOf(UserEntity);
+        expect(reloadedUser.id).toBe(user.id);
+        expect(reloadedUser.email).toBe(user.email);
+        expect(reloadedUser.username.value).toBe(user.username.value);
+        expect(reloadedUser.additionalData.firstName).toBe('Neo');
+
+        // Перевіряємо, чи методи працюють після відновлення
+        expect(reloadedUser.fullName).toBe('Neo');
+      });
+
+      it('should rehydrate events correctly as class instances', () => {
+        const user = createDefaultUser(); // Тут автоматично додається UserCreated
+        const json = user.toJSON();
+
+        const reloadedUser = UserEntity.load(json);
+
+        const events =
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+          (reloadedUser as any).events as unknown as Event<unknown>[];
+
+        expect(events.length).toBeGreaterThan(0);
+        expect(events[0]).toBeInstanceOf(UserCreated);
+
+        // Створюємо мок-диспетчер для перевірки типів івентів
+        const mockDispatcher = createMockEventDispatcher();
+
+        reloadedUser.pullEvents(mockDispatcher as any);
+      });
+
+      it('should handle missing optional additional data during load', () => {
+        const user = createDefaultUser();
+        const json = user.toJSON();
+
+        // Імітуємо відсутність деяких полів у JSON (наприклад, старі дані в БД)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        delete (json as any).firstName;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        (json as any).contact.telegram = '';
+
+        const reloadedUser = UserEntity.load(json);
+        expect(reloadedUser.additionalData.firstName).toBe(undefined);
+        expect(reloadedUser.additionalData.telegram).toBe('');
+      });
+    });
+
+    describe('AuthProvider Integration', () => {
+      it('should correctly link a new provider', async () => {
+        const user = createDefaultUser();
+        const mockProvider = new AuthProviderEntity({
+          id: 'p1',
+          type: AuthorizationProviderTypes.GOOGLE,
+          providerId: 'google-id-123',
+          passwordHash: undefined,
+        });
+        const checkUnique = jest.fn().mockResolvedValue(true);
+
+        await user.linkProvider(mockProvider, checkUnique);
+
+        expect(user.authorizationProviders.length).toBe(1);
+        expect(
+          user.hasAuthorizationProvider(AuthorizationProviderTypes.GOOGLE),
+        ).toBe(true);
+      });
+
+      it('should throw error when linking duplicate provider type', async () => {
+        const user = createDefaultUser();
+        const provider1 = new AuthProviderEntity({
+          id: 'p1',
+          type: AuthorizationProviderTypes.LOCAL,
+          passwordHash: 'hash',
+          providerId: undefined,
+        });
+        const checkUnique = jest.fn().mockResolvedValue(true);
+
+        // Перший раз додаємо вручну (або через маніпуляцію, бо в конструкторі порожньо)
+        (
+          user as unknown as { _authorizationProviders: AuthProviderEntity[] }
+        )._authorizationProviders.push(provider1);
+
+        await expect(user.linkProvider(provider1, checkUnique)).rejects.toThrow(
+          'This user already has provider with this type!',
+        );
+      });
+    });
+
+    describe('Complex Profile Getters', () => {
+      it('should return correct privateProfile structure', () => {
+        const user = createDefaultUser();
+        user.additionalData = {
+          firstName: 'John',
+          lastName: 'Doe',
+          birthDay: new Date('2000-01-01'),
+        };
+
+        const profile = user.privateProfile;
+        expect(profile.fullName?.value).toBe('John Doe');
+        expect(profile.age?.value).toBeGreaterThan(20); // Залежить від поточної дати
+        expect(Array.isArray(profile.authorizationProviders)).toBe(true);
+      });
     });
   });
 });

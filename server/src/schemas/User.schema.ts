@@ -4,7 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { AuthorizationProvider } from './AuthorizationProvider.schema';
@@ -12,7 +12,7 @@ import { NotificationSchema } from './Notification.schema';
 
 @Entity({ name: 'user' })
 export class UserSchema {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
   id: string;
 
   @Column({ unique: true })

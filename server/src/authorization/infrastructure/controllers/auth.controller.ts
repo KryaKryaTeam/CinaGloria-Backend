@@ -31,6 +31,13 @@ import { Secure } from '../guards/auth/auth.guard';
 import { GetCSRFToken } from 'src/authorization/application/useCases/GetCSRFToken';
 import { LoginQueryParams } from '../dtos/LoginQueryParams';
 import { RegistrationCommand } from 'src/authorization/application/useCases/RegistrationCommand';
+import { ValidateRegistrationCommand } from 'src/authorization/application/useCases/ValidateRegistrationCommand';
+import { ContinueBody } from '../dtos/ContinueBody';
+import { ContinueQuery } from '../dtos/ContinueQuery';
+import { ContinueResponse } from '../dtos/ContinueResponse';
+import { RegistartionBody } from '../dtos/RegistrationBody';
+import { RegistrationResponse } from '../dtos/RegistarationResponse';
+import { RegistrationQuery } from '../dtos/RegistrationQuery';
 
 @Controller('auth')
 export class AuthController {
@@ -48,6 +55,9 @@ export class AuthController {
 
   @Inject()
   private readonly configurationService: ConfigService;
+
+  @Inject(CommandTokens.ValidateRegistrationCommand)
+  private readonly validationCommand: ValidateRegistrationCommand;
 
   @Post('/login')
   @Version('1')
@@ -84,12 +94,11 @@ export class AuthController {
 
   @Post('/registration')
   @Version('1')
-  @ApiBody({ type: CreateUserLocal, required: false })
-  @ApiResponse({ type: LoginResponse, status: 201 })
+  @ApiBody({ type: RegistartionBody, required: false })
+  @ApiResponse({ type: RegistrationResponse, status: 200 })
   async registration(
-    @Query() { state, code, provider }: LoginQueryParams,
-    @Body() body: CreateUserLocal,
-    @Response({ passthrough: true }) res: ExpressResponse,
+    @Query() { state, provider }: RegistrationQuery,
+    @Body() body: RegistartionBody,
     @Request() req: ExpressRequest,
   ) {
     if (!provider || !state)
@@ -99,20 +108,37 @@ export class AuthController {
     if (!csrfProtected) throw new ForbiddenException('CSRF Protection failed');
 
     const result = await this.registrationCommand.execute({
-      loginData: { token: code, ...body },
+      loginData: { ...body },
       type: provider,
     });
 
+    return {
+      requestId: result.requestId,
+    };
+  }
+
+  @Post('/continue')
+  @Version('1')
+  @ApiBody({ type: ContinueBody })
+  @ApiResponse({ type: ContinueResponse, status: 200 })
+  async continue(
+    @Query() { state }: ContinueQuery,
+    @Body() { code, requestId }: ContinueBody,
+    @Request() req: ExpressRequest,
+    @Response({ passthrough: true }) res: ExpressResponse,
+  ) {
+    const csrfProtected = req.cookies.csrf == state;
+    if (!csrfProtected) throw new ForbiddenException('CSRF Protection failed');
+
+    const tokens = await this.validationCommand.execute({ code, requestId });
+
     res.cookie(
       'refresh',
-      result.refreshToken,
+      tokens.refreshToken,
       this.configurationService.getOrThrow('cookie'),
     );
 
-    return {
-      accessToken: result.accessToken,
-      userExistsBefore: result.userExists,
-    };
+    return { accessToken: tokens.accessToken };
   }
 
   @Post('/refresh')

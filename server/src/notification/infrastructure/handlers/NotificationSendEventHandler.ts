@@ -19,7 +19,8 @@ export class NotificationSendEventHandler {
     eventHandler.addListener(
       EventType.SEND_NOTIFICATION,
       async (payload: Notification) => {
-        await this.notificationRepository.save(payload);
+        if (!(payload.targets[0] == 'email' && payload.targets.length == 1))
+          await this.notificationRepository.save(payload);
 
         await this.notificationService.sendNotification(payload);
       },

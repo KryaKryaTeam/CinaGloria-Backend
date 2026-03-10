@@ -1,4 +1,4 @@
-import { Body, Injectable } from '@nestjs/common';
+import { BadRequestException, Body, Injectable } from '@nestjs/common';
 import { AuthorizationProvider } from '../services/AuthorizationProviderService';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import {
@@ -69,25 +69,20 @@ export class GithubAuthorizationProvider extends BaseAuthorizationProvider<Githu
       )
         throw new DomainError(DomainErrors.UNEXPECTED_VALUE, 'MEOW NO SCOPES!');
 
-      const profileData = (await fetch('https://api.github.com/user', {
-        headers: {
-          Authorization: `Bearer ${accessToken.access_token}`,
-          'X-GitHub-Api-Version': '2022-11-28',
-          'User-Agent': 'CinaGloria-Auth-Service',
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      }).then((res) => res.json())) as GithubProfileData;
+      const commonHeaders = {
+        Authorization: `Bearer ${accessToken.access_token}`,
+        'X-GitHub-Api-Version': '2022-11-28',
+        'User-Agent': 'CinaGloria-Auth-Service',
+        Accept: 'application/json',
+      };
 
-      const emails = (await fetch('https://api.github.com/user/emails', {
-        headers: {
-          Authorization: `Bearer ${accessToken.access_token}`,
-          'X-GitHub-Api-Version': '2022-11-28',
-          'User-Agent': 'CinaGloria-Auth-Service',
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-      }).then((res) => res.json())) as GithubEmail[];
+      const [profileRes, emailsRes] = await Promise.all([
+        fetch('https://api.github.com/user', { headers: commonHeaders }),
+        fetch('https://api.github.com/user/emails', { headers: commonHeaders }),
+      ]);
+
+      const profileData = (await profileRes.json()) as GithubProfileData;
+      const emails = (await emailsRes.json()) as GithubEmail[];
 
       const primaryEmail = emails.find(
         (email) => email.verified && email.primary,
@@ -101,13 +96,8 @@ export class GithubAuthorizationProvider extends BaseAuthorizationProvider<Githu
         authorizationData: profileData.id,
         email: primaryEmail.email,
       };
-    } catch (err) {
-      if (!(err instanceof DomainError)) {
-        throw new DomainError(
-          DomainErrors.UNEXPECTED_VALUE,
-          JSON.stringify(err),
-        );
-      } else throw err;
+    } catch {
+      throw new BadRequestException('Github authorization failed!');
     }
   }
   validate(loginData: GithubLoginData): Promise<boolean> {

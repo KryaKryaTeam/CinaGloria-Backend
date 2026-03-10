@@ -12,6 +12,10 @@ export class CreateUserLocal {
   @ApiProperty({ required: false, example: '123Ac&44' })
   password: string;
 
+  @IsOptional()
+  @ApiProperty({ required: false, example: 'gsi_code' })
+  code?: string;
+
   constructor(partial: Partial<CreateUserLocal>) {
     Object.assign(this, partial);
   }

@@ -19,5 +19,5 @@ export class LoginQueryParams {
     name: 'code',
     description: 'Code for OAuth provider',
   })
-  code: string;
+  code?: string;
 }

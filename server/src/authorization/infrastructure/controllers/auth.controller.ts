@@ -75,8 +75,13 @@ export class AuthController {
     const csrfProtected = req.cookies.csrf == state;
     if (!csrfProtected) throw new ForbiddenException('CSRF Protection failed');
 
+    if (!body.code && !code && !body.password)
+      throw new BadRequestException('Credential undefined');
+
+    const _code = (body.code || code) as string;
+
     const result = await this.loginCommand.execute({
-      loginData: { token: code, ...body },
+      loginData: { token: _code, ...body },
       type: provider,
     });
 

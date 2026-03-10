@@ -6,19 +6,11 @@ import {
 import { AuthProviderEntity } from 'src/authorization/domain/entities/AuthProvider.entity';
 import { randomUUID } from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
-import { Injectable } from '@nestjs/common';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { AuthorizationProvider } from '../services/AuthorizationProviderService';
 
 interface GoogleLoginData {
   token: string;
-}
-
-interface GoogleResponse {
-  picture: string;
-  email: string;
-  verified_email: boolean;
-  id: string;
 }
 
 @Injectable()
@@ -43,27 +35,33 @@ export class GoogleAuthorizationProvider extends BaseAuthorizationProvider<Googl
   }
   async handshake(loginData: GoogleLoginData): Promise<IHandshakeOutput> {
     try {
-      const { tokens } = await this.OAuthClient.getToken(loginData.token);
-      const res = (await fetch(
-        'https://www.googleapis.com/oauth2/v2/userinfo',
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${tokens.access_token}`,
-          },
-        },
-      ).then((res) => res.json())) as GoogleResponse;
+      const ticket = await this.OAuthClient.verifyIdToken({
+        idToken: loginData.token,
+        audience: this.configurationService.getOrThrow('google.clientId'),
+      });
 
-      if (!res.verified_email)
-        throw new DomainError(DomainErrors.UNEXPECTED_VALUE, 'EMAIL!');
+      const payload = ticket.getPayload();
+
+      if (!payload) {
+        throw new BadRequestException('Invalid Google token');
+      }
+
+      if (!payload.email_verified) {
+        throw new BadRequestException('Email not verified');
+      }
+
+      if (!payload.email || !payload.picture)
+        throw new BadRequestException(
+          'Email or Picture of this user is unedfined!',
+        );
 
       return {
-        authorizationData: res.id,
-        avatarURL: res.picture,
-        email: res.email,
+        authorizationData: payload.sub,
+        avatarURL: payload.picture,
+        email: payload.email,
       };
-    } catch (err) {
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE, JSON.stringify(err));
+    } catch {
+      throw new BadRequestException('Google authentication failed');
     }
   }
   createProvider(loginData: string): AuthProviderEntity {

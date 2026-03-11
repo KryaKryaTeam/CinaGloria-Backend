@@ -5,6 +5,7 @@ import { NotificationSchema } from 'src/schemas/Notification.schema';
 import { Inject } from '@nestjs/common';
 import { MapperTokens } from 'src/common/Tokens';
 import { NotificationMapper } from 'src/notification/application/mappers/NotificationMapper';
+import { NotificationNonPopulated } from 'src/notification/domain/entities/NotificationNonPopulated';
 
 export class NotificationRepository
   extends BaseRepository<NotificationSchema>
@@ -33,5 +34,27 @@ export class NotificationRepository
     if (result == null) return null;
 
     return this.notificationMapper.toEntity(result);
+  }
+
+  async getPageByUserId(
+    userId: string,
+    page: number,
+  ): Promise<null | NotificationNonPopulated[]> {
+    const result = await this.repository.find({
+      where: { to: { id: userId } },
+      skip: page * 20,
+      take: 20,
+      loadRelationIds: true,
+    });
+
+    if (!result || !result[0]) return null;
+
+    return result.map((sch) =>
+      NotificationNonPopulated.load({
+        ...sch,
+        targets: ['ws'],
+        to: sch.to as unknown as string,
+      }),
+    );
   }
 }

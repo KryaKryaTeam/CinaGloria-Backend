@@ -15,51 +15,83 @@ interface INotification {
 }
 
 export class Notification {
-  public readonly id: string;
-  public readonly title: string;
-  public readonly content: string;
-  public readonly from: string;
-  public readonly to: UserEntity;
+  private readonly _id: string;
+  private readonly _title: string;
+  private readonly _content: string;
+  private readonly _from: string;
+  private readonly _to: UserEntity;
   private _status: NotificationStatus;
-  public readonly targets: string[];
-  public readonly createdAt: Date;
+  private readonly _targets: string[];
+  private readonly _createdAt: Date;
 
-  private constructor(partial: Partial<Notification>) {
-    Object.assign(this, partial);
+  private constructor(props: INotification) {
+    this._id = props.id;
+    this._title = props.title;
+    this._content = props.content;
+    this._from = props.from;
+    this._to = props.to;
+    this._status = props.status;
+    this._targets = props.targets;
+    this._createdAt = props.createdAt;
   }
 
-  public static create(obj: {
+  public static create(props: {
     title: string;
     content: string;
     from: string;
     to: UserEntity;
     targets: string[];
-  }) {
-    if (obj.title.length < 5 || obj.title.length > 100)
+  }): Notification {
+    if (props.title.length < 5 || props.title.length > 100) {
       throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    }
 
     return new Notification({
+      ...props,
       id: randomUUID(),
       status: NotificationStatus.sended,
       createdAt: new Date(),
-      ...obj,
     });
   }
 
-  public static load(obj: INotification) {
-    return new Notification(obj);
+  public static load(props: INotification): Notification {
+    return new Notification(props);
   }
 
+  get id() {
+    return this._id;
+  }
   get status() {
     return this._status;
   }
+  get to() {
+    return this._to;
+  }
+  get content() {
+    return this._content;
+  }
+  get title() {
+    return this._title;
+  }
+  get targets() {
+    return this._targets;
+  }
+  get from() {
+    return this._from;
+  }
+  get createdAt() {
+    return this._createdAt;
+  }
 
-  set status(NextStatus: NotificationStatus) {
-    if (this._status == NotificationStatus.readed)
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
-    if (this._status == NextStatus)
-      throw new DomainError(DomainErrors.NO_CHANGE);
+  public markAsRead(actorId: string): void {
+    if (this._to.id !== actorId) {
+      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+    }
 
-    this._status = NextStatus;
+    if (this._status === NotificationStatus.readed) {
+      return;
+    }
+
+    this._status = NotificationStatus.readed;
   }
 }

@@ -13,6 +13,9 @@ import { GenerateTicketCommand } from './application/commands/GenerateTicketComm
 import { NotificationGateway } from './infrastructure/gateways/WsNotification.gateway';
 import { EmailNotificationTarget } from './infrastructure/targets/EmailTarget';
 import { CacheModule } from '@nestjs/cache-manager';
+import { GetNotificationsQuery } from './application/commands/GetNotificationsQuery';
+import { NotificationsContorller } from './infrastructure/controllers/NotificationsController';
+import { MakeNotificationReaded } from './application/commands/MakeNotificationReadedCommand';
 
 const providers: Provider[] = [
   DiscoveryService,
@@ -32,6 +35,14 @@ const providers: Provider[] = [
     provide: CommandTokens.GenerateTicketCommand,
     useClass: GenerateTicketCommand,
   },
+  {
+    provide: CommandTokens.GetNotificationsQuery,
+    useClass: GetNotificationsQuery,
+  },
+  {
+    provide: CommandTokens.MakeNotificationReaded,
+    useClass: MakeNotificationReaded,
+  },
   EmailNotificationTarget,
   NotificationSendEventHandler,
   WSTarget,
@@ -47,6 +58,6 @@ const providers: Provider[] = [
     CacheModule.register({ ttl: 3600 * 6 }),
   ],
   exports: [...providers],
-  controllers: [WSContorller],
+  controllers: [WSContorller, NotificationsContorller],
 })
 export class NotificationModule {}

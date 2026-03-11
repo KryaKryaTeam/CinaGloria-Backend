@@ -30,6 +30,7 @@ export enum CommandTokens {
   UpdateAvatarCommand = 'UPDATE_AVATAR_COMMAND',
   GetCSRFToken = 'GET_CSRF_TOKEN',
   GetNotificationsQuery = 'GET_NOTIFICATION_QUERY',
+  MakeNotificationReaded = 'MAKE_NOTIFICATION_REDED',
 }
 
 export enum ServiceTokens {

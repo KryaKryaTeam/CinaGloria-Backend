@@ -30,8 +30,15 @@ export class NotificationRepository
     return result.map((el) => this.notificationMapper.toEntity(el));
   }
   async getById(id: string): Promise<Notification | null> {
-    const result = await this.repository.findOne({ where: { id } });
+    const result = await this.repository.findOne({
+      where: { id },
+      relationLoadStrategy: 'join',
+      loadEagerRelations: true,
+      relations: { to: true },
+    });
     if (result == null) return null;
+
+    console.log(result);
 
     return this.notificationMapper.toEntity(result);
   }

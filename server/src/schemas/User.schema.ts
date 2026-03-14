@@ -57,16 +57,12 @@ export class UserSchema {
 
   ///Relations
   @OneToMany(() => AuthorizationProvider, (provider) => provider.userId, {
-    onDelete: 'CASCADE',
     eager: true,
-    cascade: true,
   })
   authorizationProviders: AuthorizationProvider[];
 
   @OneToMany(() => NotificationSchema, (notification) => notification.to, {
-    onDelete: 'CASCADE',
     eager: true,
-    cascade: true,
   })
   notifications: NotificationSchema[];
 }

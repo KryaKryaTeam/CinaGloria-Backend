@@ -8,12 +8,14 @@ export enum MapperTokens {
   AuthorizationProviderMapper = 'AUTHORIZATION_PROVIDER_MAPPER',
   UserMapper = 'USER_MAPPER',
   NotificationMapper = 'NOTIFICATION_MAPPER',
+  FileMapper = 'FILE_MAPPER',
 }
 
 export enum ReposTokens {
   UserRepository = 'USER_REPOSITORY',
   AuthorizationProviderRepository = 'AUTHORIZATION_PROVIDER_REPOSITORY',
   NotificationRepository = 'NOTIFICATION_REPOSITORY',
+  FileRepository = 'FILE_REPOSITORY',
 }
 
 export enum CommandTokens {
@@ -39,6 +41,7 @@ export enum ServiceTokens {
   HashService = 'HASH_SERVICE',
   NotificationService = 'NOTIFICATION_SERVICE',
   WsTicketService = 'WS_TICKET_SERVICE',
+  LoadFileService = 'LOAD_FILE_SERVICE',
 }
 
 export enum MetadataTokens {

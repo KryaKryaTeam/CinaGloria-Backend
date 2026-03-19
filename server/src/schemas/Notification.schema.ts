@@ -23,7 +23,9 @@ export class NotificationSchema {
   @Column({ update: false, nullable: false })
   from: string;
 
-  @ManyToOne(() => UserSchema, (user) => user.notifications)
+  @ManyToOne(() => UserSchema, (user) => user.notifications, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   to: UserSchema;
 

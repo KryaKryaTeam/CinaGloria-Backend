@@ -8,12 +8,16 @@ export enum MapperTokens {
   AuthorizationProviderMapper = 'AUTHORIZATION_PROVIDER_MAPPER',
   UserMapper = 'USER_MAPPER',
   NotificationMapper = 'NOTIFICATION_MAPPER',
+  FileMapper = 'FILE_MAPPER',
+  FileRelationMapper = 'FILE_RELATION_MAPPER',
 }
 
 export enum ReposTokens {
   UserRepository = 'USER_REPOSITORY',
   AuthorizationProviderRepository = 'AUTHORIZATION_PROVIDER_REPOSITORY',
   NotificationRepository = 'NOTIFICATION_REPOSITORY',
+  FileRepository = 'FILE_REPOSITORY',
+  FileRelationRepository = 'FILE_RELATION_REPOSITORY',
 }
 
 export enum CommandTokens {
@@ -28,9 +32,11 @@ export enum CommandTokens {
   UpdateUserAdditionalDataCommand = 'UPDATE_USER_ADDITIONAL_DATA_COMMAND',
   UpdateUsernameCommand = 'UPDATE_USERNAME_COMMAND',
   UpdateAvatarCommand = 'UPDATE_AVATAR_COMMAND',
-  GetCSRFToken = 'GET_CSRF_TOKEN',
+  GetCSRFToken = 'GET_CSRF_TOKEN_QUERY',
   GetNotificationsQuery = 'GET_NOTIFICATION_QUERY',
-  MakeNotificationReaded = 'MAKE_NOTIFICATION_REDED',
+  MakeNotificationReaded = 'MAKE_NOTIFICATION_READED_COMMAND',
+  UploadFileCommand = 'UPLOAD_FILE_COMMAND',
+  GetLinkQuery = 'GET_LINK_QUERY',
 }
 
 export enum ServiceTokens {
@@ -39,6 +45,8 @@ export enum ServiceTokens {
   HashService = 'HASH_SERVICE',
   NotificationService = 'NOTIFICATION_SERVICE',
   WsTicketService = 'WS_TICKET_SERVICE',
+  LoadFileService = 'LOAD_FILE_SERVICE',
+  FileLinkerService = 'FILE_LINKER_SERVICE',
 }
 
 export enum MetadataTokens {

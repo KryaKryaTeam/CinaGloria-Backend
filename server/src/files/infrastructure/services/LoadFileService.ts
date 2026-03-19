@@ -1,0 +1,67 @@
+import {
+  Inject,
+  InternalServerErrorException,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
+import { ILoadFileService } from 'src/files/application/bounds/ILoadFileService';
+import { FileEntity } from 'src/files/domain/entities/File.entity';
+import { Readable } from 'stream';
+import { BaseLoadController } from '../loadControllers/BaseLoadController';
+import { DiscoveryService } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
+
+export const LoadController = DiscoveryService.createDecorator();
+
+export class LoadFileService implements ILoadFileService, OnModuleInit {
+  private loadControllers: Map<string, BaseLoadController> = new Map();
+  private readonly logger = new Logger(LoadFileService.name);
+
+  @Inject()
+  private readonly discoveryService: DiscoveryService;
+
+  @Inject()
+  private readonly configService: ConfigService;
+
+  onModuleInit() {
+    const providers = this.discoveryService.getProviders();
+
+    providers.forEach((el) => {
+      if (!this.discoveryService.getMetadataByDecorator(LoadController, el))
+        return;
+
+      this.addLoadController(
+        this.discoveryService.getMetadataByDecorator(
+          LoadController,
+          el,
+        ) as string,
+        el.instance as BaseLoadController,
+      );
+    });
+  }
+
+  async loadFile(file: Readable): Promise<FileEntity> {
+    return await this.controller.load(file);
+  }
+  async deleteFile(file: FileEntity): Promise<void> {
+    return await this.controller.delete(file);
+  }
+
+  getLink(file: FileEntity | InternalFile): Promise<string> | string {
+    return this.controller.getLink(file);
+  }
+  private get controller() {
+    const controller = this.loadControllers.get(
+      this.configService.getOrThrow('storage.controller'),
+    );
+
+    if (!controller) throw new InternalServerErrorException('Misconfigured!');
+
+    return controller;
+  }
+  private addLoadController(key: string, loadController: BaseLoadController) {
+    this.logger.log(`Load Controller added: ${key}`);
+    this.loadControllers.set(key, loadController);
+  }
+}

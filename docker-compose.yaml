@@ -26,6 +26,7 @@ services:
     volumes:
       - ./server:/app:rw
       - /app/node_modules
+      - ./server/uploads:/app/uploads:rw
     env_file:
       - ./.env
     command: >

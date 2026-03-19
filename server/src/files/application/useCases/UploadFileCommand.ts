@@ -1,0 +1,31 @@
+import { Inject } from '@nestjs/common';
+import { Command } from 'src/common/application/Command';
+import { ReposTokens, ServiceTokens } from 'src/common/Tokens';
+import { FileEntity } from 'src/files/domain/entities/File.entity';
+import { Readable } from 'typeorm/platform/PlatformTools.js';
+import type { ILoadFileService } from '../bounds/ILoadFileService';
+import type { IFileRepository } from '../bounds/IFileRepository';
+
+interface CommandInput {
+  stream: Readable;
+  mimeType: string;
+}
+interface CommandOutput {
+  file: FileEntity;
+}
+
+export class UploadFileCommand extends Command<CommandInput, CommandOutput> {
+  @Inject(ServiceTokens.LoadFileService)
+  private readonly loadFileService: ILoadFileService;
+
+  @Inject(ReposTokens.FileRepository)
+  private readonly fileRepository: IFileRepository;
+
+  async implementation(data: CommandInput): Promise<CommandOutput> {
+    const result = await this.loadFileService.loadFile(data.stream);
+
+    await this.fileRepository.save(result);
+
+    return { file: result };
+  }
+}

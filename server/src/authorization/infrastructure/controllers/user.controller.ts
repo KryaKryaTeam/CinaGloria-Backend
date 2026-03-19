@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -9,7 +10,6 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { GetPublicProfileRes } from '../dtos/GetPublicProfileRes';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { Secure } from '../guards/auth/auth.guard';
 import { GetPrivateProfileRes } from '../dtos/GetPrivateProfileRes';
 import { GetPrivateProfileQuery } from 'src/authorization/application/useCases/GetPrivateProfileQuery';
@@ -60,7 +60,10 @@ export class UserController {
   })
   @ApiResponse({ type: GetPublicProfileRes, status: 200 })
   async getUserPublicData(@Query('id') id: string) {
-    if (!id) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (!id)
+      throw new BadRequestException(
+        'The id of requested user must be provided',
+      );
 
     return await this.getPublicProfileQuery.execute(id);
   }

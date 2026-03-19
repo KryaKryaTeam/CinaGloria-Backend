@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from './common/common.module';
 import { AuthorizationModule } from './authorization/authorization.module';
 import { NotificationModule } from './notification/notification.module';
+import { FilesModule } from './files/files.module';
 import UsernameConfig from './configs/Username.config';
 import AvatarConfig from './configs/Avatar.config';
 import GoogleConfig from './configs/Google.config';
@@ -14,6 +15,9 @@ import CookieConfig from './configs/Cookie.config';
 import JWTConfig from './configs/JWT.config';
 import WsConfig from './configs/Ws.config';
 import MailConfig from './configs/Mail.config';
+import ServerConfig from './configs/Server.config';
+import StorageConfig, { ServeStaticConfig } from './configs/Storage.config';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -29,6 +33,9 @@ import MailConfig from './configs/Mail.config';
         WsConfig,
         JWTConfig,
         MailConfig,
+        ServerConfig,
+        StorageConfig,
+        ServeStaticConfig,
       ],
       isGlobal: true,
     }),
@@ -36,6 +43,8 @@ import MailConfig from './configs/Mail.config';
     CommonModule,
     AuthorizationModule,
     NotificationModule,
+    FilesModule,
+    ServeStaticModule.forRoot(ServeStaticConfig()),
   ],
 })
 export class AppModule {}

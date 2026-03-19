@@ -164,7 +164,7 @@ describe('UserEntity', () => {
   describe('UserEntity - Extended Tests', () => {
     const validEmail = 'dev@cinagloria.com';
     const validUsername = Username.create('code_runner_777');
-    const validAvatar = AvatarURL.create('https://avatar.com/1.png');
+    const validAvatar = AvatarURL.create('internal_file:uuid');
 
     const createDefaultUser = () =>
       UserEntity.create(validEmail, validUsername, validAvatar);

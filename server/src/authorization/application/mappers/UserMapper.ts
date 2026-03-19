@@ -5,7 +5,8 @@ import { AuthorizationProviderMapper } from './AuthorizationProviderMapper';
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { MapperTokens } from 'src/common/Tokens';
 import { Username } from 'src/authorization/domain/objects/Username.object';
-import { AvatarURL } from 'src/authorization/domain/objects/AvatarURL.object';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
+import { RelationSlots } from 'src/types/RelationSlots';
 
 @Injectable({ scope: Scope.DEFAULT })
 export class UserMapper extends Mapper<UserSchema, UserEntity> {
@@ -22,7 +23,11 @@ export class UserMapper extends Mapper<UserSchema, UserEntity> {
       _authorizationProviders: schema.authorizationProviders?.map((schema) =>
         this.AuthProviderMapper.toEntity(schema),
       ),
-      _avatarUrl: AvatarURL.create(schema.avatarUrl),
+      _avatarUrl: InternalFile.define<typeof RelationSlots.user.avatar>(
+        schema.avatarUrl,
+        'user:avatar',
+        'user:avatar',
+      ),
       email: schema.email,
       _username: Username.create(schema.username),
       _additionalData: {

@@ -29,6 +29,7 @@ export class AuthorizationProvider {
 
   @ManyToOne(() => UserSchema, (user) => user.authorizationProviders, {
     lazy: true,
+    onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
   userId: UserSchema;

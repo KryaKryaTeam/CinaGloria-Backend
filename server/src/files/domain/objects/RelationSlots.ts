@@ -1,0 +1,124 @@
+import { DomainError, DomainErrors } from 'src/error/DomainError';
+import {
+  ISlotConfig,
+  RelationSlots,
+  RelationSlotsConfig,
+} from 'src/types/RelationSlots';
+
+export class RelationSlotFamily {
+  private readonly _value: string;
+
+  private constructor(value: string) {
+    const arrayOfFamilies = Array.from(Object.keys(RelationSlots));
+
+    if (!arrayOfFamilies.includes(value))
+      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+
+    this._value = value;
+  }
+
+  static fromRelationString(value: RelationString) {
+    return new RelationSlotFamily(value.family);
+  }
+
+  get value() {
+    return this._value;
+  }
+}
+
+export class RelationSlotCode {
+  private readonly _value: string;
+
+  private constructor(value: string, family: RelationSlotFamily) {
+    const arrayOfCodes = Array.from(
+      Object.keys(RelationSlots[family.value] as RelationString[]),
+    );
+
+    if (!arrayOfCodes.includes(value))
+      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+
+    this._value = value;
+  }
+
+  static fromRelationString(value: RelationString) {
+    return new RelationSlotCode(
+      value.code,
+      RelationSlotFamily.fromRelationString(value),
+    );
+  }
+
+  get value() {
+    return this._value;
+  }
+}
+
+export class RelationSlotConfig {
+  private readonly _value: ISlotConfig;
+
+  private constructor(value: string) {
+    const config = RelationSlotsConfig.get(value) as ISlotConfig | undefined;
+
+    if (!config) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+
+    this._value = config;
+  }
+
+  static fromRelationString(value: RelationString) {
+    return new RelationSlotConfig(value.code);
+  }
+
+  get value() {
+    return this._value;
+  }
+}
+
+export class RelationString {
+  private readonly _value: string;
+  private _family: RelationSlotFamily;
+  private _code: RelationSlotCode;
+  private _config: RelationSlotConfig;
+
+  private constructor(value: string) {
+    const splited = value.split(':');
+
+    if (!splited[0]) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (!splited[1]) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+
+    this._value = value;
+  }
+
+  static define(value: string) {
+    const obj = new RelationString(value);
+    obj.validate();
+    return obj;
+  }
+
+  private validate() {
+    this._family = RelationSlotFamily.fromRelationString(this);
+    this._code = RelationSlotCode.fromRelationString(this);
+  }
+
+  private get splited(): string[] {
+    return this._value.split(':');
+  }
+
+  public get family(): string {
+    if (this._family) return this._family.value;
+    return this.splited[0];
+  }
+
+  public get code(): string {
+    if (this._code) return this._code.value;
+    return this.splited[1];
+  }
+
+  public get config(): ISlotConfig {
+    if (this._config) return this._config.value;
+    this._config = RelationSlotConfig.fromRelationString(this);
+    return this._config.value;
+  }
+
+  public get value(): string {
+    return this._value;
+  }
+}

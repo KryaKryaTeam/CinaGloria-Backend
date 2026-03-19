@@ -10,6 +10,7 @@ import { Readable } from 'stream';
 import { BaseLoadController } from '../loadControllers/BaseLoadController';
 import { DiscoveryService } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 
 export const LoadController = DiscoveryService.createDecorator();
 
@@ -40,14 +41,14 @@ export class LoadFileService implements ILoadFileService, OnModuleInit {
     });
   }
 
-  async loadFile(file: Readable, mimeType: string): Promise<FileEntity> {
-    return this.controller.load(file, mimeType);
+  async loadFile(file: Readable): Promise<FileEntity> {
+    return await this.controller.load(file);
   }
   async deleteFile(file: FileEntity): Promise<void> {
-    return this.controller.delete(file);
+    return await this.controller.delete(file);
   }
 
-  getLink(file: FileEntity): Promise<string> | string {
+  getLink(file: FileEntity | InternalFile): Promise<string> | string {
     return this.controller.getLink(file);
   }
   private get controller() {

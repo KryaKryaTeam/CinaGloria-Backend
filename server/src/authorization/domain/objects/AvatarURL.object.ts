@@ -13,7 +13,11 @@ export class AvatarURL {
     );
   }
   static create(value: string) {
-    if (!value.startsWith('http://') && !value.startsWith('https://'))
+    if (
+      !value.startsWith('http://') &&
+      !value.startsWith('https://') &&
+      !value.startsWith('internal_file:')
+    )
       throw new BadRequestException('URL should start with protocol');
 
     return new AvatarURL(value);

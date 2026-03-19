@@ -1,35 +1,48 @@
 import { Inject, PayloadTooLargeException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileEntity } from 'src/files/domain/entities/File.entity';
-import { Readable } from 'stream';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
+import { PassThrough, Readable } from 'stream';
+import { fileTypeFromStream, FileTypeResult } from 'file-type';
 
 export abstract class BaseLoadController {
   @Inject()
   protected readonly configService: ConfigService;
 
-  async load(stream: Readable, mimeType: string) {
+  async load(stream: Readable) {
     let size = 0;
-    stream.on('data', (chunk: { length: number }) => {
-      size += chunk.length;
+    const limit = 64 * 1024 * 1024;
+    const pass = new PassThrough();
 
-      if (size > this.configService.getOrThrow<number>('storage.limit'))
-        stream.destroy(
-          new PayloadTooLargeException(
-            `File should be smaller than ${this.configService.getOrThrow<number>('storage.limit')} bytes`,
-          ),
-        );
+    const validateSize = new Promise((resolve, reject) => {
+      stream.on('data', (chunk: { length: number }) => {
+        size += chunk.length;
+        if (size > limit) {
+          stream.destroy();
+          reject(new PayloadTooLargeException('File too large'));
+        }
+      });
+      stream.on('end', () => resolve(size));
+      stream.on('error', (err) => reject(err));
     });
 
-    const file = await this._load(stream, mimeType);
+    stream.pipe(pass);
+    const pr = fileTypeFromStream(pass);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_1, _2, file_] = await Promise.all([
+      pr,
+      validateSize,
+      this._load(stream, pr),
+    ]);
 
-    file.size = size;
+    file_.size = size;
 
-    return file;
+    return file_;
   }
   protected abstract _load(
     stream: Readable,
-    mimeType: string,
+    mimeType: Promise<FileTypeResult | undefined>,
   ): Promise<FileEntity>;
   abstract delete(file: FileEntity): Promise<void> | void;
-  abstract getLink(file: FileEntity): Promise<string> | string;
+  abstract getLink(file: FileEntity | InternalFile): Promise<string> | string;
 }

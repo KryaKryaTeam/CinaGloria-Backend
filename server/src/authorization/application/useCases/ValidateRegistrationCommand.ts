@@ -39,6 +39,7 @@ export class ValidateRegistrationCommand extends Command<
     if (userAndCode.code != data.code)
       throw new BadRequestException('Validation code is incorrect');
 
+    console.log(userAndCode);
     const user = UserEntity.load(userAndCode.user);
 
     user.pullEvents(this.eventDispatcher);

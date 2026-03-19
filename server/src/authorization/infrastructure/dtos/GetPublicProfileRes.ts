@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IPublicProfile } from 'src/authorization/domain/entities/User.entity';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { RoleEnum } from 'src/types/RoleEnum';
 
 // Окремий клас для вкладених об'єктів дозволяє Swagger побудувати схему
@@ -27,7 +28,7 @@ export class GetPublicProfileRes implements IPublicProfile {
     example: 'https://cdn.example.com/avatars/1.png',
     format: 'uri',
   })
-  avatarURL: string;
+  avatarURL: InternalFile;
 
   @ApiProperty({ enum: RoleEnum, example: RoleEnum.USER })
   role: RoleEnum;

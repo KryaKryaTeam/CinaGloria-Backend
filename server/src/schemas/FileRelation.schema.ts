@@ -19,6 +19,9 @@ export class FileRelation {
   @JoinColumn({ name: 'file_url' })
   file: FileSchema;
 
+  @Column()
+  slot: string;
+
   @ManyToOne(() => UserSchema, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
   user: UserSchema;

@@ -1,7 +1,10 @@
+import { DomainError, DomainErrors } from 'src/error/DomainError';
+
 export class MimeType {
   private readonly _value: string;
 
-  constructor(value: string) {
+  constructor(value: string | undefined) {
+    if (!value) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
     this._value = value;
   }
 
@@ -10,6 +13,6 @@ export class MimeType {
   }
 
   get fileFormat() {
-    return this._value.split('/')[0];
+    return this._value.split('/')[1];
   }
 }

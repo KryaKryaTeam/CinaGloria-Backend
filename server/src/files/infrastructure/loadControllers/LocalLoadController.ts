@@ -2,38 +2,68 @@ import { FileEntity } from 'src/files/domain/entities/File.entity';
 import { Readable } from 'stream';
 import { BaseLoadController } from './BaseLoadController';
 import { MimeType } from 'src/files/domain/objects/MimeType.object';
-import fs from 'fs';
-import fsPromises from 'fs/promises';
+import fs, { existsSync, PathLike } from 'fs';
+import fsPromises, { rename, unlink } from 'fs/promises';
 import path from 'path';
+import { pipeline } from 'stream/promises';
 import { LoadController } from '../services/LoadFileService';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
+import { InternalServerErrorException, OnModuleInit } from '@nestjs/common';
+import { FileTypeResult } from 'file-type';
 
-@LoadController('local')
-export class LocalLoadController extends BaseLoadController {
-  async _load(stream: Readable, mimeType: string): Promise<FileEntity> {
-    const file = FileEntity.create(null, new MimeType(mimeType));
-
-    const filePath = path.join(
+@LoadController('ls')
+export class LocalLoadController
+  extends BaseLoadController
+  implements OnModuleInit
+{
+  async onModuleInit() {
+    await fsPromises.mkdir(
       this.configService.getOrThrow('storage.ls.basePath'),
-      file.url,
+      { recursive: true },
+    );
+  }
+  protected async _load(
+    stream: Readable,
+    mimeType: Promise<FileTypeResult | undefined>,
+  ): Promise<FileEntity> {
+    const temp = crypto.randomUUID();
+    const fileTemp = path.join(
+      this.configService.getOrThrow('storage.ls.basePath'),
+      temp,
     );
 
-    const promise = new Promise((res, rej) => {
-      const ws = fs.createWriteStream(filePath, { flags: 'wx' });
-      stream.pipe(ws);
+    let filePath: PathLike | undefined;
+    try {
+      await pipeline(stream, fs.createWriteStream(fileTemp, { flags: 'wx' }));
 
-      ws.on('error', () => {
-        if (fs.existsSync(filePath))
-          fsPromises.unlink(filePath).catch(() => {});
-        rej(new Error('LS load failed!'));
-      });
-      ws.on('finish', () => {
-        res('meow!');
-      });
-    });
+      const mm = await mimeType;
 
-    await promise;
+      const file = FileEntity.create(null, new MimeType(mm?.mime));
 
-    return file;
+      filePath = path.join(
+        this.configService.getOrThrow('storage.ls.basePath'),
+        file.url,
+      );
+
+      await rename(fileTemp, filePath);
+
+      return file;
+    } catch (err) {
+      if (
+        (err as { code: string }).code.startsWith('ENOENT') &&
+        existsSync(fileTemp)
+      )
+        await unlink(fileTemp);
+
+      if (
+        (err as { code: string }).code.startsWith('ENOENT') &&
+        typeof filePath !== 'undefined' &&
+        existsSync(filePath)
+      )
+        await unlink(filePath);
+
+      throw new InternalServerErrorException('LS Load failed!');
+    }
   }
   async delete(file: FileEntity): Promise<void> {
     const filePath = path.join(
@@ -45,9 +75,12 @@ export class LocalLoadController extends BaseLoadController {
       if ((err as { code: string }).code !== 'ENOENT') throw err;
     });
   }
-  getLink(file: FileEntity): string {
+  getLink(file: FileEntity | InternalFile): string {
     const url =
-      this.configService.getOrThrow('server.baseUrl') + '/static/' + file.url;
+      this.configService.getOrThrow('server.baseUrl') +
+      `v${this.configService.getOrThrow('server.version')}` +
+      '/static/' +
+      file.url;
 
     return url;
   }

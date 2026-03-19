@@ -1,8 +1,10 @@
 import { registerAs } from '@nestjs/config';
+import { ServeStaticModuleOptions } from '@nestjs/serve-static';
 import path from 'path';
 
 export default registerAs('storage', () => ({
-  loadController: process.env.STORAGE_CONTROLLER || 'ls',
+  controller: process.env.STORAGE_CONTROLLER || 'ls',
+  limit: Number(process.env.STORAGE_LIMIT) || 64 * 1024 * 1024,
   s3: {
     id: process.env.S3_ID,
     accessKey: process.env.S3_ACCESS_KEY,
@@ -13,3 +15,9 @@ export default registerAs('storage', () => ({
     basePath: process.env.BASE_PATH || path.join(process.cwd(), 'uploads'),
   },
 }));
+
+export const ServeStaticConfig: () => ServeStaticModuleOptions = () => ({
+  rootPath: process.env.BASE_PATH || path.join(process.cwd(), 'uploads'),
+  serveRoot: '/v' + process.env.VERSION + '/static/',
+  serveStaticOptions: { index: false },
+});

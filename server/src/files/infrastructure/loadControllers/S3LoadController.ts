@@ -10,6 +10,8 @@ import { MimeType } from 'src/files/domain/objects/MimeType.object';
 import { Upload } from '@aws-sdk/lib-storage';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { LoadController } from '../services/LoadFileService';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
+import { FileTypeResult } from 'file-type';
 
 @LoadController('s3')
 export class S3LoadController extends BaseLoadController {
@@ -22,15 +24,19 @@ export class S3LoadController extends BaseLoadController {
       region: this.configService.getOrThrow('storage.s3.region'),
     });
   }
-  async _load(stream: Readable, mimeType: string): Promise<FileEntity> {
-    const file = FileEntity.create(null, new MimeType(mimeType));
+  async _load(
+    stream: Readable,
+    mimeType: Promise<FileTypeResult | undefined>,
+  ): Promise<FileEntity> {
+    const mm = await mimeType;
+    const file = FileEntity.create(null, new MimeType(mm?.mime));
 
     const upload = new Upload({
       params: {
         Bucket: this.configService.getOrThrow('storage.s3.bucket'),
         Key: file.url,
         Body: stream,
-        ContentType: mimeType,
+        ContentType: mm!.mime,
       },
       client: this.S3Client,
       queueSize: 1,
@@ -49,10 +55,10 @@ export class S3LoadController extends BaseLoadController {
 
     await this.S3Client.send(command);
   }
-  async getLink(file: FileEntity): Promise<string> {
+  async getLink(file: FileEntity | InternalFile): Promise<string> {
     const command = new GetObjectCommand({
       Bucket: this.configService.getOrThrow('storage.s3.bucket'),
-      Key: file.url,
+      Key: file instanceof FileEntity ? file.url : file.value,
     });
     return await getSignedUrl(this.S3Client, command, { expiresIn: 3600 });
   }

@@ -1,4 +1,4 @@
-import { Module, Provider } from '@nestjs/common';
+import { forwardRef, Module, Provider } from '@nestjs/common';
 import { CommandTokens, MapperTokens, ServiceTokens } from 'src/common/Tokens';
 import { AuthorizationProviderMapper } from './application/mappers/AuthorizationProviderMapper';
 import { UserMapper } from './application/mappers/UserMapper';
@@ -26,6 +26,7 @@ import { RegistrationCommand } from './application/useCases/RegistrationCommand'
 import { UserCreatedHandler } from './infrastructure/handlers/UserCreatedEventHandler';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ValidateRegistrationCommand } from './application/useCases/ValidateRegistrationCommand';
+import { FilesModule } from 'src/files/files.module';
 
 const providers: Provider[] = [
   {
@@ -111,7 +112,12 @@ const providers: Provider[] = [
       useClass: RoleGuard,
     },
   ],
-  imports: [DiscoveryModule, JwtModule.register({}), CacheModule.register()],
+  imports: [
+    DiscoveryModule,
+    JwtModule.register({}),
+    CacheModule.register(),
+    forwardRef(() => FilesModule),
+  ],
   exports: [...providers],
   controllers: [AuthController, UserController],
 })

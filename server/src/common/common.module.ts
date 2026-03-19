@@ -11,6 +11,12 @@ import { UserSchema } from 'src/schemas/User.schema';
 import { AuthorizationProvider } from 'src/schemas/AuthorizationProvider.schema';
 import { NotificationRepository } from './infrastructure/repositories/NotificationRepository';
 import { NotificationModule } from 'src/notification/notification.module';
+import { FileRepository } from './infrastructure/repositories/FileRepository';
+import { FileRelationRepository } from './infrastructure/repositories/FileRelationRepository';
+import { FilesModule } from 'src/files/files.module';
+import { Notification } from 'src/notification/domain/entities/Notification';
+import { FileSchema } from 'src/schemas/File.schema';
+import { FileRelation } from 'src/schemas/FileRelation.schema';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -25,6 +31,11 @@ const providers: Provider[] = [
     provide: ReposTokens.NotificationRepository,
     useClass: NotificationRepository,
   },
+  { provide: ReposTokens.FileRepository, useClass: FileRepository },
+  {
+    provide: ReposTokens.FileRelationRepository,
+    useClass: FileRelationRepository,
+  },
 ];
 
 @Global()
@@ -32,9 +43,16 @@ const providers: Provider[] = [
   providers,
   exports: providers,
   imports: [
-    TypeOrmModule.forFeature([UserSchema, AuthorizationProvider]),
+    TypeOrmModule.forFeature([
+      UserSchema,
+      AuthorizationProvider,
+      Notification,
+      FileSchema,
+      FileRelation,
+    ]),
     forwardRef(() => AuthorizationModule),
     forwardRef(() => NotificationModule),
+    forwardRef(() => FilesModule),
   ],
 })
 export class CommonModule {}

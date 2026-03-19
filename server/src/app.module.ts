@@ -16,7 +16,8 @@ import JWTConfig from './configs/JWT.config';
 import WsConfig from './configs/Ws.config';
 import MailConfig from './configs/Mail.config';
 import ServerConfig from './configs/Server.config';
-import StorageConfig from './configs/Storage.config';
+import StorageConfig, { ServeStaticConfig } from './configs/Storage.config';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import StorageConfig from './configs/Storage.config';
         MailConfig,
         ServerConfig,
         StorageConfig,
+        ServeStaticConfig,
       ],
       isGlobal: true,
     }),
@@ -42,6 +44,7 @@ import StorageConfig from './configs/Storage.config';
     AuthorizationModule,
     NotificationModule,
     FilesModule,
+    ServeStaticModule.forRoot(ServeStaticConfig()),
   ],
 })
 export class AppModule {}

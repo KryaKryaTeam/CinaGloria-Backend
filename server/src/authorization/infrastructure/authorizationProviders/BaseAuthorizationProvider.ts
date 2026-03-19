@@ -1,4 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { IAuthProviderRepository } from 'src/authorization/application/bounds/IAuthProviderRepository';
 import type { IUserRepository } from 'src/authorization/application/bounds/IUserRepository';
@@ -15,9 +20,14 @@ import {
 import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import { AuthorizationProviderService } from '../services/AuthorizationProviderService';
-import { AvatarURL } from 'src/authorization/domain/objects/AvatarURL.object';
 import type { IHashService } from 'src/authorization/application/bounds/IHashService';
 import type { IEventDispatcher } from 'src/common/domain/IEventDispatcher';
+import type { ILoadFileService } from 'src/files/application/bounds/ILoadFileService';
+import { Readable } from 'stream';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
+import { RelationSlots } from 'src/types/RelationSlots';
+import type { IFileRepository } from 'src/files/application/bounds/IFileRepository';
+import { FileEntity } from 'src/files/domain/entities/File.entity';
 
 export interface IHandshakeOutput {
   email: string;
@@ -50,6 +60,12 @@ export abstract class BaseAuthorizationProvider<T> {
   @Inject(BaseTokens.EventDispatcher)
   private eventDispatcher: IEventDispatcher;
 
+  @Inject(ServiceTokens.LoadFileService)
+  private readonly loadFileService: ILoadFileService;
+
+  @Inject(ReposTokens.FileRepository)
+  private readonly fileRepostory: IFileRepository;
+
   async authorization(
     loginData: T,
   ): Promise<{ user: UserEntity; existsUser: boolean }> {
@@ -64,16 +80,40 @@ export abstract class BaseAuthorizationProvider<T> {
     if (!findUser) {
       existsUser = false;
 
+      let file: FileEntity;
+
+      try {
+        const response = await fetch(handshakeData.avatarURL, {
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            Accept:
+              'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*',
+          },
+        });
+
+        if (!response.ok || !response.arrayBuffer)
+          throw new BadRequestException('Avatar by this url is unavalible!');
+        const buffer = Buffer.from(await response.arrayBuffer());
+        file = await this.loadFileService.loadFile(Readable.from(buffer));
+
+        await this.fileRepostory.save(file);
+      } catch (err) {
+        if ((err as { code: number | undefined }).code) throw err;
+        throw new InternalServerErrorException('Failed to fecth avatar!');
+      }
+
       findUser = UserEntity.create(
         handshakeData.email,
         Username.generate(
           this.configurationService.getOrThrow('username.animals'),
           this.configurationService.getOrThrow('username.adjectives'),
         ),
-        AvatarURL.create(handshakeData.avatarURL) ??
-          AvatarURL.generate(
-            this.configurationService.getOrThrow('avatar.list'),
-          ),
+        InternalFile.define<typeof RelationSlots.user.avatar>(
+          `internal_file:${file.url}`,
+          'user:avatar',
+          'user:avatar',
+        ),
       );
 
       if (this.type != AuthorizationProviderTypes.LOCAL)
@@ -91,8 +131,9 @@ export abstract class BaseAuthorizationProvider<T> {
         );
       });
 
-      if (this.type != AuthorizationProviderTypes.LOCAL)
+      if (this.type != AuthorizationProviderTypes.LOCAL) {
         await this.userRepository.save(findUser);
+      }
     } else {
       existsUser = true;
       if (

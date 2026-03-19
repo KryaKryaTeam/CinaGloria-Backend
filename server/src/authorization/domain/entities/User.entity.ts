@@ -7,7 +7,6 @@ import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import { randomUUID } from 'crypto';
 import { Username } from '../objects/Username.object';
-import { AvatarURL } from '../objects/AvatarURL.object';
 import { IHashService } from 'src/authorization/application/bounds/IHashService';
 import { Entity } from 'src/common/domain/Entity';
 import { Age } from '../objects/Age.object';
@@ -15,6 +14,8 @@ import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { UserCreated } from '../events/UserCreated.event';
 import { IEventJSON } from 'src/common/domain/Event';
 import { getEventClass } from 'src/common/domain/EventRegister';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
+import { RelationSlots } from 'src/types/RelationSlots';
 
 export interface IUserAdditionalData {
   telegram?: string;
@@ -29,7 +30,7 @@ interface IUserEntityConstructorProps {
   id: string;
   email: string;
   _username: Username;
-  _avatarUrl: AvatarURL;
+  _avatarUrl: InternalFile<typeof RelationSlots.user.avatar>;
   _additionalData?: IUserAdditionalData;
   _role: string;
   _authorizationProviders: AuthProviderEntity[];
@@ -38,7 +39,7 @@ interface IUserEntityConstructorProps {
 export interface IPublicProfile {
   id: string;
   username: string;
-  avatarURL: string;
+  avatarURL: InternalFile<typeof RelationSlots.user.avatar>;
   role: RoleEnum;
   contacts: {
     telegram?: string;
@@ -83,7 +84,7 @@ export class UserEntity extends Entity {
   public readonly id: string;
   public readonly email: string;
   private _username: Username;
-  private _avatarUrl: AvatarURL;
+  private _avatarUrl: InternalFile<typeof RelationSlots.user.avatar>;
   private _additionalData: IUserAdditionalData = {};
   private _role: RoleEnum;
   private _authorizationProviders: AuthProviderEntity[] = [];
@@ -96,7 +97,7 @@ export class UserEntity extends Entity {
   public static create(
     email: string,
     username: Username,
-    avatarUrl: AvatarURL,
+    avatarUrl: InternalFile<typeof RelationSlots.user.avatar>,
   ) {
     const id = randomUUID();
 
@@ -130,7 +131,11 @@ export class UserEntity extends Entity {
       id: plain.id,
       email: plain.email,
       _username: Username.create(plain.username),
-      _avatarUrl: AvatarURL.create(plain.avatarURL),
+      _avatarUrl: InternalFile.define<typeof RelationSlots.user.avatar>(
+        plain.avatarURL,
+        'user:avatar',
+        'user:avatar',
+      ),
       _role: plain.role,
       _authorizationProviders: plain.authorizationProvider.map(
         (el) => new AuthProviderEntity(el),
@@ -247,7 +252,7 @@ export class UserEntity extends Entity {
 
     providerForChange.setPasswordHash(password);
   }
-  changeAvatarURL(avatar_url: AvatarURL) {
+  changeAvatarURL(avatar_url: InternalFile<typeof RelationSlots.user.avatar>) {
     this._avatarUrl = avatar_url;
   }
 
@@ -308,7 +313,11 @@ export class UserEntity extends Entity {
     return {
       id: this.id,
       username: this._username.value,
-      avatarURL: this.avatarURL.value,
+      avatarURL: InternalFile.define<typeof RelationSlots.user.avatar>(
+        this.avatarURL.value,
+        'user:avatar',
+        'user:avatar',
+      ),
       role: this.role,
       contacts: {
         discord: this._additionalData.discord,

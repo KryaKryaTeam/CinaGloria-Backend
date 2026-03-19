@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UpdateAvatarCommand } from './UpdateAvatarCommand';
-import { BaseTokens, ReposTokens } from 'src/common/Tokens';
+import { BaseTokens, ReposTokens, ServiceTokens } from 'src/common/Tokens';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
 import { BadRequestException } from '@nestjs/common';
+import { DomainError } from 'src/error/DomainError';
 
 describe('UpdateAvatarCommand', () => {
   let command: UpdateAvatarCommand;
@@ -14,6 +15,15 @@ describe('UpdateAvatarCommand', () => {
     save: jest.fn(),
   };
 
+  const mockFileRepository = {
+    findByUrl: jest.fn(),
+    save: jest.fn(),
+  };
+
+  const mockFileLinkerService = {
+    linkAvatarToUser: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -21,6 +31,11 @@ describe('UpdateAvatarCommand', () => {
         {
           provide: ReposTokens.UserRepository,
           useValue: mockUserRepository,
+        },
+        { provide: ReposTokens.FileRepository, useValue: mockFileRepository },
+        {
+          provide: ServiceTokens.FileLinkerService,
+          useValue: mockFileLinkerService,
         },
         {
           provide: BaseTokens.DBContext,
@@ -39,7 +54,7 @@ describe('UpdateAvatarCommand', () => {
 
   it('should update avatar and save user when data is valid', async () => {
     const userId = 'user-123';
-    const newAvatarStr = 'https://cdn.image.com/new-avatar.png';
+    const newAvatarStr = 'internal_file:cdn.image.com/new-avatar.png';
 
     // Створюємо мок сутності з методом changeAvatarURL
     const mockUserEntity = {
@@ -47,12 +62,18 @@ describe('UpdateAvatarCommand', () => {
       changeAvatarURL: jest.fn(),
     };
 
+    const mockFile = {
+      url: newAvatarStr,
+    };
+
     mockUserRepository.findById.mockResolvedValue(mockUserEntity);
+    mockFileRepository.findByUrl.mockResolvedValue(mockFile);
 
     await command.implementation({ id: userId, avatar: newAvatarStr });
 
     // 1. Перевіряємо, чи знайшли юзера
     expect(mockUserRepository.findById).toHaveBeenCalledWith(userId);
+    expect(mockFileRepository.findByUrl).toHaveBeenCalledWith(newAvatarStr);
 
     // 2. Перевіряємо, чи викликано метод сутності з правильним Value Object
     // Ми використовують expect.any(AvatarURL) або перевіряємо значення всередині
@@ -74,7 +95,7 @@ describe('UpdateAvatarCommand', () => {
     // він має викинути помилку до того, як дійде до збереження
     await expect(
       command.implementation({ id: userId, avatar: invalidAvatar }),
-    ).rejects.toThrow(BadRequestException);
+    ).rejects.toThrow(DomainError);
 
     expect(mockUserRepository.save).not.toHaveBeenCalled();
   });

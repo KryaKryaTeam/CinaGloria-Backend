@@ -5,8 +5,9 @@ import { UserSchema } from 'src/schemas/User.schema';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { RoleEnum } from 'src/types/RoleEnum';
 import { Username } from 'src/authorization/domain/objects/Username.object';
-import { AvatarURL } from 'src/authorization/domain/objects/AvatarURL.object';
 import { AuthProviderEntity } from 'src/authorization/domain/entities/AuthProvider.entity';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
+import { RelationSlots } from 'src/types/RelationSlots';
 
 describe('UserMapper', () => {
   let mapper: UserMapper;
@@ -38,7 +39,7 @@ describe('UserMapper', () => {
         id: 'user-uuid',
         email: 'test@hex.com',
         username: 'valid_username',
-        avatarUrl: 'https://avatar.io/pic.png',
+        avatarUrl: 'internal_file:avatar.io/pic.png',
         role: RoleEnum.USER,
         authorizationProviders: [{ id: 'auth-1' } as any],
         telegram: '@handle',
@@ -64,7 +65,11 @@ describe('UserMapper', () => {
         id: 'user-uuid',
         email: 'test@hex.com',
         _username: Username.create('valid_username'),
-        _avatarUrl: AvatarURL.create('https://avatar.io/pic.png'),
+        _avatarUrl: InternalFile.define<typeof RelationSlots.user.avatar>(
+          'internal_file:something',
+          'user:avatar',
+          'user:avatar',
+        ),
         _role: RoleEnum.ADMIN,
         _authorizationProviders: [{ id: 'auth-ent' } as AuthProviderEntity],
         _additionalData: { telegram: '@bot' },

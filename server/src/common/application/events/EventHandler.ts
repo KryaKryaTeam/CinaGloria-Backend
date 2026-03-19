@@ -19,23 +19,22 @@ export class EventHandler {
       `Dispatching ${event.EventType} to ${callbacks.length} handlers`,
     );
 
-    for (const [index, call] of callbacks.entries()) {
-      try {
-        await this.dbContext.isolate(async () => {
-          this.logger.log(
-            `Starting handler #${index + 1} for ${event.EventType}`,
-          );
-          await call(event.payload);
-          this.logger.log(
-            `Finished handler #${index + 1} for ${event.EventType}`,
-          );
-        });
-      } catch (err) {
-        this.logger.error(
-          `Handler #${index + 1} failed: ${(err as Error).message}`,
-        );
-      }
-    }
+    const promises = callbacks.map(async (call, index) => {
+      this.logger.log(
+        `Handling event ${event.EventType}:${index + 1}/${callbacks.length}`,
+      );
+      await this.dbContext.isolate(async () => {
+        await call(event.payload);
+      });
+
+      this.logger.log(
+        `Finish ${event.EventType}:${index + 1}/${callbacks.length}`,
+      );
+    });
+
+    await Promise.all(promises).catch((err) =>
+      this.logger.error(`Event failed: ${err}`),
+    );
 
     this.logger.log(`All handlers for ${event.EventType} processed`);
   }
@@ -44,6 +43,5 @@ export class EventHandler {
     const arrayOfCallbacks = this.eventMapping.get(eventType) || [];
     arrayOfCallbacks.push(callback);
     this.eventMapping.set(eventType, arrayOfCallbacks);
-    console.log(arrayOfCallbacks);
   }
 }

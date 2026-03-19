@@ -13,6 +13,7 @@ export abstract class BaseLoadController {
     let size = 0;
     const limit = 64 * 1024 * 1024;
     const pass = new PassThrough();
+    const pass2 = new PassThrough();
 
     const validateSize = new Promise((resolve, reject) => {
       stream.on('data', (chunk: { length: number }) => {
@@ -27,12 +28,13 @@ export abstract class BaseLoadController {
     });
 
     stream.pipe(pass);
+    stream.pipe(pass2);
     const pr = fileTypeFromStream(pass);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_1, _2, file_] = await Promise.all([
       pr,
       validateSize,
-      this._load(stream, pr),
+      this._load(pass2, pr),
     ]);
 
     file_.size = size;

@@ -3,7 +3,6 @@ import { UpdateAvatarCommand } from './UpdateAvatarCommand';
 import { BaseTokens, ReposTokens, ServiceTokens } from 'src/common/Tokens';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
-import { BadRequestException } from '@nestjs/common';
 import { DomainError } from 'src/error/DomainError';
 
 describe('UpdateAvatarCommand', () => {

@@ -56,7 +56,7 @@ export class RelationSlotConfig {
   private readonly _value: ISlotConfig;
 
   private constructor(value: string) {
-    const config = RelationSlotsConfig.get(value) as ISlotConfig | undefined;
+    const config = RelationSlotsConfig.get(value);
 
     if (!config) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
 
@@ -64,7 +64,7 @@ export class RelationSlotConfig {
   }
 
   static fromRelationString(value: RelationString) {
-    return new RelationSlotConfig(value.code);
+    return new RelationSlotConfig(value.value);
   }
 
   get value() {

@@ -58,7 +58,7 @@ export class S3LoadController extends BaseLoadController {
   async getLink(file: FileEntity | InternalFile): Promise<string> {
     const command = new GetObjectCommand({
       Bucket: this.configService.getOrThrow('storage.s3.bucket'),
-      Key: file instanceof FileEntity ? file.url : file.value,
+      Key: file.url,
     });
     return await getSignedUrl(this.S3Client, command, { expiresIn: 3600 });
   }

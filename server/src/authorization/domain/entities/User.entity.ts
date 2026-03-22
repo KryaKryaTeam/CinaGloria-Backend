@@ -30,7 +30,7 @@ interface IUserEntityConstructorProps {
   id: string;
   email: string;
   _username: Username;
-  _avatarUrl: InternalFile<typeof RelationSlots.user.avatar>;
+  _avatarUrl: InternalFile<'user:avatar'>;
   _additionalData?: IUserAdditionalData;
   _role: string;
   _authorizationProviders: AuthProviderEntity[];
@@ -39,7 +39,7 @@ interface IUserEntityConstructorProps {
 export interface IPublicProfile {
   id: string;
   username: string;
-  avatarURL: InternalFile<typeof RelationSlots.user.avatar>;
+  avatarURL: InternalFile<'user:avatar'>;
   role: RoleEnum;
   contacts: {
     telegram?: string;

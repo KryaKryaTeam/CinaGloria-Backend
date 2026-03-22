@@ -28,7 +28,7 @@ export class GetPublicProfileRes implements IPublicProfile {
     example: 'https://cdn.example.com/avatars/1.png',
     format: 'uri',
   })
-  avatarURL: InternalFile;
+  avatarURL: InternalFile<'user:avatar'>;
 
   @ApiProperty({ enum: RoleEnum, example: RoleEnum.USER })
   role: RoleEnum;

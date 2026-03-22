@@ -6,7 +6,7 @@ import { PropsWithUserId } from 'src/types/PropsWithUserId';
 import type { IFileRepository } from 'src/files/application/bounds/IFileRepository';
 import { LinkerApplicationService } from 'src/files/application/services/Linker.appService';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
-import { AppSlotCode } from 'src/types/RelationSlots';
+import { RelationSlots } from 'src/types/RelationSlots';
 
 export class UpdateAvatarCommand extends Command<
   PropsWithUserId<{ avatar: string }>,
@@ -29,7 +29,7 @@ export class UpdateAvatarCommand extends Command<
     if (!file) throw new BadRequestException('File with this id is undefined');
 
     user.changeAvatarURL(
-      InternalFile.define<AppSlotCode>(
+      InternalFile.define<typeof RelationSlots.user.avatar>(
         data.avatar,
         'user:avatar',
         'user:avatar',

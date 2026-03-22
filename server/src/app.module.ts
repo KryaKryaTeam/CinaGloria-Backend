@@ -18,6 +18,7 @@ import MailConfig from './configs/Mail.config';
 import ServerConfig from './configs/Server.config';
 import StorageConfig, { ServeStaticConfig } from './configs/Storage.config';
 import { ServeStaticModule } from '@nestjs/serve-static';
+import { CompetitionsModule } from './competitions/competitions.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
     NotificationModule,
     FilesModule,
     ServeStaticModule.forRoot(ServeStaticConfig()),
+    CompetitionsModule,
   ],
 })
 export class AppModule {}

@@ -1,7 +1,7 @@
 import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { Icons } from 'src/types/Icons';
 
-interface ICompetitionRule {
+export interface ICompetitionRule {
   name: string;
   description: string;
   icon: Icons;

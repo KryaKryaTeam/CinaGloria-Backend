@@ -130,6 +130,29 @@ export class CompetitionEntity extends Entity {
 
   public static load(plain: ICompetitionPlain) {
     CompetitionEntity.validate(plain);
+
+    const filledIn = [
+      plain.name,
+      plain.description,
+      plain.banner,
+      plain.avatar,
+      plain.dateOfEnd,
+      plain.dateOfEndRegistration,
+      plain.dateOfStart,
+      plain.dateOfStartRegistration,
+      plain.ultraWideBanner,
+      plain.socialMedia,
+    ].every((el) => typeof el !== 'undefined');
+
+    if (
+      !(
+        plain.rules.length > 0 &&
+        filledIn &&
+        plain.status != CompetitionStatus.DRAFT
+      )
+    )
+      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+
     return new CompetitionEntity(plain);
   }
 

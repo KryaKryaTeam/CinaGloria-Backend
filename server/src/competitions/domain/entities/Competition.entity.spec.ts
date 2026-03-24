@@ -91,15 +91,15 @@ describe('CompetitionEntity', () => {
       // Create a "naked" competition with only the name
       const competition = CompetitionEntity.create({
         name: 'Empty Competition',
-        description: undefined,
-        banner: undefined,
-        avatar: undefined,
-        ultraWideBanner: undefined,
-        socialMedia: undefined,
-        dateOfStart: undefined,
-        dateOfEnd: undefined,
-        dateOfStartRegistration: undefined,
-        dateOfEndRegistration: undefined,
+        description: null,
+        banner: null,
+        avatar: null,
+        ultraWideBanner: null,
+        socialMedia: null,
+        dateOfStart: null,
+        dateOfEnd: null,
+        dateOfStartRegistration: null,
+        dateOfEndRegistration: null,
         rules: [],
       });
 
@@ -156,7 +156,7 @@ describe('CompetitionEntity', () => {
   });
 
   describe('Data Projections (Getters)', () => {
-    it('publicInList should return undefined when in DRAFT', () => {
+    it('publicInList should return null when in DRAFT', () => {
       const competition = CompetitionEntity.create(createBaseParams());
       expect(competition.publicInList).toBeUndefined();
     });

@@ -17,6 +17,9 @@ import { FilesModule } from 'src/files/files.module';
 import { Notification } from 'src/notification/domain/entities/Notification';
 import { FileSchema } from 'src/schemas/File.schema';
 import { FileRelation } from 'src/schemas/FileRelation.schema';
+import { CompetitionsModule } from 'src/competitions/competitions.module';
+import { CompetitionSchema } from 'src/schemas/Competition.schema';
+import { CompetitionRepository } from './infrastructure/repositories/CompetitionRepository';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -36,6 +39,10 @@ const providers: Provider[] = [
     provide: ReposTokens.FileRelationRepository,
     useClass: FileRelationRepository,
   },
+  {
+    provide: ReposTokens.CompetitionRepository,
+    useClass: CompetitionRepository,
+  },
 ];
 
 @Global()
@@ -49,10 +56,12 @@ const providers: Provider[] = [
       Notification,
       FileSchema,
       FileRelation,
+      CompetitionSchema,
     ]),
     forwardRef(() => AuthorizationModule),
     forwardRef(() => NotificationModule),
     forwardRef(() => FilesModule),
+    forwardRef(() => CompetitionsModule),
   ],
 })
 export class CommonModule {}

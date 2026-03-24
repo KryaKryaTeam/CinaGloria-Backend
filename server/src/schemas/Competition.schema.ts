@@ -17,40 +17,44 @@ export class CompetitionSchema {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ nullable: true })
-  name: string;
+  @Column({ type: 'varchar', nullable: true })
+  name: string | null;
 
   @Column({ type: 'text', nullable: true })
-  description: string;
+  description: string | null;
 
-  @Column({ nullable: true })
-  ultraWideBanner: string;
+  @Column({ type: 'varchar', nullable: true })
+  ultraWideBanner: string | null;
 
-  @Column({ nullable: true })
-  banner: string;
+  @Column({ type: 'varchar', nullable: true })
+  banner: string | null;
 
-  @Column({ nullable: true })
-  avatar: string;
+  @Column({ type: 'varchar', nullable: true })
+  avatar: string | null;
 
-  @Column({ nullable: true })
-  socialMedia: string;
-
-  @Column({ type: 'timestamp with time zone', nullable: true })
-  dateOfStart: Date;
+  @Column({ type: 'varchar', nullable: true })
+  socialMedia: string | null;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  dateOfEnd: Date;
+  dateOfStart: Date | null;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  dateOfStartRegistration: Date;
+  dateOfEnd: Date | null;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  dateOfEndRegistration: Date;
+  dateOfStartRegistration: Date | null;
+
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  dateOfEndRegistration: Date | null;
 
   @Column({ type: 'jsonb', default: [] })
   rules: ICompetitionRule[];
 
-  @Column({ enum: CompetitionStatus, enumName: 'competition_status' })
+  @Column({
+    type: 'enum',
+    enum: CompetitionStatus,
+    enumName: 'competition_status',
+  })
   status: CompetitionStatus;
 
   @CreateDateColumn()

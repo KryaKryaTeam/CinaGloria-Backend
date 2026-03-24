@@ -10,6 +10,7 @@ export enum MapperTokens {
   NotificationMapper = 'NOTIFICATION_MAPPER',
   FileMapper = 'FILE_MAPPER',
   FileRelationMapper = 'FILE_RELATION_MAPPER',
+  CompetitionMapper = 'COMPETITION_MAPPER',
 }
 
 export enum ReposTokens {
@@ -18,6 +19,7 @@ export enum ReposTokens {
   NotificationRepository = 'NOTIFICATION_REPOSITORY',
   FileRepository = 'FILE_REPOSITORY',
   FileRelationRepository = 'FILE_RELATION_REPOSITORY',
+  CompetitionRepository = 'COMPETITION_REPOSITORY',
 }
 
 export enum CommandTokens {

@@ -34,50 +34,48 @@ export interface ICompetitionOnPage {
 
 export interface ICompetitionPlain {
   id: string;
-  name: string | undefined;
-  description: string | undefined;
-  ultraWideBanner: InternalFile<'competition:ultraWideBanner'> | undefined;
-  banner: InternalFile<'competition:banner'> | undefined;
-  avatar: InternalFile<'competition:avatar'> | undefined;
-  socialMedia: InternalFile<'competition:socialMedia'> | undefined;
-  dateOfStart: Date | undefined;
-  dateOfEnd: Date | undefined;
-  dateOfStartRegistration: Date | undefined;
-  dateOfEndRegistration: Date | undefined;
+  name: string | null;
+  description: string | null;
+  ultraWideBanner: InternalFile<'competition:ultraWideBanner'> | null;
+  banner: InternalFile<'competition:banner'> | null;
+  avatar: InternalFile<'competition:avatar'> | null;
+  socialMedia: InternalFile<'competition:socialMedia'> | null;
+  dateOfStart: Date | null;
+  dateOfEnd: Date | null;
+  dateOfStartRegistration: Date | null;
+  dateOfEndRegistration: Date | null;
   status: CompetitionStatus;
   rules: CompetitionRule[];
 }
 
 export interface ICreateCompetition {
-  name: string | undefined;
-  description: string | undefined;
-  ultraWideBanner: InternalFile<'competition:ultraWideBanner'> | undefined;
-  banner: InternalFile<'competition:banner'> | undefined;
-  avatar: InternalFile<'competition:avatar'> | undefined;
-  socialMedia: InternalFile<'competition:socialMedia'> | undefined;
-  dateOfStart: Date | undefined;
-  dateOfEnd: Date | undefined;
-  dateOfStartRegistration: Date | undefined;
-  dateOfEndRegistration: Date | undefined;
+  name: string | null;
+  description: string | null;
+  ultraWideBanner: InternalFile<'competition:ultraWideBanner'> | null;
+  banner: InternalFile<'competition:banner'> | null;
+  avatar: InternalFile<'competition:avatar'> | null;
+  socialMedia: InternalFile<'competition:socialMedia'> | null;
+  dateOfStart: Date | null;
+  dateOfEnd: Date | null;
+  dateOfStartRegistration: Date | null;
+  dateOfEndRegistration: Date | null;
   rules: CompetitionRule[];
 }
 
 export class CompetitionEntity extends Entity {
   public readonly id: string;
-  private _name: string | undefined;
-  private _description: string | undefined;
+  private _name: string | null;
+  private _description: string | null;
 
-  private _ultraWideBanner:
-    | InternalFile<'competition:ultraWideBanner'>
-    | undefined;
-  private _banner: InternalFile<'competition:banner'> | undefined;
-  private _avatar: InternalFile<'competition:avatar'> | undefined;
-  private _socialMedia: InternalFile<'competition:socialMedia'> | undefined;
+  private _ultraWideBanner: InternalFile<'competition:ultraWideBanner'> | null;
+  private _banner: InternalFile<'competition:banner'> | null;
+  private _avatar: InternalFile<'competition:avatar'> | null;
+  private _socialMedia: InternalFile<'competition:socialMedia'> | null;
 
-  private _dateOfStart: Date | undefined;
-  private _dateOfEnd: Date | undefined;
-  private _dateOfStartRegistration: Date | undefined;
-  private _dateOfEndRegistration: Date | undefined;
+  private _dateOfStart: Date | null;
+  private _dateOfEnd: Date | null;
+  private _dateOfStartRegistration: Date | null;
+  private _dateOfEndRegistration: Date | null;
 
   private _status: CompetitionStatus;
 
@@ -142,7 +140,7 @@ export class CompetitionEntity extends Entity {
       plain.dateOfStartRegistration,
       plain.ultraWideBanner,
       plain.socialMedia,
-    ].every((el) => typeof el !== 'undefined');
+    ].every((el) => el !== null);
 
     if (
       !(
@@ -191,8 +189,7 @@ export class CompetitionEntity extends Entity {
       this._dateOfStartRegistration,
       this._ultraWideBanner,
       this._socialMedia,
-    ].every((el) => typeof el !== 'undefined');
-
+    ].every((el) => el != null);
     return this._rules.length > 0 && filledIn;
   }
 
@@ -238,10 +235,10 @@ export class CompetitionEntity extends Entity {
   }
 
   private static datesValid(
-    _startOfReg: Date | undefined,
-    _endOfReg: Date | undefined,
-    _start: Date | undefined,
-    _end: Date | undefined,
+    _startOfReg: Date | null,
+    _endOfReg: Date | null,
+    _start: Date | null,
+    _end: Date | null,
   ) {
     const startOfReg = _startOfReg?.getTime() || 0;
     const endOfReg = _endOfReg?.getTime() || startOfReg + 1;
@@ -377,36 +374,34 @@ export class CompetitionEntity extends Entity {
     this._status = value;
   }
 
-  get name(): string | undefined {
+  get name(): string | null {
     return this._name;
   }
-  get description(): string | undefined {
+  get description(): string | null {
     return this._description;
   }
-  get ultraWideBanner():
-    | InternalFile<'competition:ultraWideBanner'>
-    | undefined {
+  get ultraWideBanner(): InternalFile<'competition:ultraWideBanner'> | null {
     return this._ultraWideBanner;
   }
-  get banner(): InternalFile<'competition:banner'> | undefined {
+  get banner(): InternalFile<'competition:banner'> | null {
     return this._banner;
   }
-  get avatar(): InternalFile<'competition:avatar'> | undefined {
+  get avatar(): InternalFile<'competition:avatar'> | null {
     return this._avatar;
   }
-  get socialMedia(): InternalFile<'competition:socialMedia'> | undefined {
+  get socialMedia(): InternalFile<'competition:socialMedia'> | null {
     return this._socialMedia;
   }
-  get dateOfStart(): Date | undefined {
+  get dateOfStart(): Date | null {
     return this._dateOfStart;
   }
-  get dateOfEnd(): Date | undefined {
+  get dateOfEnd(): Date | null {
     return this._dateOfEnd;
   }
-  get dateOfStartRegistration(): Date | undefined {
+  get dateOfStartRegistration(): Date | null {
     return this._dateOfStartRegistration;
   }
-  get dateOfEndRegistration(): Date | undefined {
+  get dateOfEndRegistration(): Date | null {
     return this._dateOfEndRegistration;
   }
   get status() {

@@ -45,6 +45,7 @@ export class CompetitionMapper extends Mapper<
           )
         : null,
       status: schema.status,
+      publishAt: schema.publishAt,
       ultraWideBanner: schema.ultraWideBanner
         ? InternalFile.define<typeof RelationSlots.competition.ultraWideBanner>(
             schema.ultraWideBanner,
@@ -77,6 +78,7 @@ export class CompetitionMapper extends Mapper<
         ? null
         : entity.socialMedia.value;
     schema.status = entity.status;
+    schema.publishAt = entity.publishAt;
     schema.rules = entity.rules.map((el) => el.toJSON);
 
     return schema;

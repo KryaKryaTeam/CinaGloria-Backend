@@ -47,6 +47,9 @@ export class CompetitionSchema {
   @Column({ type: 'timestamp with time zone', nullable: true })
   dateOfEndRegistration: Date | null;
 
+  @Column({ type: 'timestamp with time zone', nullable: true })
+  publishAt: Date | null;
+
   @Column({ type: 'jsonb', default: [] })
   rules: ICompetitionRule[];
 

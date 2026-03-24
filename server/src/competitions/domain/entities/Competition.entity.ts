@@ -44,6 +44,7 @@ export interface ICompetitionPlain {
   dateOfEnd: Date | null;
   dateOfStartRegistration: Date | null;
   dateOfEndRegistration: Date | null;
+  publishAt: Date | null;
   status: CompetitionStatus;
   rules: CompetitionRule[];
 }
@@ -76,9 +77,9 @@ export class CompetitionEntity extends Entity {
   private _dateOfEnd: Date | null;
   private _dateOfStartRegistration: Date | null;
   private _dateOfEndRegistration: Date | null;
+  private _publishAt: Date | null;
 
   private _status: CompetitionStatus;
-
   private _rules: CompetitionRule[];
 
   private readonly createdAt: Date;
@@ -94,6 +95,7 @@ export class CompetitionEntity extends Entity {
     this._banner = plain.banner;
     this._avatar = plain.avatar;
     this._socialMedia = plain.socialMedia;
+    this._publishAt = plain.publishAt;
     this._dateOfStart = plain.dateOfStart;
     this._dateOfEnd = plain.dateOfEnd;
     this._dateOfStartRegistration = plain.dateOfStartRegistration;
@@ -105,6 +107,7 @@ export class CompetitionEntity extends Entity {
   private static validate(plain: ICompetitionPlain | ICreateCompetition) {
     if (
       !CompetitionEntity.datesValid(
+        new Date(),
         plain.dateOfStartRegistration,
         plain.dateOfEndRegistration,
         plain.dateOfStart,
@@ -161,6 +164,7 @@ export class CompetitionEntity extends Entity {
       id: randomUUID(),
       rules: plain.rules || [],
       status: CompetitionStatus.DRAFT,
+      publishAt: null,
     });
   }
 
@@ -195,7 +199,14 @@ export class CompetitionEntity extends Entity {
 
   private canChangeStatusTo(newStatus: CompetitionStatus): boolean {
     const allowedTransitions: Record<CompetitionStatus, CompetitionStatus[]> = {
-      [CompetitionStatus.DRAFT]: [CompetitionStatus.PUBLISHED],
+      [CompetitionStatus.DRAFT]: [
+        CompetitionStatus.PUBLISHED,
+        CompetitionStatus.SCHEDULED,
+      ],
+      [CompetitionStatus.SCHEDULED]: [
+        CompetitionStatus.DRAFT,
+        CompetitionStatus.PUBLISHED,
+      ],
       [CompetitionStatus.PUBLISHED]: [
         CompetitionStatus.CANCELED,
         CompetitionStatus.REGISTRATION,
@@ -224,7 +235,10 @@ export class CompetitionEntity extends Entity {
 
     const possibleStatuses = allowedTransitions[this._status] ?? [];
 
-    if (newStatus == CompetitionStatus.PUBLISHED)
+    if (
+      newStatus == CompetitionStatus.PUBLISHED ||
+      newStatus == CompetitionStatus.SCHEDULED
+    )
       return this.canBePublished && possibleStatuses.includes(newStatus);
 
     return possibleStatuses.includes(newStatus);
@@ -235,24 +249,18 @@ export class CompetitionEntity extends Entity {
   }
 
   private static datesValid(
-    _startOfReg: Date | null,
-    _endOfReg: Date | null,
-    _start: Date | null,
-    _end: Date | null,
-  ) {
-    const startOfReg = _startOfReg?.getTime() || 0;
-    const endOfReg = _endOfReg?.getTime() || startOfReg + 1;
-    const start = _start?.getTime() || endOfReg + 1;
-    const end = _end?.getTime() || start + 1;
+    publishAt: Date | null,
+    startReg: Date | null,
+    endReg: Date | null,
+    start: Date | null,
+    end: Date | null,
+  ): boolean {
+    if (publishAt && startReg && publishAt >= startReg) return false;
+    if (startReg && endReg && startReg >= endReg) return false;
+    if (endReg && start && endReg > start) return false;
+    if (start && end && start >= end) return false;
 
-    if (
-      startOfReg < endOfReg &&
-      (endOfReg < start || endOfReg == start) &&
-      start < end
-    )
-      return true;
-
-    return false;
+    return true;
   }
 
   set name(value: string) {
@@ -278,6 +286,7 @@ export class CompetitionEntity extends Entity {
 
     if (
       !CompetitionEntity.datesValid(
+        this._publishAt,
         this._dateOfStartRegistration,
         this._dateOfEndRegistration,
         value,
@@ -294,6 +303,7 @@ export class CompetitionEntity extends Entity {
 
     if (
       !CompetitionEntity.datesValid(
+        this._publishAt,
         this._dateOfStartRegistration,
         this._dateOfEndRegistration,
         this._dateOfStart,
@@ -310,6 +320,7 @@ export class CompetitionEntity extends Entity {
 
     if (
       !CompetitionEntity.datesValid(
+        this._publishAt,
         value,
         this._dateOfEndRegistration,
         this._dateOfStart,
@@ -326,6 +337,7 @@ export class CompetitionEntity extends Entity {
 
     if (
       !CompetitionEntity.datesValid(
+        this._publishAt,
         this._dateOfStartRegistration,
         value,
         this._dateOfStart,
@@ -335,6 +347,37 @@ export class CompetitionEntity extends Entity {
       throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
 
     this._dateOfEndRegistration = value;
+  }
+
+  public schedule(date: Date) {
+    this.canChangeCheck();
+
+    if (!this.canChangeStatusTo(CompetitionStatus.SCHEDULED))
+      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+
+    if (
+      !CompetitionEntity.datesValid(
+        date,
+        this._dateOfStartRegistration,
+        this._dateOfEndRegistration,
+        this._dateOfStart,
+        this._dateOfEnd,
+      )
+    )
+      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+
+    this._status = CompetitionStatus.SCHEDULED;
+    this._publishAt = date;
+  }
+
+  public declineScheduledPublish() {
+    this.canChangeCheck();
+
+    if (!this.canChangeStatusTo(CompetitionStatus.DRAFT))
+      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+
+    this._status = CompetitionStatus.DRAFT;
+    this._publishAt = null;
   }
 
   set ultraWideBanner(value: InternalFile<'competition:ultraWideBanner'>) {
@@ -369,6 +412,9 @@ export class CompetitionEntity extends Entity {
   }
 
   set status(value: CompetitionStatus) {
+    if (value == CompetitionStatus.SCHEDULED)
+      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+
     if (!this.canChangeStatusTo(value))
       throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
     this._status = value;
@@ -403,6 +449,9 @@ export class CompetitionEntity extends Entity {
   }
   get dateOfEndRegistration(): Date | null {
     return this._dateOfEndRegistration;
+  }
+  get publishAt(): Date | null {
+    return this._publishAt;
   }
   get status() {
     return this._status;
@@ -456,6 +505,7 @@ export class CompetitionEntity extends Entity {
       dateOfEnd: this._dateOfEnd,
       dateOfStartRegistration: this._dateOfStartRegistration,
       dateOfEndRegistration: this._dateOfEndRegistration,
+      publishAt: this._publishAt,
       rules: this.rules,
       status: this._status,
     };

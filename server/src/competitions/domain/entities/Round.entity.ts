@@ -1,0 +1,136 @@
+import { randomUUID } from 'crypto';
+import { Entity } from 'src/common/domain/Entity';
+import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { Icons } from 'src/types/Icons';
+import { RoundStatus } from 'src/types/RoundStatus';
+import { TaskEntity } from './Task.entity';
+
+export interface ICreateRound {
+  name: string;
+  description: string;
+  icon: Icons;
+  startOfRound: Date;
+  endOfRound: Date;
+  relatedTasks: TaskEntity[];
+  hidden: boolean;
+}
+
+export interface IRoundPlain {
+  id: string;
+  name: string;
+  hidden: boolean;
+  description: string;
+  icon: Icons;
+  startOfRound: Date;
+  endOfRound: Date;
+  relatedTasks: TaskEntity[];
+  status: RoundStatus;
+}
+
+export class RoundEntity extends Entity {
+  private readonly id: string;
+  private _hidden: boolean;
+  private _name: string | null;
+  private _description: string | null;
+  private _icon: Icons | null;
+  private _startOfRound: Date | null;
+  private _endOfRound: Date | null;
+  private _relatedTasks: TaskEntity[];
+  private _status: RoundStatus;
+
+  private constructor(plain: IRoundPlain) {
+    super();
+    this._name = plain.name;
+    this._description = plain.description;
+    this._icon = plain.icon;
+    this._startOfRound = plain.startOfRound;
+    this._endOfRound = plain.endOfRound;
+    this._relatedTasks = plain.relatedTasks;
+    this._status = plain.status;
+  }
+
+  public static create(data: ICreateRound) {
+    return new RoundEntity({
+      ...data,
+      id: randomUUID(),
+      status: RoundStatus.CREATED,
+    });
+  }
+
+  private canChangeStatusTo(status: RoundStatus): boolean {
+    const allowedTransitions: Record<RoundStatus, RoundStatus[]> = {
+      [RoundStatus.CREATED]: [RoundStatus.IN_PROGRESS],
+      [RoundStatus.IN_PROGRESS]: [RoundStatus.ON_JUDGING],
+      [RoundStatus.ON_JUDGING]: [RoundStatus.FINISHED],
+      [RoundStatus.FINISHED]: [],
+    };
+
+    const possibleStatuses = allowedTransitions[this._status] ?? [];
+
+    return possibleStatuses.includes(status);
+  }
+
+  set name(name: string) {
+    this._name = name;
+  }
+  set description(description: string) {
+    this._description = description;
+  }
+
+  set icon(icon: Icons) {
+    this._icon = icon;
+  }
+
+  set startOfRound(date: Date) {
+    if (date > new Date()) this._startOfRound = date;
+    else throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+  }
+
+  set enfOfRound(date: Date) {
+    if (date > new Date()) this._endOfRound = date;
+    else throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+  }
+
+  set status(status: RoundStatus) {
+    this._status = status;
+  }
+
+  get name() {
+    return this._name ?? '';
+  }
+
+  get description() {
+    return this._description ?? '';
+  }
+
+  get icon(): Icons | null {
+    return this._icon ?? null;
+  }
+
+  get startOfRound() {
+    return this._startOfRound;
+  }
+
+  get endOfRound() {
+    return this._endOfRound;
+  }
+
+  get relatedTasks() {
+    return this._relatedTasks;
+  }
+
+  get status() {
+    return this._status;
+  }
+
+  addTask(task: TaskEntity) {
+    this._relatedTasks.push(task);
+  }
+
+  removeTask(task: TaskEntity) {
+    const i: number = this._relatedTasks.findIndex((t) => {
+      if (t.id == task.id) return true;
+    });
+    this._relatedTasks.splice(i, 1);
+  }
+}

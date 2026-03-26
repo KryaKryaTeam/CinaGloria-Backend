@@ -3,7 +3,7 @@ import {
   ICreateCompetition,
 } from '../entities/Competition.entity';
 import { RoundEntity, type ICreateRound } from '../entities/Round.entity';
-import { TaskEntity } from '../entities/Task.entity';
+import { ICreateTask, TaskEntity } from '../entities/Task.entity';
 
 export class RoundAndCompetitionService {
   createRound(data: ICreateRound) {
@@ -12,6 +12,10 @@ export class RoundAndCompetitionService {
 
   createCompetition(data: ICreateCompetition) {
     return CompetitionEntity.create(data);
+  }
+
+  createTask(data: ICreateTask) {
+    return TaskEntity.create(data);
   }
 
   addTaskToRound(task: TaskEntity, round: RoundEntity) {

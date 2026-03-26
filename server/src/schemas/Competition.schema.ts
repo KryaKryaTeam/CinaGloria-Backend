@@ -50,12 +50,14 @@ export class CompetitionSchema {
   dateOfEndRegistration: Date | null;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  publishAt: Date | null;
+  publishedAt: Date | null;
 
   @Column({ type: 'jsonb', default: [] })
   rules: ICompetitionRule[];
 
-  @OneToMany(() => RoundSchema, (round) => round.competition)
+  @OneToMany(() => RoundSchema, (round) => round.competition, {
+    onDelete: 'CASCADE',
+ })
   rounds: RoundSchema;
 
   @Column({

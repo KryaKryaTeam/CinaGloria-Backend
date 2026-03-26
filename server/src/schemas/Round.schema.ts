@@ -5,9 +5,11 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { CompetitionSchema } from './Competition.schema';
+import { TaskSchema } from './Task.schema';
 
 @Entity({ name: 'round' })
 export class RoundSchema {
@@ -32,8 +34,8 @@ export class RoundSchema {
   @Column({ type: 'timestamp with time zone', nullable: true })
   endOfRound: Date | null;
 
-  //   @Column({ type: 'jsonb', default: [] })
-  //   relatedTasks: TaskSchema[];
+  @OneToMany(() => TaskSchema, (task) => task.round, { onDelete: 'CASCADE' })
+  relatedTasks: TaskSchema[];
 
   // fire engineering
   @Column({ type: 'enum', enum: RoundStatus, enumName: 'round_status' })

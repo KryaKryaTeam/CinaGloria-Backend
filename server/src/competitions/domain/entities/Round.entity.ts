@@ -57,6 +57,10 @@ export class RoundEntity extends Entity {
     });
   }
 
+  public static load(data: IRoundPlain) {
+    return new RoundEntity(data);
+  }
+
   private canChangeStatusTo(status: RoundStatus): boolean {
     const allowedTransitions: Record<RoundStatus, RoundStatus[]> = {
       [RoundStatus.CREATED]: [RoundStatus.IN_PROGRESS],
@@ -95,6 +99,10 @@ export class RoundEntity extends Entity {
     this._status = status;
   }
 
+  set hidden(hidden: boolean) {
+    this._hidden = hidden;
+  }
+
   get name() {
     return this._name ?? '';
   }
@@ -108,7 +116,7 @@ export class RoundEntity extends Entity {
   }
 
   get startOfRound() {
-    return this._startOfRound;
+    return this._startOfRound!;
   }
 
   get endOfRound() {
@@ -121,6 +129,10 @@ export class RoundEntity extends Entity {
 
   get status() {
     return this._status;
+  }
+
+  get hidden() {
+    return this._hidden;
   }
 
   addTask(task: TaskEntity) {

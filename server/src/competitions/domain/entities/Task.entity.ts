@@ -36,6 +36,10 @@ export class TaskEntity extends Entity {
     });
   }
 
+  public static load(data: ITaskPlain) {
+    return new TaskEntity(data);
+  }
+
   get name() {
     return this._name;
   }

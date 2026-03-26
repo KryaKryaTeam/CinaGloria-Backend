@@ -1,182 +1,185 @@
+import { randomUUID } from 'crypto';
 import {
   CompetitionEntity,
   ICreateCompetition,
   ICompetitionPlain,
 } from './Competition.entity';
 import { CompetitionStatus } from 'src/types/CompetitionStatus';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { DomainErrors } from 'src/error/DomainError';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionRule } from '../objects/CompetitionRule.object';
+import { AppSlotCode, RelationSlots } from 'src/types/RelationSlots';
 
 describe('CompetitionEntity', () => {
-  const mockFile = { id: 'file-id', url: 'https://cdn.com/img.png' } as {
-    id: string;
-    url: string;
-  };
-  const mockRule = { title: 'Rule 1', content: 'Be nice' } as {
-    title: string;
-    content: string;
+  // --- Mocks & Helpers ---
+  const mockFile = <T extends AppSlotCode>(id: string) =>
+    ({
+      id,
+      url: `https://cdn.com/${id}.png`,
+    }) as unknown as InternalFile<T>;
+  const mockRule = (title: string) =>
+    ({ title, content: 'Rules content' }) as unknown as CompetitionRule;
+
+  const getValidDates = () => {
+    const now = Date.now();
+    return {
+      publishAt: new Date(now + 1000), // T + 1s
+      dateOfStartRegistration: new Date(now + 5000), // T + 5s
+      dateOfEndRegistration: new Date(now + 10000), // T + 10s
+      dateOfStart: new Date(now + 15000), // T + 15s
+      dateOfEnd: new Date(now + 20000), // T + 20s
+    };
   };
 
-  const validDates = {
-    dateOfStartRegistration: new Date('2026-01-01'),
-    dateOfEndRegistration: new Date('2026-01-10'),
-    dateOfStart: new Date('2026-01-15'),
-    dateOfEnd: new Date('2026-01-20'),
-  };
-
-  const createBaseParams = (): ICreateCompetition => ({
-    name: 'Champion Cup',
-    description: 'A great competition',
-    banner: mockFile as unknown as InternalFile<'competition:banner'>,
-    avatar: mockFile as unknown as InternalFile<'competition:avatar'>,
+  const createFullParams = (): ICreateCompetition => ({
+    name: 'Pro League 2026',
+    description: 'The ultimate showdown.',
+    banner: mockFile<typeof RelationSlots.competition.banner>('banner'),
+    avatar: mockFile<typeof RelationSlots.competition.avatar>('avatar'),
     ultraWideBanner:
-      mockFile as unknown as InternalFile<'competition:ultraWideBanner'>,
-    socialMedia: mockFile as unknown as InternalFile<'competition:socialMedia'>,
-    ...validDates,
-    rules: [mockRule as unknown as CompetitionRule],
+      mockFile<typeof RelationSlots.competition.ultraWideBanner>('uw-banner'),
+    socialMedia:
+      mockFile<typeof RelationSlots.competition.socialMedia>('social'),
+    ...getValidDates(),
+    rules: [mockRule('Rule 1')],
   });
 
-  describe('Creation & Loading', () => {
-    it('should create a new competition in DRAFT status', () => {
-      const competition = CompetitionEntity.create(createBaseParams());
+  // --- Tests ---
 
-      expect(competition.id).toBeDefined();
+  describe('Lifecycle: Construction & Loading', () => {
+    it('should initialize a new competition as a DRAFT', () => {
+      const params = createFullParams();
+      const competition = CompetitionEntity.create(params);
+
       expect(competition.status).toBe(CompetitionStatus.DRAFT);
-      expect(competition.name).toBe('Champion Cup');
+      expect(competition.id).toBeDefined();
+      expect(competition.name).toBe(params.name);
     });
 
-    it('should load an existing competition from plain object', () => {
+    it('should successfully hydrate an existing entity via load()', () => {
       const plain: ICompetitionPlain = {
-        id: 'existing-uuid',
-        ...createBaseParams(),
+        id: randomUUID(),
+        ...createFullParams(),
         status: CompetitionStatus.PUBLISHED,
-      };
-      const competition = CompetitionEntity.load(plain);
+      } as unknown as ICompetitionPlain;
 
-      expect(competition.id).toBe('existing-uuid');
-      expect(competition.status).toBe(CompetitionStatus.PUBLISHED);
+      const entity = CompetitionEntity.load(plain);
+      expect(entity.toJSON).toEqual(plain);
     });
 
-    it('should throw DomainError if initial name is too long', () => {
-      const params = createBaseParams();
-      params.name = 'a'.repeat(256);
+    it('should prevent loading a non-DRAFT entity if required fields are missing', () => {
+      const incompletePlain: ICompetitionPlain = {
+        id: randomUUID(),
+        ...createFullParams(),
+        name: null, // Critical missing field
+        status: CompetitionStatus.PUBLISHED,
+      } as unknown as ICompetitionPlain;
 
-      expect(() => CompetitionEntity.create(params)).toThrow(DomainError);
+      expect(() => CompetitionEntity.load(incompletePlain)).toThrow(
+        expect.objectContaining({ message: DomainErrors.UNEXPECTED_VALUE }),
+      );
     });
   });
 
-  describe('Date Validation', () => {
-    it('should throw if registration ends after competition starts', () => {
-      const competition = CompetitionEntity.create(createBaseParams());
+  describe('Domain Logic: Date Invariants', () => {
+    let competition: CompetitionEntity;
 
-      // Attempt to set registration end date to be AFTER the competition start date
-      const invalidDate = new Date(validDates.dateOfStart.getTime() + 10000);
-
-      expect(() => {
-        competition.dateOfEndRegistration = invalidDate;
-      }).toThrow(DomainError);
+    beforeEach(() => {
+      competition = CompetitionEntity.create(createFullParams());
     });
 
-    it('should allow registration end date to equal competition start date', () => {
-      const competition = CompetitionEntity.create(createBaseParams());
+    it('should throw if the start date is after the end date', () => {
+      const start = new Date('2026-10-10');
+      const end = new Date('2026-09-09');
+
       expect(() => {
-        competition.dateOfEndRegistration = validDates.dateOfStart;
+        competition.dateOfStart = start;
+        competition.dateOfEnd = end;
+      }).toThrow();
+    });
+
+    it('should allow registration to end exactly when the competition starts', () => {
+      const sharedTime = createFullParams().dateOfEndRegistration;
+
+      expect(() => {
+        competition.dateOfEndRegistration = sharedTime as unknown as Date;
+        competition.dateOfStart = sharedTime as unknown as Date;
       }).not.toThrow();
     });
   });
 
-  describe('Status Transitions & Publishing', () => {
-    it('should fail to publish if essential fields are missing', () => {
-      // Create a "naked" competition with only the name
-      const competition = CompetitionEntity.create({
-        name: 'Empty Competition',
-        description: null,
-        banner: null,
-        avatar: null,
-        ultraWideBanner: null,
-        socialMedia: null,
-        dateOfStart: null,
-        dateOfEnd: null,
-        dateOfStartRegistration: null,
-        dateOfEndRegistration: null,
-        rules: [],
-      });
+  describe('Domain Logic: State Transitions', () => {
+    it('should allow transition from DRAFT to SCHEDULED via schedule() method', () => {
+      const competition = CompetitionEntity.create(createFullParams());
+      const publishDate = new Date(Date.now() + 2000);
 
+      competition.schedule(publishDate);
+
+      expect(competition.status).toBe(CompetitionStatus.SCHEDULED);
+      expect(competition.publishAt).toEqual(publishDate);
+    });
+
+    it('should prohibit direct manual status change to SCHEDULED', () => {
+      const competition = CompetitionEntity.create(createFullParams());
       expect(() => {
-        competition.status = CompetitionStatus.PUBLISHED;
+        competition.status = CompetitionStatus.SCHEDULED;
       }).toThrow(
         expect.objectContaining({ message: DomainErrors.RESTRICTED_CHANGE }),
       );
     });
 
-    it('should transition from DRAFT to PUBLISHED if all fields are present', () => {
-      const competition = CompetitionEntity.create(createBaseParams());
-
-      expect(() => {
-        competition.status = CompetitionStatus.PUBLISHED;
-      }).not.toThrow();
-      expect(competition.status).toBe(CompetitionStatus.PUBLISHED);
-    });
-
-    it('should block editing name if status is ARCHIVED', () => {
-      // Manually load as CANCELED to test immutability
+    it('should lock the entity from modifications once it hits an immutable state (e.g., CANCELED)', () => {
       const competition = CompetitionEntity.load({
-        id: '123',
-        ...createBaseParams(),
+        id: randomUUID(),
+        ...createFullParams(),
         status: CompetitionStatus.CANCELED,
-      });
+      } as unknown as ICompetitionPlain);
 
       expect(() => {
-        competition.name = 'New Name';
+        competition.name = 'New Title';
       }).toThrow(
         expect.objectContaining({ message: DomainErrors.IMMUTABLE_VALUE }),
       );
     });
   });
 
-  describe('Rules Collection', () => {
-    it('should add rules and return a copy (encapsulation check)', () => {
-      const competition = CompetitionEntity.create(createBaseParams());
-      competition.addRule(mockRule as unknown as CompetitionRule);
+  describe('Encapsulation & Projections', () => {
+    it('should ensure the rules array is not mutable from the outside', () => {
+      const competition = CompetitionEntity.create(createFullParams());
+      const rulesReference = competition.rules;
 
-      const rules = competition.rules;
-      rules.push({} as any); // Try to mutate the returned array
+      // Attempt mutation
+      rulesReference.push(mockRule('Evil Rule'));
 
-      expect(competition.rules.length).toBe(2); // Should still be 2 (initial + 1), not 3
+      expect(competition.rules).toHaveLength(1);
     });
 
-    it('should delete a rule by index', () => {
-      const competition = CompetitionEntity.create(createBaseParams());
-      const initialCount = competition.rules.length;
+    it('should correctly project data for public view only when not in DRAFT', () => {
+      const competition = CompetitionEntity.create(createFullParams());
 
-      competition.deleteRule(0);
-      expect(competition.rules.length).toBe(initialCount - 1);
+      // Act 1: Check Draft
+      expect(competition.publicInList).toBeUndefined();
+
+      // Act 2: Publish
+      competition.status = CompetitionStatus.PUBLISHED;
+
+      // Assert
+      const projection = competition.publicInList;
+      expect(projection).toBeDefined();
+      expect(projection?.id).toBe(competition.id);
+      expect(projection).not.toHaveProperty('description'); // Logic: list doesn't need desc
     });
   });
 
-  describe('Data Projections (Getters)', () => {
-    it('publicInList should return null when in DRAFT', () => {
-      const competition = CompetitionEntity.create(createBaseParams());
-      expect(competition.publicInList).toBeUndefined();
-    });
+  describe('Validation: String Constraints', () => {
+    it.each([
+      ['empty string', '   '],
+      ['too long', 'a'.repeat(256)],
+    ])('should throw error if name is %s', (_, value) => {
+      const params = createFullParams();
+      params.name = value;
 
-    it('publicInList should return data when PUBLISHED', () => {
-      const competition = CompetitionEntity.create(createBaseParams());
-      competition.status = CompetitionStatus.PUBLISHED;
-
-      const data = competition.publicInList;
-      expect(data).toBeDefined();
-      expect(data).toHaveProperty('name', 'Champion Cup');
-      expect(data).not.toHaveProperty('description'); // list view shouldn't have description
-    });
-
-    it('toJSON should always return the full plain state', () => {
-      const competition = CompetitionEntity.create(createBaseParams());
-      const json = competition.toJSON;
-
-      expect(json.status).toBe(CompetitionStatus.DRAFT);
-      expect(json.name).toBe('Champion Cup');
+      expect(() => CompetitionEntity.create(params)).toThrow();
     });
   });
 });

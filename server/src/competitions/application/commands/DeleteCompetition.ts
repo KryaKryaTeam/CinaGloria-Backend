@@ -5,16 +5,19 @@ import { ReposTokens } from 'src/common/Tokens';
 import type { ICompetitionRepository } from '../bounds/CompetitionRepository';
 import { UserAndCompetitionService } from 'src/competitions/domain/services/UserAndCompetitionService';
 
-interface CommandInput {
+interface DeleteCompetitionCommandInput {
   user: UserEntity;
   competitionId: string;
 }
 
-export class PublishCompetitionCommand extends Command<CommandInput, void> {
+export class DeleteCompetitionCommand extends Command<
+  DeleteCompetitionCommandInput,
+  void
+> {
   @Inject(ReposTokens.CompetitionRepository)
   private readonly competitionRepository: ICompetitionRepository;
 
-  async implementation(data: CommandInput): Promise<void> {
+  async implementation(data: DeleteCompetitionCommandInput): Promise<void> {
     const competition = await this.competitionRepository.findById(
       data.competitionId,
     );
@@ -22,8 +25,8 @@ export class PublishCompetitionCommand extends Command<CommandInput, void> {
     if (!competition)
       throw new NotFoundException('Competition with this id is unedfined!');
 
-    UserAndCompetitionService.publishCompetiton(competition, data.user);
+    UserAndCompetitionService.deleteCompetition(competition, data.user);
 
-    await this.competitionRepository.save(competition);
+    await this.competitionRepository.deleteById(competition.id);
   }
 }

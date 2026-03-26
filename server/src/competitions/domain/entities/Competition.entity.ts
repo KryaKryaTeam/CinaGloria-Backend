@@ -63,6 +63,20 @@ export interface ICreateCompetition {
   rules: CompetitionRule[];
 }
 
+export interface ICreateCompetitionRAW {
+  name: string | null;
+  description: string | null;
+  ultraWideBanner: string | null;
+  banner: string | null;
+  avatar: string | null;
+  socialMedia: string | null;
+  dateOfStart: Date | null;
+  dateOfEnd: Date | null;
+  dateOfStartRegistration: Date | null;
+  dateOfEndRegistration: Date | null;
+  rules: { name: string; description: string; icon: string }[];
+}
+
 export class CompetitionEntity extends Entity {
   public readonly id: string;
   private _name: string | null;
@@ -458,6 +472,10 @@ export class CompetitionEntity extends Entity {
   }
   get rules() {
     return [...this._rules];
+  }
+
+  get canBeDeleted() {
+    return this.canBeChanged;
   }
 
   get publicInList(): ICompetitionInList | void {

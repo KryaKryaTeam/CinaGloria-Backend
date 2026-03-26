@@ -10,7 +10,10 @@ interface CommandInput {
   competitionId: string;
 }
 
-export class declineScheduleOfPublishing extends Command<CommandInput, void> {
+export class DeclineScheduledPublishCommand extends Command<
+  CommandInput,
+  void
+> {
   @Inject(ReposTokens.CompetitionRepository)
   private readonly competitionRepository: ICompetitionRepository;
 

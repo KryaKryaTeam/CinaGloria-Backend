@@ -79,4 +79,18 @@ export class UserAndCompetitionService {
 
     competition.status = CompetitionStatus.PUBLISHED;
   }
+
+  static deleteCompetition(competition: CompetitionEntity, user: UserEntity) {
+    this.userCanEditCompetitions(user);
+
+    if (competition.canBeDeleted == false)
+      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+
+    return competition.canBeDeleted;
+  }
+
+  static userHasAccessToSeePrivateCompetitions(user: UserEntity) {
+    UserAndCompetitionService.userCanEditCompetitions(user);
+    return true;
+  }
 }

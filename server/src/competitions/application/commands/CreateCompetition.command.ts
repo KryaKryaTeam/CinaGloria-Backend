@@ -2,7 +2,10 @@ import { Inject } from '@nestjs/common';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { Command } from 'src/common/application/Command';
 import { ReposTokens, ServiceTokens } from 'src/common/Tokens';
-import { ICompetitionPlain } from 'src/competitions/domain/entities/Competition.entity';
+import {
+  ICompetitionPlain,
+  ICreateCompetitionRAW,
+} from 'src/competitions/domain/entities/Competition.entity';
 import type { IFileRepository } from 'src/files/application/bounds/IFileRepository';
 import { LinkerApplicationService } from 'src/files/application/services/Linker.appService';
 import { FileEntity } from 'src/files/domain/entities/File.entity';
@@ -11,10 +14,12 @@ import { RelationString } from 'src/files/domain/objects/RelationSlots';
 import { RelationSlots } from 'src/types/RelationSlots';
 import type { ICompetitionRepository } from '../bounds/CompetitionRepository';
 import { UserAndCompetitionService } from 'src/competitions/domain/services/UserAndCompetitionService';
+import { CompetitionRule } from 'src/competitions/domain/objects/CompetitionRule.object';
+import { Icons } from 'src/types/Icons';
 
 interface CommandInput {
   user: UserEntity;
-  competition: ICompetitionPlain;
+  competition: ICreateCompetitionRAW;
 }
 
 export class CreateCompetitionCommand extends Command<
@@ -44,8 +49,8 @@ export class CreateCompetitionCommand extends Command<
       data.competition.socialMedia,
       data.competition.ultraWideBanner,
     ].map(async (el, i) => {
-      if (el && el.url) {
-        const file = await this.fileRepository.findByUrl(el.url);
+      if (el) {
+        const file = await this.fileRepository.findByUrl(el);
         if (!file) return null;
         await this.linkerService.linkFileToCompetitionSlot(
           file,
@@ -58,7 +63,14 @@ export class CreateCompetitionCommand extends Command<
     });
 
     const comp = UserAndCompetitionService.createCompetition(
-      data.competition,
+      {
+        ...data.competition,
+        banner: null,
+        avatar: null,
+        socialMedia: null,
+        ultraWideBanner: null,
+        rules: [],
+      },
       data.user,
     );
 
@@ -91,6 +103,12 @@ export class CreateCompetitionCommand extends Command<
         'competition:ultraWideBanner',
         'competition:ultraWideBanner',
       );
+
+    data.competition.rules.forEach((el) => {
+      comp.addRule(
+        CompetitionRule.define(el.name, el.description, el.icon as Icons),
+      );
+    });
 
     await this.competitionRepository.save(comp);
 

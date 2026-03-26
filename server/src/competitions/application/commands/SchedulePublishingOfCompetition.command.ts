@@ -11,7 +11,7 @@ interface CommandInput {
   user: UserEntity;
 }
 
-export class schedulePublishingOfCompetition extends Command<
+export class ScheduleCompetitionPublishCommand extends Command<
   CommandInput,
   void
 > {

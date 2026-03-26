@@ -6,6 +6,7 @@ import { UserMapper } from 'src/authorization/application/mappers/UserMapper';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { MapperTokens } from 'src/common/Tokens';
+import { CompetitionMapper } from 'src/competitions/application/mapper/Competition.mapper';
 
 @Injectable()
 export class FileRelationMapper extends Mapper<
@@ -17,6 +18,8 @@ export class FileRelationMapper extends Mapper<
     private readonly userMapper: UserMapper,
     @Inject(MapperTokens.FileMapper)
     private readonly fileMapper: FileMapper,
+    @Inject(MapperTokens.CompetitionMapper)
+    private readonly competitionMapper: CompetitionMapper,
   ) {
     super();
   }
@@ -27,6 +30,9 @@ export class FileRelationMapper extends Mapper<
       file: this.fileMapper.toEntity(schema.file),
       slot: schema.slot ? RelationString.define(schema.slot) : undefined,
       user: schema.user ? this.userMapper.toEntity(schema.user) : undefined,
+      competition: schema.competition
+        ? this.competitionMapper.toEntity(schema.competition)
+        : undefined,
     });
   }
 
@@ -44,6 +50,11 @@ export class FileRelationMapper extends Mapper<
     if (entity.user) {
       sch.user = this.userMapper.toSchema(entity.user);
       sch.user_id = entity.user.id;
+    }
+
+    if (entity.competition) {
+      sch.competition = this.competitionMapper.toSchema(entity.competition);
+      sch.competition_id = entity.competition.id;
     }
 
     sch.slot = entity.slot;

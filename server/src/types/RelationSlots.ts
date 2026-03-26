@@ -20,7 +20,12 @@ export interface ISlotConfig {
   shouldBeProcessed: boolean;
 }
 
-const imagesMimeType: TMimeType[] = ['image/png', 'image/jpeg', 'image/webp'];
+const imagesMimeType: TMimeType[] = [
+  'image/png',
+  'image/jpeg',
+  'image/webp',
+  'image/avif',
+];
 
 export const RelationSlotsConfig = new Map<string, ISlotConfig>([
   [

@@ -10,6 +10,7 @@ import type { IFileRepository } from 'src/files/application/bounds/IFileReposito
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
 import { FileMapper } from 'src/files/application/mappers/FileMapper';
+import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
 
 export class FileRelationRepository
   extends BaseRepository<FileRelation>
@@ -89,5 +90,28 @@ export class FileRelationRepository
       user_id: user.id,
       slot: scope.value,
     });
+  }
+
+  async deleteRelationByCompetitionAndScope(
+    competition: CompetitionEntity,
+    slot: RelationString,
+  ): Promise<void> {
+    await this.repository.delete({
+      competition_id: competition.id,
+      slot: slot.value,
+    });
+  }
+  async findFileByCompetitionAndSlot(
+    competition: CompetitionEntity,
+    slot: RelationString,
+  ): Promise<FileEntity | null> {
+    const relation = await this.repository.findOne({
+      where: { competition_id: competition.id, slot: slot.value },
+      relations: ['file'],
+    });
+
+    if (!relation) return null;
+
+    return this.fileMapper.toEntity(relation.file);
   }
 }

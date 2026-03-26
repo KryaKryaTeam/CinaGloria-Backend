@@ -11,6 +11,7 @@ import { BaseLoadController } from '../loadControllers/BaseLoadController';
 import { DiscoveryService } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
+import { RelationString } from 'src/files/domain/objects/RelationSlots';
 
 export const LoadController = DiscoveryService.createDecorator();
 
@@ -41,8 +42,8 @@ export class LoadFileService implements ILoadFileService, OnModuleInit {
     });
   }
 
-  async loadFile(file: Readable): Promise<FileEntity> {
-    return await this.controller.load(file);
+  async loadFile(file: Readable, rel: RelationString): Promise<FileEntity> {
+    return await this.controller.load(file, rel);
   }
   async deleteFile(file: FileEntity): Promise<void> {
     return await this.controller.delete(file);

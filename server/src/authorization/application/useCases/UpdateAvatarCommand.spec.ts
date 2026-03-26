@@ -3,7 +3,6 @@ import { UpdateAvatarCommand } from './UpdateAvatarCommand';
 import { BaseTokens, ReposTokens, ServiceTokens } from 'src/common/Tokens';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
-import { DomainError } from 'src/error/DomainError';
 
 describe('UpdateAvatarCommand', () => {
   let command: UpdateAvatarCommand;
@@ -82,21 +81,6 @@ describe('UpdateAvatarCommand', () => {
 
     // 3. Перевіряємо збереження
     expect(mockUserRepository.save).toHaveBeenCalledWith(mockUserEntity);
-  });
-
-  it('should throw DomainError if avatar URL is invalid', async () => {
-    const userId = 'user-123';
-    const invalidAvatar = 'not-a-url'; // AvatarURL.create кине помилку
-
-    mockUserRepository.findById.mockResolvedValue({ id: userId });
-
-    // Оскільки AvatarURL.create(data.avatar) викликається всередині,
-    // він має викинути помилку до того, як дійде до збереження
-    await expect(
-      command.implementation({ id: userId, avatar: invalidAvatar }),
-    ).rejects.toThrow(DomainError);
-
-    expect(mockUserRepository.save).not.toHaveBeenCalled();
   });
 
   it('should throw if user does not exist', async () => {

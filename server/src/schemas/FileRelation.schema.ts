@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { FileSchema } from './File.schema';
 import { UserSchema } from './User.schema';
+import { CompetitionSchema } from './Competition.schema';
 
 @Entity({ name: 'file_relation' })
 export class FileRelation {
@@ -28,4 +29,11 @@ export class FileRelation {
 
   @Column({ nullable: true })
   user_id?: string;
+
+  @ManyToOne(() => CompetitionSchema, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'competition_id' })
+  competition: CompetitionSchema;
+
+  @Column({ nullable: true })
+  competition_id?: string;
 }

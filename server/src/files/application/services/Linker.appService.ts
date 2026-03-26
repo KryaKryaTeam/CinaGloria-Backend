@@ -6,6 +6,7 @@ import { FileRelationEntity } from 'src/files/domain/entities/FileRelation.entit
 import { RelationSlots } from 'src/types/RelationSlots';
 import type { IFileRelationsRepository } from '../bounds/IFileRelationsRepository';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
+import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
 
 @Injectable()
 export class LinkerApplicationService {
@@ -19,30 +20,41 @@ export class LinkerApplicationService {
     );
   }
 
+  private async unlinkSlotFromCompetition(
+    competition: CompetitionEntity,
+    slot: RelationString,
+  ) {
+    if (slot.family !== 'competition')
+      throw new BadRequestException('This slot is not for competition');
+
+    await this.relationRepository.deleteRelationByCompetitionAndScope(
+      competition,
+      slot,
+    );
+  }
+
   async linkAvatarToUser(file: FileEntity, user: UserEntity) {
     await this.unlinkAvatarFromUser(user);
-
-    const relationConfig = RelationString.define(
-      RelationSlots.user.avatar,
-    ).config;
-
-    if (
-      !relationConfig.allowedMimeTypes.includes(
-        file.mimeType.value as `${string}/${string}`,
-      )
-    )
-      throw new BadRequestException(
-        "Mime type of the file aren't allowed for this slot!",
-      );
-
-    if (relationConfig.maxSize < file.size) {
-      throw new BadRequestException('File is too big for this slot!');
-    }
 
     const relation = FileRelationEntity.create(file);
 
     relation.user = user;
     relation.slot = RelationSlots.user.avatar;
+
+    await this.relationRepository.save(relation);
+  }
+
+  async linkFileToCompetitionSlot(
+    file: FileEntity,
+    competition: CompetitionEntity,
+    slot: RelationString,
+  ) {
+    await this.unlinkSlotFromCompetition(competition, slot);
+
+    const relation = FileRelationEntity.create(file);
+
+    relation.competition = competition;
+    relation.slot = slot;
 
     await this.relationRepository.save(relation);
   }

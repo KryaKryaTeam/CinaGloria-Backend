@@ -16,8 +16,11 @@ export class InternalFile<S extends AppSlotCode = AppSlotCode> {
     slot: AppSlotCode,
     expected: T,
   ) {
+    console.log(value);
     if (slot !== expected) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
-    return new InternalFile<T>(value);
+    return new InternalFile<T>(
+      value.startsWith('internal_file:') ? value : `internal_file:${value}`,
+    );
   }
 
   get value(): string {

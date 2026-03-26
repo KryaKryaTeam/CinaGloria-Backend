@@ -1,9 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsUrl } from 'class-validator';
+import { IsNotEmpty } from 'class-validator';
 
 export class UpdateAvatarReq {
-  @IsUrl()
   @IsNotEmpty()
-  @ApiProperty({ type: 'string', format: 'uri' })
+  @ApiProperty({ type: 'string' })
   avatar: string;
 }

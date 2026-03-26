@@ -32,8 +32,8 @@ export class RoundSchema {
   @Column({ type: 'timestamp with time zone', nullable: true })
   endOfRound: Date | null;
 
-//   @Column({ type: 'jsonb', default: [] })
-//   relatedTasks: TaskSchema[];
+  //   @Column({ type: 'jsonb', default: [] })
+  //   relatedTasks: TaskSchema[];
 
   // fire engineering
   @Column({ type: 'enum', enum: RoundStatus, enumName: 'round_status' })

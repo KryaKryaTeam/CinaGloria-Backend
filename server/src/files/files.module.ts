@@ -13,6 +13,7 @@ import { GetLinkQuery } from './application/useCases/GetLinkQuery';
 import { InternalFileInterceptor } from './infrastructure/interceptors/InternalFileInterceptor';
 import { LinkerApplicationService } from './application/services/Linker.appService';
 import { UserCreatedHandlerFile } from './infrastructure/handlers/UserCreateHandler';
+import { CompetitionsModule } from 'src/competitions/competitions.module';
 
 const providers: Provider[] = [
   { provide: MapperTokens.FileMapper, useClass: FileMapper },
@@ -24,6 +25,7 @@ const providers: Provider[] = [
     provide: ServiceTokens.FileLinkerService,
     useClass: LinkerApplicationService,
   },
+
   UserCreatedHandlerFile,
   S3LoadController,
   LocalLoadController,
@@ -35,7 +37,11 @@ const providers: Provider[] = [
     { provide: APP_INTERCEPTOR, useClass: InternalFileInterceptor },
   ],
   exports: [...providers],
-  imports: [DiscoveryModule, forwardRef(() => AuthorizationModule)],
+  imports: [
+    DiscoveryModule,
+    forwardRef(() => AuthorizationModule),
+    CompetitionsModule,
+  ],
   controllers: [FileController],
 })
 export class FilesModule {}

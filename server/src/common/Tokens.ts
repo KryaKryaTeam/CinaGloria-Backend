@@ -39,6 +39,15 @@ export enum CommandTokens {
   MakeNotificationReaded = 'MAKE_NOTIFICATION_READED_COMMAND',
   UploadFileCommand = 'UPLOAD_FILE_COMMAND',
   GetLinkQuery = 'GET_LINK_QUERY',
+  CreateCompetitionCommand = 'CREATE_COMPETITION_COMMAND',
+  UpdateCompetitionCommand = 'UPDATE_COMPETITION_COMMAND',
+  DeleteCompetitionCommand = 'DELETE_COMPETITION_COMMAND',
+  PublishCompetitionCommand = 'PUBLISH_COMPETITION_COMMAND',
+  ScheduleCompetitionPublishCommand = 'SCHEDULE_COMPETITION_PUBLISH_COMMAND',
+  DeclineScheduledPublishCommand = 'DECLINE_SCHEDULED_PUBLISH_COMMAND',
+  GetPublicCompetitionQuery = 'GET_PUBLIC_COMPETITION_QUERY',
+  GetCompetitionPageQuery = 'GET_COMPETITION_PAGE_QUERY',
+  GetPublicCompetitionsPageQuery = 'GET_PUBLIC_COMPETITIONS_PAGE_QUERY',
 }
 
 export enum ServiceTokens {

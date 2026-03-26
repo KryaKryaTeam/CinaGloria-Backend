@@ -20,6 +20,8 @@ import { FileRelation } from 'src/schemas/FileRelation.schema';
 import { CompetitionsModule } from 'src/competitions/competitions.module';
 import { CompetitionSchema } from 'src/schemas/Competition.schema';
 import { CompetitionRepository } from './infrastructure/repositories/CompetitionRepository';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { JsonInterceptor } from './infrastructure/interceptors/JsonInterceptor';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -47,7 +49,13 @@ const providers: Provider[] = [
 
 @Global()
 @Module({
-  providers,
+  providers: [
+    ...providers,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: JsonInterceptor,
+    },
+  ],
   exports: providers,
   imports: [
     TypeOrmModule.forFeature([

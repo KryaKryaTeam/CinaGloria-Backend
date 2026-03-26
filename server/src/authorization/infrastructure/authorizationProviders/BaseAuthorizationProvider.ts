@@ -28,6 +28,7 @@ import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { RelationSlots } from 'src/types/RelationSlots';
 import type { IFileRepository } from 'src/files/application/bounds/IFileRepository';
 import { FileEntity } from 'src/files/domain/entities/File.entity';
+import { RelationString } from 'src/files/domain/objects/RelationSlots';
 
 export interface IHandshakeOutput {
   email: string;
@@ -95,7 +96,10 @@ export abstract class BaseAuthorizationProvider<T> {
         if (!response.ok || !response.arrayBuffer)
           throw new BadRequestException('Avatar by this url is unavalible!');
         const buffer = Buffer.from(await response.arrayBuffer());
-        file = await this.loadFileService.loadFile(Readable.from(buffer));
+        file = await this.loadFileService.loadFile(
+          Readable.from(buffer),
+          RelationString.define('user:avatar'),
+        );
 
         await this.fileRepostory.save(file);
       } catch (err) {

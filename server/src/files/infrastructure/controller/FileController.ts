@@ -15,6 +15,8 @@ import type { Request as RequestExpress } from 'express';
 import { CommandTokens } from 'src/common/Tokens';
 import { UploadFileCommand } from 'src/files/application/useCases/UploadFileCommand';
 import { GetLinkQuery } from 'src/files/application/useCases/GetLinkQuery';
+import { RelationString } from 'src/files/domain/objects/RelationSlots';
+import { RelationStringTransfromPipe } from '../dto/RelationString.dto';
 
 @Controller('file')
 @Secure(true)
@@ -26,7 +28,7 @@ export class FileController {
   @Inject(CommandTokens.GetLinkQuery)
   private readonly getLinkQuery: GetLinkQuery;
 
-  @Post('/upload')
+  @Post('/upload/:relationString')
   @Version('1')
   @ApiConsumes('multipart/form-data') // Вказуємо тип контенту
   @ApiBody({
@@ -41,7 +43,11 @@ export class FileController {
       },
     },
   })
-  async uploadFile(@Req() req: RequestExpress) {
+  async uploadFile(
+    @Req() req: RequestExpress,
+    @Query('relationString', RelationStringTransfromPipe)
+    relationString: RelationString,
+  ) {
     const bb = busboy({
       headers: req.headers,
       limits: { files: 1 },
@@ -50,15 +56,15 @@ export class FileController {
     const pr = new Promise((resolve, reject) => {
       let fileProcessed = false;
 
-      bb.on('file', (name, stream, info) => {
+      bb.on('file', (name, stream) => {
         fileProcessed = true;
 
         this.uploadFileCommand
           .execute({
             stream,
-            mimeType: info.mimeType,
+            relationString,
           })
-          .then(resolve)
+          .then(({ file }) => resolve(file.toJSON))
           .catch(reject);
       });
 
@@ -71,11 +77,6 @@ export class FileController {
       });
 
       req.pipe(bb);
-    });
-
-    pr.catch((err) => {
-      console.log(err);
-      throw err;
     });
 
     return await pr;

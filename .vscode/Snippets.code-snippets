@@ -1,0 +1,108 @@
+/** @format */
+
+{
+  // Place your CinaGloria-Backend workspace snippets here. Each snippet is defined under a snippet name and has a scope, prefix, body and
+  // description. Add comma separated ids of the languages where the snippet is applicable in the scope field. If scope
+  // is left empty or omitted, the snippet gets applied to all languages. The prefix is what is
+  // used to trigger the snippet and the body will be expanded and inserted. Possible variables are:
+  // $1, $2 for tab stops, $0 for the final cursor position, and ${1:label}, ${2:another} for placeholders.
+  // Placeholders with the same ids are connected.
+  // Example:
+  // "Print to console": {
+  // 	"scope": "javascript,typescript",
+  // 	"prefix": "log",
+  // 	"body": [
+  // 		"console.log('$1');",
+  // 		"$2"
+  // 	],
+  // 	"description": "Log output to console"
+  // }
+  //
+  // You can also restrict snippets to specific files using include/exclude patterns:
+  // "Test snippet": {
+  // 	"scope": "javascript,typescript",
+  // 	"prefix": "test",
+  // 	"body": "test('$1', () => {\n\t$0\n});",
+  // 	"include": ["**/*.test.ts", "*.spec.ts"],
+  // 	"exclude": ["**/temp/*.ts"],
+  // 	"description": "Insert test block"
+  // }
+
+  "Generate command without output": {
+    "prefix": "cmwo",
+    "body": [
+      "import { Command } from 'src/common/application/Command';",
+      "",
+      "interface ${1:Name}CommandInput {",
+      "  $2",
+      "}",
+      "",
+      "export class ${1:Name}Command extends Command<${1:Name}CommandInput, void> {",
+      "  async implementation(data: ${1:Name}CommandInput): Promise<void> {",
+      "    $0",
+      "  }",
+      "}",
+    ],
+    "description": "Generate command without output",
+  },
+  "Generate command with custom output": {
+    "prefix": "cm",
+    "body": [
+      "import { Command } from 'src/common/application/Command';",
+      "",
+      "interface ${1:Name}CommandInput {$2}",
+      "interface ${1:Name}CommandOutput {$3}",
+      "",
+      "export class ${1:Name}Command extends Command<${1:Name}CommandInput, ${1:Name}CommandOutput> {",
+      "  async implementation(data: ${1:Name}CommandInput): Promise<${1:Name}CommandOutput> {",
+      "    $0",
+      "  }",
+      "}",
+    ],
+    "description": "Generate command with custom Input and Output interfaces",
+  },
+  "Generate Async Query with custom Input/Output": {
+    "prefix": "aqio",
+    "body": [
+      "import { Query } from 'src/common/application/Query';",
+      "",
+      "interface ${1:Name}QueryInput {$2}",
+      "interface ${1:Name}QueryOutput {$3}",
+      "",
+      "export class ${1:Name}Query extends Query<${1:Name}QueryInput, ${1:Name}QueryOutput> {",
+      "  async implementation(data: ${1:Name}QueryInput): Promise<${1:Name}QueryOutput> {",
+      "    $0",
+      "  }",
+      "}",
+    ],
+    "description": "Generate an async Query with custom Input and Output interfaces",
+  },
+
+  "Generate Query with custom Output": {
+    "prefix": "qio",
+    "body": [
+      "import { Query } from 'src/common/application/Query';",
+      "",
+      "interface ${1:Name}QueryInput {$2}",
+      "interface ${1:Name}QueryOutput {$3}",
+      "",
+      "export class ${1:Name}Query extends Query<${1:Name}QueryInput, ${1:Name}QueryOutput> {",
+      "  implementation(data: ${1:Name}QueryInput): ${1:Name}QueryOutput {",
+      "    $0",
+      "  }",
+      "}",
+    ],
+    "description": "Generate a Query with custom Input and Output interfaces",
+  },
+
+  "Provide Command/Query Token": {
+    "prefix": "proc",
+    "body": [
+      "{",
+      "  provide: CommandTokens.${1:Name},",
+      "  useClass: ${1:Name},",
+      "},$0",
+    ],
+    "description": "Generate a NestJS provider mapping for a Command or Query Token",
+  },
+}

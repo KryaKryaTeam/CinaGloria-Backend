@@ -25,4 +25,14 @@ export class CompetitionRepository
 
     return this.mapper.toEntity(result);
   }
+
+  async deleteById(id: string): Promise<void> {
+    await this.repository.delete({ id });
+  }
+
+  async getPage(pageNum: number): Promise<CompetitionEntity[]> {
+    return (await this.repository.find({ take: 20, skip: pageNum * 20 })).map(
+      (el) => this.mapper.toEntity(el),
+    );
+  }
 }

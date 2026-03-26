@@ -12,6 +12,9 @@ export class FileSchema {
   @Column()
   size: number;
 
+  @Column()
+  slot: string;
+
   @OneToMany(() => FileRelation, (rel) => rel.file)
   relations: FileRelation[];
 }

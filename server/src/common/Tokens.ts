@@ -11,6 +11,8 @@ export enum MapperTokens {
   FileMapper = 'FILE_MAPPER',
   FileRelationMapper = 'FILE_RELATION_MAPPER',
   CompetitionMapper = 'COMPETITION_MAPPER',
+  RoundMapper = 'ROUND_MAPPER',
+  TaskMapper = 'TASK_MAPPER',
 }
 
 export enum ReposTokens {

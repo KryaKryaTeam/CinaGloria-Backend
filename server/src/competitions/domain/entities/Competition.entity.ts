@@ -4,6 +4,7 @@ import { CompetitionStatus } from 'src/types/CompetitionStatus';
 import { CompetitionRule } from '../objects/CompetitionRule.object';
 import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { randomUUID } from 'crypto';
+import { RoundEntity } from './Round.entity';
 
 export interface ICompetitionInList {
   id: string;
@@ -95,6 +96,7 @@ export class CompetitionEntity extends Entity {
 
   private _status: CompetitionStatus;
   private _rules: CompetitionRule[];
+  private _rounds: RoundEntity[];
 
   private readonly createdAt: Date;
 
@@ -423,6 +425,18 @@ export class CompetitionEntity extends Entity {
   public deleteRule(index: number) {
     this.canChangeCheck();
     this._rules.splice(index, 1);
+  }
+
+  public addRound(round: RoundEntity) {
+    this.canChangeCheck();
+    this._rounds.push(round);
+  }
+
+  public deleteRound(round: RoundEntity) {
+    this.canChangeCheck();
+    const i = this._rounds.findIndex((r) => r.id == round.id);
+    if (i == -1) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    this._rounds.splice(i, 1);
   }
 
   set status(value: CompetitionStatus) {

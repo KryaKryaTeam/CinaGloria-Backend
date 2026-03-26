@@ -4,8 +4,10 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { RoundSchema } from './Round.schema';
 
 @Entity({
   name: 'competition',
@@ -49,6 +51,9 @@ export class CompetitionSchema {
 
   @Column({ type: 'jsonb', default: [] })
   rules: ICompetitionRule[];
+
+  @OneToMany(() => RoundSchema, (round) => round.competition)
+  rounds: RoundSchema;
 
   @Column({
     type: 'enum',

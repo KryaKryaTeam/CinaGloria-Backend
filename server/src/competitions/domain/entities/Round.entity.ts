@@ -28,7 +28,7 @@ export interface IRoundPlain {
 }
 
 export class RoundEntity extends Entity {
-  private readonly id: string;
+  public readonly id: string;
   private _hidden: boolean;
   private _name: string | null;
   private _description: string | null;

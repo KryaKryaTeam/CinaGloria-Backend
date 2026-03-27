@@ -7,7 +7,7 @@ import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { GenerateTicketCommand } from 'src/notification/application/commands/GenerateTicketCommand';
 
 @Controller('/ws')
-export class WSContorller {
+export class WSController {
   @Inject(CommandTokens.GenerateTicketCommand)
   private generateTicketCommand: GenerateTicketCommand;
 

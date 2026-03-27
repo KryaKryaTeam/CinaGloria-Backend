@@ -105,4 +105,24 @@
     ],
     "description": "Generate a NestJS provider mapping for a Command or Query Token",
   },
+  "Inject command": {
+    "prefix": "injc",
+    "body": [
+      "@Inject(CommandTokens.${1:Name})",
+      "private readonly ${1/(.*)/${1:/downcase}/}: ${1:Name};",
+    ],
+    "description": "Inject command",
+  },
+
+  "Create NestJS DTO": {
+    "prefix": "dto",
+    "body": [
+      "import { IsString, IsNotEmpty } from 'class-validator';",
+      "",
+      "export class ${1:${TM_FILENAME_BASE/(.*)\\..*/${1:/pascalcase}/}}Dto {",
+      "  $0",
+      "}",
+    ],
+    "description": "Create DTO class based on filename",
+  },
 }

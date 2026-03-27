@@ -57,7 +57,7 @@ export class CompetitionSchema {
 
   @OneToMany(() => RoundSchema, (round) => round.competition, {
     onDelete: 'CASCADE',
- })
+  })
   rounds: RoundSchema;
 
   @Column({

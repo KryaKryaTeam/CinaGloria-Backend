@@ -8,13 +8,13 @@ import { NotificationMapper } from './application/mappers/NotificationMapper';
 import { AuthorizationModule } from 'src/authorization/authorization.module';
 import { JwtModule } from '@nestjs/jwt';
 import { TicketService } from './infrastructure/service/TicketService';
-import { WSContorller } from './infrastructure/controllers/WebsocketContorller';
+import { WSController } from './infrastructure/controllers/WebsocketContorller';
 import { GenerateTicketCommand } from './application/commands/GenerateTicketCommand';
 import { NotificationGateway } from './infrastructure/gateways/WsNotification.gateway';
 import { EmailNotificationTarget } from './infrastructure/targets/EmailTarget';
 import { CacheModule } from '@nestjs/cache-manager';
 import { GetNotificationsQuery } from './application/commands/GetNotificationsQuery';
-import { NotificationsContorller } from './infrastructure/controllers/NotificationsController';
+import { NotificationsController } from './infrastructure/controllers/NotificationsController';
 import { MakeNotificationReaded } from './application/commands/MakeNotificationReadedCommand';
 
 const providers: Provider[] = [
@@ -58,6 +58,6 @@ const providers: Provider[] = [
     CacheModule.register({ ttl: 3600 * 6 }),
   ],
   exports: [...providers],
-  controllers: [WSContorller, NotificationsContorller],
+  controllers: [WSController, NotificationsController],
 })
 export class NotificationModule {}

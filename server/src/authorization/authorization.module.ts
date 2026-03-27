@@ -4,7 +4,12 @@ import { AuthorizationProviderMapper } from './application/mappers/Authorization
 import { UserMapper } from './application/mappers/UserMapper';
 import { LoginCommand } from './application/useCases/LoginCommand';
 import { AuthorizationProviderService } from './infrastructure/services/AuthorizationProviderService';
-import { APP_GUARD, DiscoveryModule, DiscoveryService } from '@nestjs/core';
+import {
+  APP_GUARD,
+  APP_PIPE,
+  DiscoveryModule,
+  DiscoveryService,
+} from '@nestjs/core';
 import { GoogleAuthorizationProvider } from './infrastructure/authorizationProviders/GoogleAuthorizationProvider';
 import { AuthController } from './infrastructure/controllers/auth.controller';
 import { GithubAuthorizationProvider } from './infrastructure/authorizationProviders/GithubAuthorizationProvider';
@@ -27,6 +32,7 @@ import { UserCreatedHandler } from './infrastructure/handlers/UserCreatedEventHa
 import { CacheModule } from '@nestjs/cache-manager';
 import { ValidateRegistrationCommand } from './application/useCases/ValidateRegistrationCommand';
 import { FilesModule } from 'src/files/files.module';
+import { TransfromUserIdtoEntity } from './infrastructure/pipes/TransfromUserIdToEntity.pipe';
 
 const providers: Provider[] = [
   {
@@ -110,6 +116,10 @@ const providers: Provider[] = [
     {
       provide: APP_GUARD,
       useClass: RoleGuard,
+    },
+    {
+      provide: APP_PIPE,
+      useClass: TransfromUserIdtoEntity,
     },
   ],
   imports: [

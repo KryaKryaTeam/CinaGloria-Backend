@@ -10,6 +10,8 @@ import { PublishCompetitionCommand } from './application/commands/PublishCompeti
 import { ScheduleCompetitionPublishCommand } from './application/commands/SchedulePublishingOfCompetition.command';
 import { UpdateCompetitionCommand } from './application/commands/UpdateCompetition.command';
 import { FilesModule } from 'src/files/files.module';
+import { CompetitionController } from './infrastructure/controllers/competition.controller';
+import { DeleteCompetitionCommand } from './application/commands/DeleteCompetition';
 
 const providers: Provider[] = [
   {
@@ -48,11 +50,16 @@ const providers: Provider[] = [
     provide: CommandTokens.UpdateCompetitionCommand,
     useClass: UpdateCompetitionCommand,
   },
+  {
+    provide: CommandTokens.DeleteCompetitionCommand,
+    useClass: DeleteCompetitionCommand,
+  },
 ];
 
 @Module({
   providers,
   exports: [...providers],
   imports: [forwardRef(() => FilesModule)],
+  controllers: [CompetitionController],
 })
 export class CompetitionsModule {}

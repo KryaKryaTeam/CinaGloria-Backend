@@ -14,10 +14,10 @@ import { CommandTokens } from 'src/common/Tokens';
 import { GetNotificationsQuery } from 'src/notification/application/commands/GetNotificationsQuery';
 import { MakeNotificationReaded } from 'src/notification/application/commands/MakeNotificationReadedCommand';
 
-@Controller('notification')
+@Controller('/notification')
 @ApiBearerAuth('main')
 @Secure(true)
-export class NotificationsContorller {
+export class NotificationsController {
   @Inject(CommandTokens.GetNotificationsQuery)
   private readonly getNotificationQuery: GetNotificationsQuery;
 

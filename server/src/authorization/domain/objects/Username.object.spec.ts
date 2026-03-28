@@ -1,5 +1,5 @@
-import { BadRequestException } from '@nestjs/common';
 import { Username } from './Username.object';
+import { ApiError } from 'src/error/ApiError';
 
 describe('Username Value Object', () => {
   describe('create', () => {
@@ -11,16 +11,16 @@ describe('Username Value Object', () => {
     });
 
     it('should throw if username is too short (less than 8)', () => {
-      expect(() => Username.create('short')).toThrow(BadRequestException);
+      expect(() => Username.create('short')).toThrow(ApiError);
     });
 
     it('should throw if username is too long (more than 50)', () => {
       const longName = 'a'.repeat(51);
-      expect(() => Username.create(longName)).toThrow(BadRequestException);
+      expect(() => Username.create(longName)).toThrow(ApiError);
     });
 
     it('should throw if username starts with an underscore', () => {
-      expect(() => Username.create('_admin_user')).toThrow(BadRequestException);
+      expect(() => Username.create('_admin_user')).toThrow(ApiError);
     });
   });
 

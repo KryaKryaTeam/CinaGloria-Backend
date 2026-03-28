@@ -3,19 +3,18 @@ import {
   AuthProviderEntity,
   IAuthProviderConstructorProps,
 } from './AuthProvider.entity';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import { randomUUID } from 'crypto';
 import { Username } from '../objects/Username.object';
 import { IHashService } from 'src/authorization/application/bounds/IHashService';
 import { Entity } from 'src/common/domain/Entity';
 import { Age } from '../objects/Age.object';
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { UserCreated } from '../events/UserCreated.event';
 import { IEventJSON } from 'src/common/domain/Event';
 import { getEventClass } from 'src/common/domain/EventRegister';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { RelationSlots } from 'src/types/RelationSlots';
+import { ApiError, DomainErrors, UserErrors } from 'src/error/ApiError';
 
 export interface IUserAdditionalData {
   telegram?: string;
@@ -195,11 +194,11 @@ export class UserEntity extends Entity {
     checkProviderUnique: (providerId: string) => Promise<boolean>,
   ) {
     if (this._authorizationProviders?.find((ent) => ent.isType(provider.type)))
-      throw new DomainError('This user already has provider with this type!');
+      ApiError.throw(UserErrors.PROVIDERS_DUPLICATION);
 
     if (!provider.isType(AuthorizationProviderTypes.LOCAL))
       if (!(await checkProviderUnique(provider.getProviderId())))
-        throw new DomainError(DomainErrors.DUPLICATION);
+        ApiError.throw(DomainErrors.DUPLICATION);
 
     this._authorizationProviders.push(provider);
   }
@@ -209,9 +208,10 @@ export class UserEntity extends Entity {
   }
 
   setRoleTo(requester: UserEntity, role: RoleEnum) {
-    if (!requester.hasRole(RoleEnum.ADMIN)) throw new ForbiddenException();
+    if (!requester.hasRole(RoleEnum.ADMIN))
+      ApiError.throw(UserErrors.USER_ROLE_CANT_BE_CHANGED);
 
-    if (this.hasRole(role)) throw new ForbiddenException();
+    if (this.hasRole(role)) ApiError.throw(DomainErrors.NO_CHANGE);
 
     this._role = role;
   }
@@ -221,15 +221,13 @@ export class UserEntity extends Entity {
     checkUnique: (username: string) => Promise<boolean>,
   ) {
     if (username.length < 8 || username.length > 50)
-      throw new BadRequestException(
-        'Username should be longer than 8 and shorter than 50',
-      );
+      ApiError.throw(UserErrors.USERNAME_LENGTH_RESTRICTION);
 
     if (username.startsWith('_'))
-      throw new BadRequestException('Username shouldn`t starts with _');
+      ApiError.throw(UserErrors.USERNAME_NOT_STARTS_WITH_);
 
     if (!(await checkUnique(username)))
-      throw new BadRequestException('Duplicated data');
+      ApiError.throw(DomainErrors.DUPLICATION);
 
     this._username = Username.create(username);
   }
@@ -237,16 +235,14 @@ export class UserEntity extends Entity {
     if (
       !password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)
     )
-      throw new BadRequestException('Password is incorrect');
+      ApiError.throw(UserErrors.PASSWORD_IS_INCORRECT);
 
     const providerForChange = this._authorizationProviders.find((e) =>
       e.isType(AuthorizationProviderTypes.LOCAL),
     );
 
     if (!providerForChange)
-      throw new BadRequestException(
-        'Can`t change password for user without Local provider',
-      );
+      ApiError.throw(UserErrors.CHANGE_PASSWORD_FOR_NOT_LOCAL_PROVIDER);
 
     //here should be hash service
 
@@ -288,10 +284,10 @@ export class UserEntity extends Entity {
     if (data.birthDay) Age.fromDate(data.birthDay);
 
     if (this._additionalData.birthDay != null && data.birthDay)
-      throw new ForbiddenException();
+      ApiError.throw(DomainErrors.IMMUTABLE_VALUE);
 
     if (data.telegram && data.telegram[0] != '@')
-      throw new BadRequestException('Incorrect contact data');
+      ApiError.throw(UserErrors.INCORRECT_CONTACT_DATA);
 
     this._additionalData.birthDay =
       data.birthDay ?? this._additionalData.birthDay;

@@ -1,5 +1,5 @@
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { IHashService } from 'src/authorization/application/bounds/IHashService';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 
 export interface IAuthProviderConstructorProps {
@@ -29,13 +29,13 @@ export class AuthProviderEntity {
       partial.type == AuthorizationProviderTypes.LOCAL &&
       (!partial.passwordHash || partial.providerId)
     )
-      throw new BadRequestException('Incorrect data for this provider');
+      ApiError.throw(UserErrors.INCORRECT_PROVIDER_DATA);
 
     if (
       partial.type != AuthorizationProviderTypes.LOCAL &&
       (partial.passwordHash || !partial.providerId)
     )
-      throw new BadRequestException('Incorrect data for this provider');
+      ApiError.throw(UserErrors.INCORRECT_PROVIDER_DATA);
 
     Object.assign(this, partial);
   }
@@ -54,29 +54,30 @@ export class AuthProviderEntity {
 
   setPasswordHash(hash: string) {
     if (this.type != AuthorizationProviderTypes.LOCAL)
-      throw new ForbiddenException();
+      ApiError.throw(UserErrors.DENIED_BY_AUTH_PROVIDER);
     this.passwordHash = hash;
   }
 
   setProviderId(id: string) {
     if (this.type == AuthorizationProviderTypes.LOCAL)
-      throw new ForbiddenException();
-
+      ApiError.throw(UserErrors.DENIED_BY_AUTH_PROVIDER);
     if (this.providerId && typeof this.providerId !== 'undefined')
-      throw new ForbiddenException();
+      ApiError.throw(UserErrors.DENIED_BY_AUTH_PROVIDER);
 
     this.providerId = id;
   }
 
-  getProviderId() {
+  getProviderId(): string {
     if (this.type != AuthorizationProviderTypes.LOCAL)
       return this.providerId as string;
-    throw new ForbiddenException();
+    ApiError.throw(UserErrors.DENIED_BY_AUTH_PROVIDER);
+    return '';
   }
 
-  getPasswordHash() {
+  getPasswordHash(): string {
     if (this.type == AuthorizationProviderTypes.LOCAL)
       return this.passwordHash as string;
-    throw new ForbiddenException();
+    ApiError.throw(UserErrors.DENIED_BY_AUTH_PROVIDER);
+    return '';
   }
 }

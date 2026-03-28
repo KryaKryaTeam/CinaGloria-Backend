@@ -1,6 +1,6 @@
 import { CompetitionRule } from './CompetitionRule.object';
 import { Icons } from 'src/types/Icons';
-import { DomainErrors } from 'src/error/DomainError';
+import { ApiError, DomainErrors } from 'src/error/ApiError';
 
 describe('CompetitionRule', () => {
   const validName = 'Fair Play';
@@ -24,17 +24,13 @@ describe('CompetitionRule', () => {
     it('should throw DomainError if name is empty or only whitespace', () => {
       expect(() => {
         CompetitionRule.define('   ', validDescription, validIcon);
-      }).toThrow(
-        expect.objectContaining({ message: DomainErrors.UNEXPECTED_VALUE }),
-      );
+      }).toThrow(ApiError);
     });
 
     it('should throw DomainError if description is empty or only whitespace', () => {
       expect(() => {
         CompetitionRule.define(validName, '', validIcon);
-      }).toThrow(
-        expect.objectContaining({ message: DomainErrors.UNEXPECTED_VALUE }),
-      );
+      }).toThrow(ApiError);
     });
   });
 

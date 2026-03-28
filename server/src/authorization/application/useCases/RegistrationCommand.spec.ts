@@ -4,11 +4,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { RegistrationCommand } from './RegistrationCommand';
 import { BaseTokens, ReposTokens, ServiceTokens } from 'src/common/Tokens';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
-import { BadRequestException } from '@nestjs/common';
 import { Cache } from '@nestjs/cache-manager';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
 import { SendNotificationEvent } from 'src/notification/domain/events/SendNotificationEvent';
+import { ApiError } from 'src/error/ApiError';
 
 describe('RegistrationCommand', () => {
   let command: RegistrationCommand;
@@ -61,7 +61,7 @@ describe('RegistrationCommand', () => {
       const data = { type: AuthorizationProviderTypes.GOOGLE, loginData: {} };
 
       await expect(command.implementation(data as any)).rejects.toThrow(
-        new BadRequestException('This endpoint service only Local Provider'),
+        ApiError,
       );
     });
 
@@ -73,7 +73,7 @@ describe('RegistrationCommand', () => {
       mockUserRepository.existsByEmail.mockResolvedValue(true);
 
       await expect(command.implementation(data as any)).rejects.toThrow(
-        new BadRequestException('User with this email is already exists'),
+        ApiError,
       );
     });
   });

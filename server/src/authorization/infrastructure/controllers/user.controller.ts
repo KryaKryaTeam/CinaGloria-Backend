@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -8,7 +7,7 @@ import {
   Query,
   Version,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { GetPublicProfileRes } from '../dtos/GetPublicProfileRes';
 import { Secure } from '../guards/auth/auth.guard';
 import { GetPrivateProfileRes } from '../dtos/GetPrivateProfileRes';
@@ -22,6 +21,7 @@ import { UpdateUsernameReq } from '../dtos/UpdateUsernameReq';
 import { UpdateAvatarCommand } from 'src/authorization/application/useCases/UpdateAvatarCommand';
 import { UpdateAvatarReq } from '../dtos/UpdateAvatarReq';
 import { UserId } from '../decorators/user.decorator';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 
 @Controller('user')
 export class UserController {
@@ -42,8 +42,7 @@ export class UserController {
 
   @Get('/me')
   @Version('1')
-  @Secure(true)
-  @ApiBearerAuth('main')
+  @Secure()
   @ApiResponse({ type: GetPrivateProfileRes, status: 200 })
   async getUserPrivateData(@UserId() id: string) {
     return await this.getPrivateProfileQuery.execute(id);
@@ -60,19 +59,15 @@ export class UserController {
   })
   @ApiResponse({ type: GetPublicProfileRes, status: 200 })
   async getUserPublicData(@Query('id') id: string) {
-    if (!id)
-      throw new BadRequestException(
-        'The id of requested user must be provided',
-      );
+    if (!id) ApiError.throw(UserErrors.ID_OF_REQUESTED_USER_NOT_PROVIDED);
 
     return await this.getPublicProfileQuery.execute(id);
   }
 
   @Put('/additional')
   @Version('1')
-  @Secure(true)
+  @Secure()
   @ApiBody({ type: UpdateUserAdditionalDataDto, required: true })
-  @ApiBearerAuth('main')
   async updateUserAdditionalData(
     @Body() body: UpdateUserAdditionalDataDto,
     @UserId() id: string,
@@ -85,8 +80,7 @@ export class UserController {
 
   @Put('/username')
   @Version('1')
-  @Secure(true)
-  @ApiBearerAuth('main')
+  @Secure()
   @ApiBody({ type: UpdateUsernameReq })
   async updateUsername(@Body() body: UpdateUsernameReq, @UserId() id: string) {
     await this.updateUsernameCommand.execute({
@@ -97,8 +91,7 @@ export class UserController {
 
   @Put('/avatar')
   @Version('1')
-  @Secure(true)
-  @ApiBearerAuth('main')
+  @Secure()
   @ApiBody({ type: UpdateAvatarReq })
   async updateAvatar(@Body() body: UpdateAvatarReq, @UserId() id: string) {
     await this.updateAvatarCommand.execute({

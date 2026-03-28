@@ -1,8 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Query } from '../../../common/application/Query';
 import { ReposTokens, ServiceTokens } from 'src/common/Tokens';
 import type { ILoadFileService } from '../bounds/ILoadFileService';
 import type { IFileRepository } from '../bounds/IFileRepository';
+import { ApiError, FileErrors } from 'src/error/ApiError';
 
 interface CommandInput {
   fileUrl: string;
@@ -18,7 +19,7 @@ export class GetLinkQuery extends Query<CommandInput, string> {
   async implementation(data: CommandInput): Promise<string> {
     const file = await this.fileRepository.findByUrl(data.fileUrl);
 
-    if (!file) throw new NotFoundException('File with this url is undefined!');
+    if (!file) ApiError.throw(FileErrors.FILE_WITH_THIS_ID_UNDEFINED);
 
     return await this.loadFileService.getLink(file);
   }

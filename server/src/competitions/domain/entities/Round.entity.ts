@@ -1,9 +1,9 @@
 import { randomUUID } from 'crypto';
 import { Entity } from 'src/common/domain/Entity';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { Icons } from 'src/types/Icons';
 import { RoundStatus } from 'src/types/RoundStatus';
 import { TaskEntity } from './Task.entity';
+import { ApiError, RoundErrors } from 'src/error/ApiError';
 
 export interface ICreateRound {
   name: string;
@@ -40,6 +40,8 @@ export class RoundEntity extends Entity {
 
   private constructor(plain: IRoundPlain) {
     super();
+    this.id = plain.id;
+    this._hidden = plain.hidden;
     this._name = plain.name;
     this._description = plain.description;
     this._icon = plain.icon;
@@ -75,9 +77,13 @@ export class RoundEntity extends Entity {
   }
 
   set name(name: string) {
+    if (name.trim().length == 0 || name.trim().length > 255)
+      ApiError.throw(RoundErrors.CONTENT_LENGTH_RESTRICTION);
     this._name = name;
   }
   set description(description: string) {
+    if (description.trim().length == 0 || description.trim().length > 1000)
+      ApiError.throw(RoundErrors.CONTENT_LENGTH_RESTRICTION);
     this._description = description;
   }
 
@@ -86,16 +92,25 @@ export class RoundEntity extends Entity {
   }
 
   set startOfRound(date: Date) {
-    if (date > new Date()) this._startOfRound = date;
-    else throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (date < new Date()) ApiError.throw(RoundErrors.START_DATE_INVALID);
+
+    if (this._endOfRound && date.getTime() >= this._endOfRound.getTime())
+      ApiError.throw(RoundErrors.INVALID_DATE_SEQUENCE);
+
+    this._startOfRound = date;
   }
 
-  set enfOfRound(date: Date) {
-    if (date > new Date()) this._endOfRound = date;
-    else throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+  set endOfRound(date: Date) {
+    if (date < new Date()) ApiError.throw(RoundErrors.END_DATE_INVALID);
+
+    if (this._endOfRound && date.getTime() >= this._endOfRound.getTime())
+      ApiError.throw(RoundErrors.INVALID_DATE_SEQUENCE);
+    this._endOfRound = date;
   }
 
   set status(status: RoundStatus) {
+    if (!this.canChangeStatusTo(status))
+      ApiError.throw(RoundErrors.STATUS_FLOW_BREAKS);
     this._status = status;
   }
 
@@ -119,8 +134,8 @@ export class RoundEntity extends Entity {
     return this._startOfRound!;
   }
 
-  get endOfRound() {
-    return this._endOfRound;
+  get endOfRound(): Date {
+    return this._endOfRound!;
   }
 
   get relatedTasks() {
@@ -143,6 +158,7 @@ export class RoundEntity extends Entity {
     const i: number = this._relatedTasks.findIndex((t) => {
       if (t.id == task.id) return true;
     });
+    if (i == -1) ApiError.throw(RoundErrors.TASK_NOT_FOUND_IN_ROUND);
     this._relatedTasks.splice(i, 1);
   }
 }

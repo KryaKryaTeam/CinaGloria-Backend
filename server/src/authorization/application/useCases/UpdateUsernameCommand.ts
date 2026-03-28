@@ -1,8 +1,9 @@
-import { BadRequestException, Inject } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { Command } from 'src/common/application/Command';
 import { ReposTokens } from 'src/common/Tokens';
 import type { IUserRepository } from '../bounds/IUserRepository';
 import { PropsWithUserId } from 'src/types/PropsWithUserId';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 
 export class UpdateUsernameCommand extends Command<
   PropsWithUserId<{ username: string }>,
@@ -13,12 +14,12 @@ export class UpdateUsernameCommand extends Command<
 
   async implementation(data: { username: string; id: string }): Promise<void> {
     const user = await this.userRepository.findById(data.id);
-    if (!user) throw new BadRequestException('User with this id is unedfined!');
+    if (!user) ApiError.throw(UserErrors.USER_WITH_THIS_ID_UNDEFINED);
 
-    await user.changeUsername(data.username, async (t) => {
+    await user!.changeUsername(data.username, async (t) => {
       return !(await this.userRepository.existsByUsername(t));
     });
 
-    await this.userRepository.save(user);
+    await this.userRepository.save(user!);
   }
 }

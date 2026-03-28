@@ -4,7 +4,7 @@ import {
   ICreateCompetition,
 } from '../entities/Competition.entity';
 import { RoleEnum } from 'src/types/RoleEnum';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { ApiError, CompetitionErrors } from 'src/error/ApiError';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionStatus } from 'src/types/CompetitionStatus';
 
@@ -26,7 +26,7 @@ export class UserAndCompetitionService {
     const allowedRoles: RoleEnum[] = [RoleEnum.ADMIN, RoleEnum.ORGANIZER];
 
     if (!allowedRoles.includes(user.role))
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(CompetitionErrors.CANNOT_EDIT);
   }
   static createCompetition(data: ICreateCompetition, user: UserEntity) {
     UserAndCompetitionService.userCanEditCompetitions(user);
@@ -84,7 +84,7 @@ export class UserAndCompetitionService {
     this.userCanEditCompetitions(user);
 
     if (competition.canBeDeleted == false)
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(CompetitionErrors.CANNOT_DELETE);
 
     return competition.canBeDeleted;
   }

@@ -1,4 +1,4 @@
-import { BadRequestException, Inject } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { Command } from 'src/common/application/Command';
 import { ReposTokens, ServiceTokens } from 'src/common/Tokens';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
@@ -9,6 +9,7 @@ import { Cache } from '@nestjs/cache-manager';
 import { randomInt, randomUUID } from 'crypto';
 import { SendNotificationEvent } from 'src/notification/domain/events/SendNotificationEvent';
 import { Notification } from 'src/notification/domain/entities/Notification';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 
 interface RegistrationCommandProps {
   type: AuthorizationProviderTypes;
@@ -39,14 +40,12 @@ export class RegistrationCommand extends Command<
     data: RegistrationCommandProps,
   ): Promise<RegistrationCommandOutput> {
     if (data.type !== AuthorizationProviderTypes.LOCAL) {
-      throw new BadRequestException(
-        'This endpoint service only Local Provider',
-      );
+      ApiError.throw(UserErrors.ONLY_FOR_LOCAL_PROVIDER);
     }
 
     const loginData = data.loginData as { email: string };
     if (await this.userRepository.existsByEmail(loginData.email)) {
-      throw new BadRequestException('User with this email is already exists');
+      ApiError.throw(UserErrors.USER_BY_THIS_EMAIL_IS_EXISTS);
     }
 
     const { user } = await this.authorizationProviderService.authorize(

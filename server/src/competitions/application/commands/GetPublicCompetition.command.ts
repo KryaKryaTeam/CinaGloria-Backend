@@ -1,8 +1,9 @@
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { Query } from 'src/common/application/Query';
 import { ReposTokens } from 'src/common/Tokens';
 import { ICompetitionOnPage } from 'src/competitions/domain/entities/Competition.entity';
 import type { ICompetitionRepository } from '../bounds/CompetitionRepository';
+import { ApiError, CompetitionErrors } from 'src/error/ApiError';
 
 interface GetPublicCompetitionQueryInput {
   competitionId: string;
@@ -26,7 +27,7 @@ export class GetPublicCompetitionQuery extends Query<
     );
 
     if (!result || !result.publicOnPage)
-      throw new NotFoundException('Competition with this id is undefined!');
+      ApiError.throw(CompetitionErrors.UNDEFINED);
 
     return {
       competition: result.publicOnPage,

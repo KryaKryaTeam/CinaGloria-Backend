@@ -1,13 +1,9 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { IAuthProviderRepository } from 'src/authorization/application/bounds/IAuthProviderRepository';
 import type { IUserRepository } from 'src/authorization/application/bounds/IUserRepository';
 import { UserMapper } from 'src/authorization/application/mappers/UserMapper';
+import { FileErrors, ServiceErrors } from 'src/error/ApiError';
 import { AuthProviderEntity } from 'src/authorization/domain/entities/AuthProvider.entity';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { Username } from 'src/authorization/domain/objects/Username.object';
@@ -17,7 +13,6 @@ import {
   ReposTokens,
   ServiceTokens,
 } from 'src/common/Tokens';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import { AuthorizationProviderService } from '../services/AuthorizationProviderService';
 import type { IHashService } from 'src/authorization/application/bounds/IHashService';
@@ -29,6 +24,7 @@ import { RelationSlots } from 'src/types/RelationSlots';
 import type { IFileRepository } from 'src/files/application/bounds/IFileRepository';
 import { FileEntity } from 'src/files/domain/entities/File.entity';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 
 export interface IHandshakeOutput {
   email: string;
@@ -71,7 +67,7 @@ export abstract class BaseAuthorizationProvider<T> {
     loginData: T,
   ): Promise<{ user: UserEntity; existsUser: boolean }> {
     if (!(await this.validate(loginData)))
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE, 'Here');
+      ApiError.throw(UserErrors.INVALID_LOGIN_DATA);
 
     const handshakeData = await this.handshake(loginData);
 
@@ -94,7 +90,7 @@ export abstract class BaseAuthorizationProvider<T> {
         });
 
         if (!response.ok || !response.arrayBuffer)
-          throw new BadRequestException('Avatar by this url is unavalible!');
+          ApiError.throw(FileErrors.AVATAR_URL_UNAVAILABLE);
         const buffer = Buffer.from(await response.arrayBuffer());
         file = await this.loadFileService.loadFile(
           Readable.from(buffer),
@@ -104,7 +100,7 @@ export abstract class BaseAuthorizationProvider<T> {
         await this.fileRepostory.save(file);
       } catch (err) {
         if ((err as { code: number | undefined }).code) throw err;
-        throw new InternalServerErrorException('Failed to fecth avatar!');
+        ApiError.throw(ServiceErrors.MISCONFIGURED);
       }
 
       findUser = UserEntity.create(
@@ -147,7 +143,7 @@ export abstract class BaseAuthorizationProvider<T> {
           this.hashService,
         )
       )
-        throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+        ApiError.throw(UserErrors.UNAUTHORIZED);
     }
     return { user: findUser, existsUser };
   }

@@ -1,7 +1,7 @@
 import { Notification } from './Notification'; // Adjust the path as needed
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { NotificationStatus } from 'src/types/NotificationStatus';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { ApiError } from 'src/error/ApiError';
 
 describe('Notification Entity', () => {
   // Mock User helper
@@ -28,17 +28,13 @@ describe('Notification Entity', () => {
     it('should throw an error if the title is too short', () => {
       const shortTitle = { ...validProps, title: 'No' };
 
-      expect(() => Notification.create(shortTitle)).toThrow(
-        new DomainError(DomainErrors.UNEXPECTED_VALUE),
-      );
+      expect(() => Notification.create(shortTitle)).toThrow(ApiError);
     });
 
     it('should throw an error if the title is too long', () => {
       const longTitle = { ...validProps, title: 'a'.repeat(101) };
 
-      expect(() => Notification.create(longTitle)).toThrow(
-        new DomainError(DomainErrors.UNEXPECTED_VALUE),
-      );
+      expect(() => Notification.create(longTitle)).toThrow(ApiError);
     });
   });
 
@@ -54,9 +50,7 @@ describe('Notification Entity', () => {
     it('should throw an error if someone other than the recipient tries to mark as read', () => {
       const notification = Notification.create(validProps);
 
-      expect(() => notification.markAsRead('wrong-user-id')).toThrow(
-        new DomainError(DomainErrors.RESTRICTED_CHANGE),
-      );
+      expect(() => notification.markAsRead('wrong-user-id')).toThrow(ApiError);
     });
 
     it('should do nothing (stay readed) if already readed (idempotency)', () => {

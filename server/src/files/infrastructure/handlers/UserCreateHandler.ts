@@ -1,16 +1,11 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  Logger,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { EventHandler } from 'src/common/application/events/EventHandler';
 import { EventType } from 'src/common/domain/EventType';
 import { BaseTokens, ReposTokens, ServiceTokens } from 'src/common/Tokens';
 import type { IFileRepository } from 'src/files/application/bounds/IFileRepository';
 import { LinkerApplicationService } from 'src/files/application/services/Linker.appService';
+import { ApiError, FileErrors } from 'src/error/ApiError';
 
 @Injectable()
 export class UserCreatedHandlerFile implements OnModuleInit {
@@ -32,7 +27,7 @@ export class UserCreatedHandlerFile implements OnModuleInit {
 
   async handle(payload: UserEntity) {
     const file = await this.fileRepostory.findByUrl(payload.avatarURL.url);
-    if (!file) throw new BadRequestException('File with this id is unefined!');
+    if (!file) ApiError.throw(FileErrors.FILE_WITH_THIS_ID_UNDEFINED);
 
     await this.linkerService.linkAvatarToUser(file, payload);
     this.logger.log('User avatar linked to user');

@@ -1,4 +1,4 @@
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { ApiError, FileErrors } from 'src/error/ApiError';
 import {
   ISlotConfig,
   RelationSlots,
@@ -12,7 +12,7 @@ export class RelationSlotFamily {
     const arrayOfFamilies = Array.from(Object.keys(RelationSlots));
 
     if (!arrayOfFamilies.includes(value))
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(FileErrors.UNKNOWN_FAMILY);
 
     this._value = value;
   }
@@ -35,7 +35,7 @@ export class RelationSlotCode {
     );
 
     if (!arrayOfCodes.includes(value))
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(FileErrors.UNKNOWN_FAMILY);
 
     this._value = value;
   }
@@ -58,7 +58,7 @@ export class RelationSlotConfig {
   private constructor(value: string) {
     const config = RelationSlotsConfig.get(value);
 
-    if (!config) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (!config) ApiError.throw(FileErrors.CONFIG_NOT_FOUND);
 
     this._value = config;
   }
@@ -81,8 +81,8 @@ export class RelationString {
   private constructor(value: string) {
     const splited = value.split(':');
 
-    if (!splited[0]) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
-    if (!splited[1]) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (!splited[0]) ApiError.throw(FileErrors.INVALID_RELATION_FORMAT);
+    if (!splited[1]) ApiError.throw(FileErrors.INVALID_RELATION_FORMAT);
 
     this._value = value;
   }

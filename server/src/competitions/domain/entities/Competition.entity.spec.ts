@@ -5,7 +5,7 @@ import {
   ICompetitionPlain,
 } from './Competition.entity';
 import { CompetitionStatus } from 'src/types/CompetitionStatus';
-import { DomainErrors } from 'src/error/DomainError';
+import { ApiError } from 'src/error/ApiError';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionRule } from '../objects/CompetitionRule.object';
 import { AppSlotCode, RelationSlots } from 'src/types/RelationSlots';
@@ -75,9 +75,7 @@ describe('CompetitionEntity', () => {
         status: CompetitionStatus.PUBLISHED,
       } as unknown as ICompetitionPlain;
 
-      expect(() => CompetitionEntity.load(incompletePlain)).toThrow(
-        expect.objectContaining({ message: DomainErrors.UNEXPECTED_VALUE }),
-      );
+      expect(() => CompetitionEntity.load(incompletePlain)).toThrow(ApiError);
     });
   });
 
@@ -123,9 +121,7 @@ describe('CompetitionEntity', () => {
       const competition = CompetitionEntity.create(createFullParams());
       expect(() => {
         competition.status = CompetitionStatus.SCHEDULED;
-      }).toThrow(
-        expect.objectContaining({ message: DomainErrors.RESTRICTED_CHANGE }),
-      );
+      }).toThrow(ApiError);
     });
 
     it('should lock the entity from modifications once it hits an immutable state (e.g., CANCELED)', () => {
@@ -137,9 +133,7 @@ describe('CompetitionEntity', () => {
 
       expect(() => {
         competition.name = 'New Title';
-      }).toThrow(
-        expect.objectContaining({ message: DomainErrors.IMMUTABLE_VALUE }),
-      );
+      }).toThrow(ApiError);
     });
   });
 

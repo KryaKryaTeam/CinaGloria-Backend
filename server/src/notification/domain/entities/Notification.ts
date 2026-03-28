@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { ApiError, DomainErrors } from 'src/error/ApiError';
 import { NotificationStatus } from 'src/types/NotificationStatus';
 
 interface INotification {
@@ -43,7 +43,7 @@ export class Notification {
     targets: string[];
   }): Notification {
     if (props.title.length < 5 || props.title.length > 100) {
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(DomainErrors.UNEXPECTED_VALUE);
     }
 
     return new Notification({
@@ -85,7 +85,7 @@ export class Notification {
 
   public markAsRead(actorId: string): void {
     if (this._to.id !== actorId) {
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
     }
 
     if (this._status === NotificationStatus.readed) {

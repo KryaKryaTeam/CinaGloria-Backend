@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { BaseTokens, ReposTokens, ServiceTokens } from 'src/common/Tokens';
-import { BadRequestException } from '@nestjs/common';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
 import { ValidateRegistrationCommand } from './ValidateRegistrationCommand';
 import { Cache } from '@nestjs/cache-manager';
+import { ApiError } from 'src/error/ApiError';
 
 describe('ValidateRegistrationCommand', () => {
   let command: ValidateRegistrationCommand;
@@ -43,15 +43,15 @@ describe('ValidateRegistrationCommand', () => {
     );
   });
 
-  it('should throw BadRequestException if requestId not found in cache', async () => {
+  it('should throw ApiError if requestId not found in cache', async () => {
     mockCache.get.mockResolvedValue(null);
 
     await expect(
       command.implementation({ requestId: 'id', code: '123456' }),
-    ).rejects.toThrow(BadRequestException);
+    ).rejects.toThrow(ApiError);
   });
 
-  it('should throw BadRequestException if code is incorrect', async () => {
+  it('should throw ApiError if code is incorrect', async () => {
     mockCache.get.mockResolvedValue({
       code: '111111',
       user: { id: 'uuid' }, // спрощена структура
@@ -59,7 +59,7 @@ describe('ValidateRegistrationCommand', () => {
 
     await expect(
       command.implementation({ requestId: 'id', code: '222222' }),
-    ).rejects.toThrow('Validation code is incorrect');
+    ).rejects.toThrow(ApiError);
   });
 
   it('should successfully validate, save user and return tokens', async () => {

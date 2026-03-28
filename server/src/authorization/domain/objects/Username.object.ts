@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 
 export class Username {
   private readonly _value: string;
@@ -16,12 +16,10 @@ export class Username {
 
   public static create(value: string): Username {
     if (value.length < 8 || value.length > 50)
-      throw new BadRequestException(
-        'Username should be longer than 8 and shorter than 50 symbols',
-      );
+      ApiError.throw(UserErrors.USERNAME_LENGTH_RESTRICTION);
 
     if (value.startsWith('_'))
-      throw new BadRequestException('Username shouldn`t start with _');
+      ApiError.throw(UserErrors.USERNAME_NOT_STARTS_WITH_);
 
     return new Username(value);
   }

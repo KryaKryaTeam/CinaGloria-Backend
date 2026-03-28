@@ -1,7 +1,7 @@
 import { Entity } from 'src/common/domain/Entity';
 import { MimeType } from '../objects/MimeType.object';
 import { randomUUID } from 'crypto';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { ApiError, FileErrors } from 'src/error/ApiError';
 import { RelationString } from '../objects/RelationSlots';
 
 export interface IFileEntity {
@@ -54,7 +54,7 @@ export class FileEntity extends Entity {
   }
 
   get slot(): RelationString {
-    if (!this._slot) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (!this._slot) ApiError.throw(FileErrors.METADATA_IMMUTABLE);
     return this._slot;
   }
 
@@ -63,13 +63,13 @@ export class FileEntity extends Entity {
   }
 
   set size(value: number) {
-    if (this._size) throw new DomainError(DomainErrors.IMMUTABLE_VALUE);
+    if (this._size) ApiError.throw(FileErrors.METADATA_IMMUTABLE);
 
     this._size = value;
   }
 
   set slot(value: RelationString) {
-    if (this._slot) throw new DomainError(DomainErrors.IMMUTABLE_VALUE);
+    if (this._slot) ApiError.throw(FileErrors.METADATA_IMMUTABLE);
 
     this._slot = value;
   }

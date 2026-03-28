@@ -1,9 +1,4 @@
-import {
-  Inject,
-  InternalServerErrorException,
-  Logger,
-  OnModuleInit,
-} from '@nestjs/common';
+import { Inject, Logger, OnModuleInit } from '@nestjs/common';
 import { ILoadFileService } from 'src/files/application/bounds/ILoadFileService';
 import { FileEntity } from 'src/files/domain/entities/File.entity';
 import { Readable } from 'stream';
@@ -12,6 +7,7 @@ import { DiscoveryService } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
+import { ApiError, ServiceErrors } from 'src/error/ApiError';
 
 export const LoadController = DiscoveryService.createDecorator();
 
@@ -57,7 +53,7 @@ export class LoadFileService implements ILoadFileService, OnModuleInit {
       this.configService.getOrThrow('storage.controller'),
     );
 
-    if (!controller) throw new InternalServerErrorException('Misconfigured!');
+    if (!controller) ApiError.throw(ServiceErrors.MISCONFIGURED);
 
     return controller;
   }

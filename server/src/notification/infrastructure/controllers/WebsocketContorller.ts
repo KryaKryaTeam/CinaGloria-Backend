@@ -1,9 +1,10 @@
 import { Controller, Get, Inject, Req, Version } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+
 import type { Request as ExpressRequest } from 'express';
+import { UserId } from 'src/authorization/infrastructure/decorators/user.decorator';
 import { Secure } from 'src/authorization/infrastructure/guards/auth/auth.guard';
 import { CommandTokens } from 'src/common/Tokens';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { documentError, NotificationErrors } from 'src/error/ApiError';
 import { GenerateTicketCommand } from 'src/notification/application/commands/GenerateTicketCommand';
 
 @Controller('/ws')
@@ -12,14 +13,12 @@ export class WSController {
   private generateTicketCommand: GenerateTicketCommand;
 
   @Get('token')
-  @Secure(true)
+  @Secure()
   @Version('1')
-  @ApiBearerAuth('main')
-  async getTokenV1(@Req() req: ExpressRequest) {
-    if (!req['user_id']) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
-
+  @documentError(NotificationErrors.TICKER_SERVICE_ERROR)
+  async getTokenV1(@Req() req: ExpressRequest, @UserId() userId: string) {
     return {
-      token: await this.generateTicketCommand.execute(req['user_id'] as string),
+      token: await this.generateTicketCommand.execute(userId),
     };
   }
 }

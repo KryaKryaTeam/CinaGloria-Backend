@@ -1,10 +1,10 @@
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { ApiError, FileErrors } from 'src/error/ApiError';
 
 export class MimeType {
   private readonly _value: string;
 
   constructor(value: string | undefined) {
-    if (!value) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (!value) ApiError.throw(FileErrors.MIME_TYPE_IS_UNDEFINED);
     this._value = value;
   }
 

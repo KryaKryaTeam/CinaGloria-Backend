@@ -1,5 +1,6 @@
-import { BadRequestException, PipeTransform } from '@nestjs/common';
+import { PipeTransform } from '@nestjs/common';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
+import { ApiError, FileErrors } from 'src/error/ApiError';
 
 export class RelationStringTransfromPipe implements PipeTransform {
   transform(value: any) {
@@ -8,7 +9,7 @@ export class RelationStringTransfromPipe implements PipeTransform {
       console.log(value);
       return RelationString.define(value);
     } catch {
-      throw new BadRequestException('Relation string is incorrect!');
+      ApiError.throw(FileErrors.INVALID_RELATION_FORMAT);
     }
   }
 }

@@ -19,8 +19,16 @@ import ServerConfig from './configs/Server.config';
 import StorageConfig, { ServeStaticConfig } from './configs/Storage.config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { CompetitionsModule } from './competitions/competitions.module';
+import { APP_FILTER } from '@nestjs/core';
+import { ApiErrorExceptionsFilter } from './error/ApiError.filter';
 
 @Module({
+  providers: [
+    {
+      provide: APP_FILTER,
+      useClass: ApiErrorExceptionsFilter,
+    },
+  ],
   imports: [
     ConfigModule.forRoot({
       load: [

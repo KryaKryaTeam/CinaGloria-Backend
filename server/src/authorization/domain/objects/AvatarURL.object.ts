@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { ApiError, FileErrors } from 'src/error/ApiError';
 
 export class AvatarURL {
   private _value: string;
@@ -18,7 +18,7 @@ export class AvatarURL {
       !value.startsWith('https://') &&
       !value.startsWith('internal_file:')
     )
-      throw new BadRequestException('URL should start with protocol');
+      ApiError.throw(FileErrors.INVALID_PREFIX);
 
     return new AvatarURL(value);
   }

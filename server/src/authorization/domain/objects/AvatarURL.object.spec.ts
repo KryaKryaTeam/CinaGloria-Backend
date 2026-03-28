@@ -1,5 +1,5 @@
-import { BadRequestException } from '@nestjs/common';
 import { AvatarURL } from './AvatarURL.object';
+import { ApiError } from 'src/error/ApiError';
 
 describe('AvatarURL Value Object', () => {
   describe('create', () => {
@@ -21,7 +21,7 @@ describe('AvatarURL Value Object', () => {
     it('should throw DomainError if URL does not contain http/https', () => {
       const invalidUrl = 'ftp://files.com/image.jpg';
 
-      expect(() => AvatarURL.create(invalidUrl)).toThrow(BadRequestException);
+      expect(() => AvatarURL.create(invalidUrl)).toThrow(ApiError);
     });
   });
 

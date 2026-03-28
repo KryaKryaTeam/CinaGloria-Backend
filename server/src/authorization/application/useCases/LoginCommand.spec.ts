@@ -5,7 +5,7 @@ import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersType
 import { RoleEnum } from 'src/types/RoleEnum';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
-import { BadRequestException } from '@nestjs/common';
+import { ApiError } from 'src/error/ApiError';
 
 describe('LoginCommand', () => {
   let command: LoginCommand;
@@ -120,7 +120,7 @@ describe('LoginCommand', () => {
         type: AuthorizationProviderTypes.LOCAL,
         loginData: {},
       }),
-    ).rejects.toThrow(BadRequestException);
+    ).rejects.toThrow(ApiError);
 
     expect(mockUserRepository.save).not.toHaveBeenCalled();
   });

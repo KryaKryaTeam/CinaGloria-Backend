@@ -4,7 +4,7 @@ import { BaseTokens, ReposTokens } from 'src/common/Tokens';
 import { IUserAdditionalData } from 'src/authorization/domain/entities/User.entity';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
-import { BadRequestException } from '@nestjs/common';
+import { ApiError } from 'src/error/ApiError';
 
 describe('UpdateAdditionalDataCommand', () => {
   let command: UpdateAdditionalDataCommand;
@@ -79,7 +79,7 @@ describe('UpdateAdditionalDataCommand', () => {
       data: {} as IUserAdditionalData,
     });
 
-    await expect(call).rejects.toThrow(BadRequestException);
+    await expect(call).rejects.toThrow(ApiError);
     await expect(call).rejects.toThrow();
 
     // Збереження не має викликатися

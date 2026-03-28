@@ -4,7 +4,7 @@ import {
   INotificationData,
 } from './BaseNotificationTarget';
 import { NotificationTarget } from '../service/NotificationService';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { ApiError, NotificationErrors } from 'src/error/ApiError';
 import juice from 'juice';
 import { marked } from 'marked';
 import Mailgun from 'mailgun.js';
@@ -33,7 +33,7 @@ export class EmailNotificationTarget extends BaseNotificationTarget {
         this.configurationService.getOrThrow<string>(templateKey),
       ).then((res) => res.text());
 
-      if (!template) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      if (!template) ApiError.throw(NotificationErrors.TEMPLATE_IS_UNDEFINED);
 
       await this.chacheService.set(templateKey, template);
     }

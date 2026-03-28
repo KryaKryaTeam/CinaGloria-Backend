@@ -1,13 +1,12 @@
-import { BadRequestException } from '@nestjs/common';
+import { ApiError, UserErrors } from 'src/error/ApiError';
+
 export class Age {
   private _value: number;
 
   constructor(value: number) {
-    if (value < 14 || value > 120)
-      throw new BadRequestException(
-        'User should be older than 14 and younger than 120',
-      );
-
+    if (value < 14 || value > 120) {
+      ApiError.throw(UserErrors.INVALID_AGE);
+    }
     this._value = value;
   }
 

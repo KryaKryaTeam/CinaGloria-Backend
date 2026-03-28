@@ -2,7 +2,7 @@ import { Entity } from 'src/common/domain/Entity';
 import { FileEntity } from './File.entity';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { randomUUID } from 'crypto';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { ApiError, FileErrors } from 'src/error/ApiError';
 import { RelationString } from '../objects/RelationSlots';
 import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
 
@@ -44,27 +44,25 @@ export class FileRelationEntity extends Entity {
     if (typeof slot == 'string') slot = RelationString.define(slot);
 
     if (slot.value != this.file.slot.value)
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(FileErrors.SLOT_MISMATCH);
 
     if (this._user && slot.family !== 'user')
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(FileErrors.ENTITY_MISMATCH);
 
     if (this._competition && slot.family !== 'competition')
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(FileErrors.ENTITY_MISMATCH);
 
     this._slot = slot;
   }
 
   public set user(value: UserEntity) {
-    if (this.relatedToEntity)
-      throw new DomainError(DomainErrors.IMMUTABLE_VALUE);
+    if (this.relatedToEntity) ApiError.throw(FileErrors.RELATION_IMMUTABLE);
 
     this._user = value;
   }
 
   public set competition(value: CompetitionEntity) {
-    if (this.relatedToEntity)
-      throw new DomainError(DomainErrors.IMMUTABLE_VALUE);
+    if (this.relatedToEntity) ApiError.throw(FileErrors.RELATION_IMMUTABLE);
 
     this._competition = value;
   }
@@ -92,7 +90,8 @@ export class FileRelationEntity extends Entity {
   }
 
   public get slot(): string {
-    if (!this._slot) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (!this._slot)
+      ApiError.throw(FileErrors.INCOMPLETE_RELATION, 'Slot is not defined');
     return this._slot.value;
   }
 }

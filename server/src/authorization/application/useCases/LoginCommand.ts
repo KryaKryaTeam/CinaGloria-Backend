@@ -1,10 +1,11 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Command } from 'src/common/application/Command';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import type { IAuthorizationProviderService } from '../bounds/IAuthorizationProviderService';
 import type { IUserRepository } from '../bounds/IUserRepository';
 import { ReposTokens, ServiceTokens } from 'src/common/Tokens';
 import type { IJWTTokenService } from '../bounds/IJWTTokenService';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 
 interface LoginCommandProps {
   type: AuthorizationProviderTypes;
@@ -38,7 +39,7 @@ export class LoginCommand extends Command<
           (data.loginData as { email: string }).email,
         ))
       )
-        throw new BadRequestException('User with this email is undefined');
+        ApiError.throw(UserErrors.USER_BY_THIS_EMAIL_IS_UNDEFINED);
     }
 
     const { user, existsUser } =

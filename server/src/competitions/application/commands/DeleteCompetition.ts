@@ -1,9 +1,10 @@
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { Command } from 'src/common/application/Command';
 import { ReposTokens } from 'src/common/Tokens';
 import type { ICompetitionRepository } from '../bounds/CompetitionRepository';
 import { UserAndCompetitionService } from 'src/competitions/domain/services/UserAndCompetitionService';
+import { ApiError, CompetitionErrors } from 'src/error/ApiError';
 
 interface DeleteCompetitionCommandInput {
   user: UserEntity;
@@ -22,8 +23,7 @@ export class DeleteCompetitionCommand extends Command<
       data.competitionId,
     );
 
-    if (!competition)
-      throw new NotFoundException('Competition with this id is unedfined!');
+    if (!competition) ApiError.throw(CompetitionErrors.UNDEFINED);
 
     UserAndCompetitionService.deleteCompetition(competition, data.user);
 

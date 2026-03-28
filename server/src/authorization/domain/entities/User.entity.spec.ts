@@ -1,6 +1,5 @@
 import { UserEntity } from './User.entity';
 import { Username } from '../objects/Username.object';
-import { AvatarURL } from '../objects/AvatarURL.object';
 import { RoleEnum } from 'src/types/RoleEnum';
 import {
   createMockEventDispatcher,
@@ -12,6 +11,10 @@ import { RegisterEvent } from 'src/common/domain/EventRegister';
 import { AuthProviderEntity } from './AuthProvider.entity';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import { Event } from 'src/common/domain/Event';
+import { ApiError } from 'src/error/ApiError';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
+import { randomUUID } from 'crypto';
+import { RelationSlots } from 'src/types/RelationSlots';
 
 // Реєструємо івент для тестів регідрації
 RegisterEvent(UserCreated);
@@ -19,7 +22,11 @@ RegisterEvent(UserCreated);
 describe('UserEntity', () => {
   const validEmail = 'dev@cinagloria.com';
   const validUsername = Username.create('code_runner_777');
-  const validAvatar = AvatarURL.create('https://avatar.com/1.png');
+  const validAvatar = InternalFile.define<typeof RelationSlots.user.avatar>(
+    `internal_file:${randomUUID()}.webp`,
+    'user:avatar',
+    'user:avatar',
+  );
 
   const eventDispatcher = new EventDispatcher();
 
@@ -53,9 +60,7 @@ describe('UserEntity', () => {
       const user = createDefaultUser();
       const nonAdmin = createDefaultUser();
 
-      expect(() => user.setRoleTo(nonAdmin, RoleEnum.ADMIN)).toThrow(
-        ForbiddenException,
-      );
+      expect(() => user.setRoleTo(nonAdmin, RoleEnum.ADMIN)).toThrow(ApiError);
     });
 
     it('should throw error if role is already set to the same value', () => {
@@ -63,9 +68,7 @@ describe('UserEntity', () => {
       const admin = createDefaultUser();
       admin.__forceSetRole(RoleEnum.ADMIN);
 
-      expect(() => user.setRoleTo(admin, RoleEnum.USER)).toThrow(
-        ForbiddenException,
-      );
+      expect(() => user.setRoleTo(admin, RoleEnum.USER)).toThrow(ApiError);
     });
   });
 
@@ -83,21 +86,21 @@ describe('UserEntity', () => {
       const user = createDefaultUser();
       await expect(
         user.changeUsername('short', checkUniqueTrue),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(ApiError);
     });
 
     it('should throw error if username starts with underscore', async () => {
       const user = createDefaultUser();
       await expect(
         user.changeUsername('_invalid_start', checkUniqueTrue),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(ApiError);
     });
 
     it('should throw error if username is not unique', async () => {
       const user = createDefaultUser();
       await expect(
         user.changeUsername('already_taken', checkUniqueFalse),
-      ).rejects.toThrow(BadRequestException);
+      ).rejects.toThrow(ApiError);
     });
   });
 
@@ -116,7 +119,7 @@ describe('UserEntity', () => {
       const user = createDefaultUser();
       expect(() => {
         user.additionalData = { telegram: 'john_doe' };
-      }).toThrow(BadRequestException);
+      }).toThrow(ApiError);
     });
 
     it('should throw error if trying to change birthDay after it was set', () => {
@@ -125,7 +128,7 @@ describe('UserEntity', () => {
 
       expect(() => {
         user.additionalData = { birthDay: new Date('1991-01-01') };
-      }).toThrow(ForbiddenException);
+      }).toThrow(ApiError);
     });
 
     it('should return isProfileFull correctly', () => {
@@ -148,23 +151,23 @@ describe('UserEntity', () => {
     it('should throw error if password is weak', () => {
       const user = createDefaultUser();
       // Немає великої літери, цифр та символів
-      expect(() => user.changePassword('weakpass')).toThrow(
-        BadRequestException,
-      );
+      expect(() => user.changePassword('weakpass')).toThrow(ApiError);
     });
 
     it('should throw error if LOCAL provider is missing', () => {
       const user = createDefaultUser();
       // Пароль сильний: Велика літера, цифра, символ, 8+ знаків
-      expect(() => user.changePassword('StrongPass123!')).toThrow(
-        BadRequestException,
-      );
+      expect(() => user.changePassword('StrongPass123!')).toThrow(ApiError);
     });
   });
   describe('UserEntity - Extended Tests', () => {
     const validEmail = 'dev@cinagloria.com';
     const validUsername = Username.create('code_runner_777');
-    const validAvatar = AvatarURL.create('internal_file:uuid');
+    const validAvatar = InternalFile.define<typeof RelationSlots.user.avatar>(
+      `internal_file:${randomUUID()}.webp`,
+      'user:avatar',
+      'user:avatar',
+    );
 
     const createDefaultUser = () =>
       UserEntity.create(validEmail, validUsername, validAvatar);

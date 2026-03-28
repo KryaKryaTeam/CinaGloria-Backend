@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { MakeNotificationReaded } from './MakeNotificationReadedCommand';
 import { BaseTokens, ReposTokens } from 'src/common/Tokens';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { ApiError, DomainErrors } from 'src/error/ApiError';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
 
@@ -66,9 +66,7 @@ describe('MakeNotificationReaded', () => {
     mockNotificationRepo.getById.mockResolvedValue(null);
 
     // Act & Assert
-    await expect(command.implementation(input)).rejects.toThrow(
-      NotFoundException,
-    );
+    await expect(command.implementation(input)).rejects.toThrow(ApiError);
     expect(mockNotificationRepo.save).not.toHaveBeenCalled();
   });
 
@@ -76,15 +74,13 @@ describe('MakeNotificationReaded', () => {
     // Arrange: Mock entity that throws a Restricted Change error
     const mockNotification = {
       markAsRead: jest.fn().mockImplementation(() => {
-        throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+        ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
       }),
     };
     mockNotificationRepo.getById.mockResolvedValue(mockNotification);
 
     // Act & Assert
-    await expect(command.implementation(input)).rejects.toThrow(
-      new DomainError(DomainErrors.RESTRICTED_CHANGE),
-    );
+    await expect(command.implementation(input)).rejects.toThrow(ApiError);
     expect(mockNotificationRepo.save).not.toHaveBeenCalled();
   });
 });

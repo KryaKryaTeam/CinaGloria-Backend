@@ -2,12 +2,12 @@ import {
   ArgumentMetadata,
   Injectable,
   PipeTransform,
-  NotFoundException,
   Inject,
 } from '@nestjs/common';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import type { IUserRepository } from 'src/authorization/application/bounds/IUserRepository';
 import { ReposTokens } from 'src/common/Tokens';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 
 @Injectable()
 export class TransfromUserIdtoEntity implements PipeTransform {
@@ -31,7 +31,7 @@ export class TransfromUserIdtoEntity implements PipeTransform {
     const user = await this.userRepository.findById(userId);
 
     if (!user) {
-      throw new NotFoundException('User not found in database');
+      ApiError.throw(UserErrors.USER_WITH_THIS_ID_UNDEFINED);
     }
 
     return user;

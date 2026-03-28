@@ -8,8 +8,9 @@ import path from 'path';
 import { pipeline } from 'stream/promises';
 import { LoadController } from '../services/LoadFileService';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
-import { InternalServerErrorException, OnModuleInit } from '@nestjs/common';
+import { OnModuleInit } from '@nestjs/common';
 import { FileTypeResult } from 'file-type';
+import { ApiError, StorageErrors } from 'src/error/ApiError';
 
 @LoadController('ls')
 export class LocalLoadController
@@ -62,7 +63,7 @@ export class LocalLoadController
       )
         await unlink(filePath);
 
-      throw new InternalServerErrorException('LS Load failed!');
+      ApiError.throw(StorageErrors.OPERATION_FAILED);
     }
   }
   async delete(file: FileEntity): Promise<void> {

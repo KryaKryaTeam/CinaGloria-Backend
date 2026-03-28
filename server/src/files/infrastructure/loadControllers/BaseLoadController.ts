@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Inject,
-  PayloadTooLargeException,
-} from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileEntity } from 'src/files/domain/entities/File.entity';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
@@ -10,6 +6,7 @@ import { PassThrough, Readable } from 'stream';
 import { fileTypeFromStream, FileTypeResult } from 'file-type';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
 import sharp from 'sharp';
+import { ApiError, FileErrors } from 'src/error/ApiError';
 
 export abstract class BaseLoadController {
   @Inject()
@@ -39,7 +36,7 @@ export abstract class BaseLoadController {
         size += chunk.length;
         if (size > config.maxSize) {
           stream.destroy();
-          reject(new PayloadTooLargeException('File too large'));
+          reject(ApiError.returnNew(FileErrors.FILE_TOO_LARGE));
         }
       });
       source.on('end', () => resolve(size));
@@ -55,7 +52,7 @@ export abstract class BaseLoadController {
         (!val ||
           !config.allowedMimeTypes.includes(val.mime as `${string}/${string}`))
       ) {
-        throw new BadRequestException('Mime type error!');
+        ApiError.throw(FileErrors.MIME_TYPE_IS_UNDEFINED);
       }
 
       return config.shouldBeProcessed

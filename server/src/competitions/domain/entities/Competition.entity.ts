@@ -2,9 +2,9 @@ import { Entity } from 'src/common/domain/Entity';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionStatus } from 'src/types/CompetitionStatus';
 import { CompetitionRule } from '../objects/CompetitionRule.object';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { randomUUID } from 'crypto';
 import { RoundEntity } from './Round.entity';
+import { ApiError, CompetitionErrors } from 'src/error/ApiError';
 
 export interface ICompetitionInList {
   id: string;
@@ -130,19 +130,19 @@ export class CompetitionEntity extends Entity {
         plain.dateOfEnd,
       )
     )
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(CompetitionErrors.INVALID_DATES);
 
     if (
       (plain.name && plain.name.trim().length == 0) ||
       (plain.name && plain.name.trim().length > 255)
     )
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(CompetitionErrors.NAME_LENGTH_RESTRICTION);
 
     if (
       (plain.description && plain.description.trim().length == 0) ||
       (plain.description && plain.description.trim().length > 1000)
     )
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(CompetitionErrors.DESCRIPTION_LENGTH_RESTRICTION);
   }
 
   public static load(plain: ICompetitionPlain) {
@@ -168,7 +168,7 @@ export class CompetitionEntity extends Entity {
         plain.status != CompetitionStatus.DRAFT
       )
     )
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(CompetitionErrors.LOAD_FROM_DB_FAILED, plain.id);
 
     return new CompetitionEntity(plain);
   }
@@ -261,7 +261,8 @@ export class CompetitionEntity extends Entity {
   }
 
   private canChangeCheck() {
-    if (!this.canBeChanged) throw new DomainError(DomainErrors.IMMUTABLE_VALUE);
+    if (!this.canBeChanged)
+      ApiError.throw(CompetitionErrors.COMPETITION_IS_READONLY);
   }
 
   private static datesValid(
@@ -283,7 +284,7 @@ export class CompetitionEntity extends Entity {
     this.canChangeCheck();
 
     if (value.trim().length == 0 || value.trim().length > 255)
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(CompetitionErrors.NAME_LENGTH_RESTRICTION);
 
     this._name = value.trim();
   }
@@ -292,7 +293,7 @@ export class CompetitionEntity extends Entity {
     this.canChangeCheck();
 
     if (value.trim().length == 0 || value.trim().length > 1000)
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(CompetitionErrors.DESCRIPTION_LENGTH_RESTRICTION);
 
     this._description = value.trim();
   }
@@ -309,7 +310,7 @@ export class CompetitionEntity extends Entity {
         this._dateOfEnd,
       )
     )
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(CompetitionErrors.INVALID_DATES);
 
     this._dateOfStart = value;
   }
@@ -326,7 +327,7 @@ export class CompetitionEntity extends Entity {
         value,
       )
     )
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(CompetitionErrors.INVALID_DATES);
 
     this._dateOfEnd = value;
   }
@@ -343,7 +344,7 @@ export class CompetitionEntity extends Entity {
         this._dateOfEnd,
       )
     )
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(CompetitionErrors.INVALID_DATES);
 
     this._dateOfStartRegistration = value;
   }
@@ -360,7 +361,7 @@ export class CompetitionEntity extends Entity {
         this._dateOfEnd,
       )
     )
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(CompetitionErrors.INVALID_DATES);
 
     this._dateOfEndRegistration = value;
   }
@@ -369,7 +370,10 @@ export class CompetitionEntity extends Entity {
     this.canChangeCheck();
 
     if (!this.canChangeStatusTo(CompetitionStatus.SCHEDULED))
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(
+        CompetitionErrors.STATUS_FLOW_BREAKS,
+        `Change from ${this.status} to ${CompetitionStatus.SCHEDULED}`,
+      );
 
     if (
       !CompetitionEntity.datesValid(
@@ -380,7 +384,7 @@ export class CompetitionEntity extends Entity {
         this._dateOfEnd,
       )
     )
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(CompetitionErrors.INVALID_DATES);
 
     this._status = CompetitionStatus.SCHEDULED;
     this._publishAt = date;
@@ -390,7 +394,10 @@ export class CompetitionEntity extends Entity {
     this.canChangeCheck();
 
     if (!this.canChangeStatusTo(CompetitionStatus.DRAFT))
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(
+        CompetitionErrors.STATUS_FLOW_BREAKS,
+        `Change from ${this.status} to ${CompetitionStatus.DRAFT}`,
+      );
 
     this._status = CompetitionStatus.DRAFT;
     this._publishAt = null;
@@ -435,16 +442,19 @@ export class CompetitionEntity extends Entity {
   public deleteRound(round: RoundEntity) {
     this.canChangeCheck();
     const i = this._rounds.findIndex((r) => r.id == round.id);
-    if (i == -1) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (i == -1)
+      ApiError.throw(CompetitionErrors.ROUND_UNDEFINED_IN_COMPETITION);
     this._rounds.splice(i, 1);
   }
 
   set status(value: CompetitionStatus) {
     if (value == CompetitionStatus.SCHEDULED)
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
-
+      ApiError.throw(CompetitionErrors.SETTER_SCHEDULED);
     if (!this.canChangeStatusTo(value))
-      throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(
+        CompetitionErrors.STATUS_FLOW_BREAKS,
+        `Change from ${this.status} to ${value}`,
+      );
     this._status = value;
   }
 

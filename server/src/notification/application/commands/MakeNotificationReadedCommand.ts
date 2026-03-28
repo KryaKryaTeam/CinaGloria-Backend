@@ -1,8 +1,9 @@
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { Command } from 'src/common/application/Command';
 import { ReposTokens } from 'src/common/Tokens';
 import { PropsWithUserId } from 'src/types/PropsWithUserId';
 import type { INotificationRepository } from '../bounds/INotificationRepository';
+import { ApiError, NotificationErrors } from 'src/error/ApiError';
 
 interface CommandInput {
   notificationId: string;
@@ -20,7 +21,7 @@ export class MakeNotificationReaded extends Command<
     );
 
     if (!notification)
-      throw new NotFoundException('Notifications with this id is undefined!');
+      return ApiError.throw(NotificationErrors.NOTIFICATION_IS_UNDEFINED);
 
     notification.markAsRead(data.id);
 

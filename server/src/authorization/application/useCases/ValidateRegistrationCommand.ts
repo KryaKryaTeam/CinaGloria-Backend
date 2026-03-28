@@ -1,4 +1,4 @@
-import { BadRequestException, Inject } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import type { Cache } from 'cache-manager';
 import {
   IUserEntityJSON,
@@ -9,6 +9,7 @@ import { UserRepository } from 'src/common/infrastructure/repositories/UserRepos
 import { ReposTokens, ServiceTokens } from 'src/common/Tokens';
 import type { IJWTTokenService } from '../bounds/IJWTTokenService';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 
 export class ValidateRegistrationCommand extends Command<
   {
@@ -35,12 +36,12 @@ export class ValidateRegistrationCommand extends Command<
       user: IUserEntityJSON;
     }>(`registration:${data.requestId}`);
 
-    if (!userAndCode) throw new BadRequestException('RequestId is incorrect');
-    if (userAndCode.code != data.code)
-      throw new BadRequestException('Validation code is incorrect');
+    if (!userAndCode) ApiError.throw(UserErrors.REQUEST_ID_INCORRECT);
+    if (userAndCode!.code != data.code)
+      ApiError.throw(UserErrors.VALIDATION_CODE_INCORRECT);
 
     console.log(userAndCode);
-    const user = UserEntity.load(userAndCode.user);
+    const user = UserEntity.load(userAndCode!.user);
 
     user.pullEvents(this.eventDispatcher);
 

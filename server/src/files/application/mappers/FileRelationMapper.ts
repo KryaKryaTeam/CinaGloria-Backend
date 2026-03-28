@@ -4,7 +4,8 @@ import { FileRelation } from 'src/schemas/FileRelation.schema';
 import { FileMapper } from './FileMapper';
 import { UserMapper } from 'src/authorization/application/mappers/UserMapper';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { ApiError, FileErrors } from 'src/error/ApiError';
 import { MapperTokens } from 'src/common/Tokens';
 import { CompetitionMapper } from 'src/competitions/application/mapper/Competition.mapper';
 
@@ -37,8 +38,7 @@ export class FileRelationMapper extends Mapper<
   }
 
   public toSchema(entity: FileRelationEntity): FileRelation {
-    if (!entity.filed)
-      throw new BadRequestException('Relation is not ready for load!');
+    if (!entity.filed) ApiError.throw(FileErrors.INCOMPLETE_RELATION);
 
     const sch = new FileRelation();
     sch.id = entity.id;

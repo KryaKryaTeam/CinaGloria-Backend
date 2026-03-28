@@ -1,4 +1,4 @@
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { Command } from 'src/common/application/Command';
 import { ReposTokens, ServiceTokens } from 'src/common/Tokens';
@@ -11,6 +11,7 @@ import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { RelationSlots } from 'src/types/RelationSlots';
 import { LinkerApplicationService } from 'src/files/application/services/Linker.appService';
 import type { IFileRepository } from 'src/files/application/bounds/IFileRepository';
+import { ApiError, CompetitionErrors } from 'src/error/ApiError';
 
 interface UpdateCompetitionCommandInput {
   competitionId: string;
@@ -36,8 +37,7 @@ export class UpdateCompetitionCommand extends Command<
       data.competitionId,
     );
 
-    if (!competition)
-      throw new NotFoundException('Competition with this id is unedfined!');
+    if (!competition) ApiError.throw(CompetitionErrors.UNDEFINED);
 
     const slots = [
       RelationString.define('competition:avatar'),

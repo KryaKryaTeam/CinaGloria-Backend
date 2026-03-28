@@ -1,4 +1,4 @@
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { ApiError, CompetitionErrors } from 'src/error/ApiError';
 import { Icons } from 'src/types/Icons';
 
 export interface ICompetitionRule {
@@ -19,8 +19,13 @@ export class CompetitionRule {
   }
 
   public static define(name: string, description: string, icon: Icons) {
-    if (name.trim().length == 0 || description.trim().length == 0)
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (name.trim().length == 0 || name.trim().length > 255)
+      ApiError.throw(CompetitionErrors.RULE_NAME_INVALID);
+    if (description.trim().length == 0 || description.trim().length > 1000)
+      ApiError.throw(CompetitionErrors.RULE_DESCRIPTION_INVALID);
+
+    if (!icon) ApiError.throw(CompetitionErrors.RULE_ICON_INVALID);
+
     return new CompetitionRule({ name, description, icon });
   }
 

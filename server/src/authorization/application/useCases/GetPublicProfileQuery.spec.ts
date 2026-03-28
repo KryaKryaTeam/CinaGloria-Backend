@@ -3,7 +3,7 @@ import { GetPublicProfileQuery } from './GetPublicProfileQuery';
 import { BaseTokens, ReposTokens } from 'src/common/Tokens';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
-import { BadRequestException } from '@nestjs/common';
+import { ApiError } from 'src/error/ApiError';
 
 describe('GetPublicProfileQuery', () => {
   let query: GetPublicProfileQuery;
@@ -60,9 +60,7 @@ describe('GetPublicProfileQuery', () => {
     // 3. Репозиторій повертає null (користувача не знайдено)
     mockUserRepository.findById.mockResolvedValue(null);
 
-    await expect(query.implementation(userId)).rejects.toThrow(
-      BadRequestException,
-    );
+    await expect(query.implementation(userId)).rejects.toThrow(ApiError);
     await expect(query.implementation(userId)).rejects.toThrow();
   });
 });

@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Controller,
   Get,
   Inject,
@@ -8,7 +7,7 @@ import {
   Req,
   Version,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { Secure } from 'src/authorization/infrastructure/guards/auth/auth.guard';
 import busboy from 'busboy';
 import type { Request as RequestExpress } from 'express';
@@ -17,10 +16,10 @@ import { UploadFileCommand } from 'src/files/application/useCases/UploadFileComm
 import { GetLinkQuery } from 'src/files/application/useCases/GetLinkQuery';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
 import { RelationStringTransfromPipe } from '../dto/RelationString.dto';
+import { ApiError, FileErrors } from 'src/error/ApiError';
 
 @Controller('file')
-@Secure(true)
-@ApiBearerAuth('main')
+@Secure()
 export class FileController {
   @Inject(CommandTokens.UploadFileCommand)
   private readonly uploadFileCommand: UploadFileCommand;
@@ -72,7 +71,7 @@ export class FileController {
 
       bb.on('finish', () => {
         if (!fileProcessed) {
-          reject(new BadRequestException('No file uploaded'));
+          reject(ApiError.returnNew(FileErrors.FILE_UNPROCESSED));
         }
       });
 

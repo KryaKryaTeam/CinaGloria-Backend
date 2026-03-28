@@ -1,6 +1,7 @@
 import { Entity } from 'src/common/domain/Entity';
 import { Color } from '../objects/Color.object';
 import { randomUUID } from 'crypto';
+import { ApiError, TaskErrors } from 'src/error/ApiError';
 
 export interface ICreateTask {
   name: string;
@@ -29,7 +30,17 @@ export class TaskEntity extends Entity {
     this.id = data.id;
   }
 
+  private static validate(name: string, description: string) {
+    if (name.trim().length === 0 || name.trim().length > 255) {
+      ApiError.throw(TaskErrors.NAME_LENGTH_RESTRICTION);
+    }
+    if (description.trim().length === 0 || description.trim().length > 2000) {
+      ApiError.throw(TaskErrors.DESCRIPTION_LENGTH_RESTRICTION);
+    }
+  }
+
   public static create(data: ICreateTask) {
+    this.validate(data.name, data.description);
     return new TaskEntity({
       ...data,
       id: randomUUID(),
@@ -37,6 +48,7 @@ export class TaskEntity extends Entity {
   }
 
   public static load(data: ITaskPlain) {
+    this.validate(data.name, data.description);
     return new TaskEntity(data);
   }
 
@@ -53,13 +65,20 @@ export class TaskEntity extends Entity {
   }
 
   set name(name: string) {
-    this._name = name;
+    const trimmed = name.trim();
+    if (trimmed.length === 0 || trimmed.length > 255) {
+      ApiError.throw(TaskErrors.NAME_LENGTH_RESTRICTION);
+    }
+    this._name = trimmed;
   }
 
   set description(description: string) {
-    this._description = description;
+    const trimmed = description.trim();
+    if (trimmed.length === 0 || trimmed.length > 2000) {
+      ApiError.throw(TaskErrors.DESCRIPTION_LENGTH_RESTRICTION);
+    }
+    this._description = trimmed;
   }
-
   set color(color: Color) {
     this._color = color;
   }

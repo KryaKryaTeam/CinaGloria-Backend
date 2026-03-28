@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UpdateUsernameCommand } from './UpdateUsernameCommand';
 import { BaseTokens, ReposTokens } from 'src/common/Tokens';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
+import { ApiError, DomainErrors } from 'src/error/ApiError';
 
 describe('UpdateUsernameCommand', () => {
   let command: UpdateUsernameCommand;
@@ -83,8 +83,7 @@ describe('UpdateUsernameCommand', () => {
             checkFn: (arg: string) => Promise<boolean>,
           ) => {
             const isUnique = await checkFn(username);
-            if (!isUnique)
-              throw new DomainError(DomainErrors.RESTRICTED_CHANGE);
+            if (!isUnique) ApiError.throw(DomainErrors.DUPLICATION);
           },
         ),
     };

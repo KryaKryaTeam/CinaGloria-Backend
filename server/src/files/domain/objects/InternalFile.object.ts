@@ -1,4 +1,4 @@
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { ApiError, FileErrors } from 'src/error/ApiError';
 import { AppSlotCode } from 'src/types/RelationSlots';
 import { FileEntity } from '../entities/File.entity';
 
@@ -8,7 +8,7 @@ export class InternalFile<S extends AppSlotCode = AppSlotCode> {
 
   private constructor(value: string) {
     if (!value.startsWith('internal_file:'))
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(FileErrors.INVALID_PREFIX);
     this._value = value;
   }
 
@@ -17,7 +17,7 @@ export class InternalFile<S extends AppSlotCode = AppSlotCode> {
     slot: AppSlotCode,
     expected: T,
   ) {
-    if (slot !== expected) throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (slot !== expected) ApiError.throw(FileErrors.SLOT_MISMATCH);
 
     return new InternalFile<T>(
       value.startsWith('internal_file:') ? value : `internal_file:${value}`,
@@ -28,8 +28,7 @@ export class InternalFile<S extends AppSlotCode = AppSlotCode> {
     file: FileEntity,
     expected: T,
   ) {
-    if (file.slot.value != expected)
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+    if (file.slot.value != expected) ApiError.throw(FileErrors.SLOT_MISMATCH);
 
     return new InternalFile<T>(`internal_file:${file.url}`);
   }

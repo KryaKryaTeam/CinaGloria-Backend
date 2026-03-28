@@ -1,7 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService, JwtSignOptions } from '@nestjs/jwt';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { ApiError, NotificationErrors } from 'src/error/ApiError';
 import { ITicketService } from 'src/notification/application/bounds/ITicketService';
 
 export class TicketService implements ITicketService {
@@ -23,7 +23,7 @@ export class TicketService implements ITicketService {
         secret: this.configurationService.getOrThrow<string>('ws.secret'),
       }).userId;
     } catch {
-      throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+      ApiError.throw(NotificationErrors.TICKER_SERVICE_ERROR);
     }
   }
 }

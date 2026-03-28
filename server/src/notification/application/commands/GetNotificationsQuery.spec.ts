@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
 import { GetNotificationsQuery } from './GetNotificationsQuery';
 import { BaseTokens, ReposTokens } from 'src/common/Tokens';
 import { NotificationNonPopulated } from 'src/notification/domain/entities/NotificationNonPopulated';
 import { NotificationStatus } from 'src/types/NotificationStatus';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
+import { ApiError } from 'src/error/ApiError';
 
 describe('GetNotificationsQuery', () => {
   let query: GetNotificationsQuery;
@@ -71,14 +71,12 @@ describe('GetNotificationsQuery', () => {
     expect(result[0]).toBeInstanceOf(NotificationNonPopulated);
   });
 
-  it('should throw NotFoundException if repository returns null/undefined', async () => {
+  it('should throw ApiError if repository returns null/undefined', async () => {
     // Arrange
     mockNotificationRepo.getPageByUserId.mockResolvedValue(null);
 
     // Act & Assert
-    await expect(query.implementation(input)).rejects.toThrow(
-      new NotFoundException('Notification for this page is undefined!'),
-    );
+    await expect(query.implementation(input)).rejects.toThrow(ApiError);
   });
 
   it('should return an empty array if the repository returns an empty array (if not treated as error)', async () => {

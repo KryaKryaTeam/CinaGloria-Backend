@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Injectable } from '@nestjs/common';
+import { Body, Injectable } from '@nestjs/common';
 import { AuthorizationProvider } from '../services/AuthorizationProviderService';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import {
@@ -7,7 +7,7 @@ import {
 } from './BaseAuthorizationProvider';
 import { AuthProviderEntity } from 'src/authorization/domain/entities/AuthProvider.entity';
 import { randomUUID } from 'crypto';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 
 interface GithubLoginData {
   token: string;
@@ -67,7 +67,7 @@ export class GithubAuthorizationProvider extends BaseAuthorizationProvider<Githu
         !accessToken.scope.includes('user:email') ||
         !accessToken.scope.includes('read:user')
       )
-        throw new DomainError(DomainErrors.UNEXPECTED_VALUE, 'MEOW NO SCOPES!');
+        ApiError.throw(UserErrors.GITHUB_NO_SCOPES);
 
       const commonHeaders = {
         Authorization: `Bearer ${accessToken.access_token}`,
@@ -89,15 +89,17 @@ export class GithubAuthorizationProvider extends BaseAuthorizationProvider<Githu
       );
 
       if (!primaryEmail || !profileData.avatar_url || !profileData.id)
-        throw new DomainError(DomainErrors.UNEXPECTED_VALUE);
+        ApiError.throw(UserErrors.GITHUB_DAMAGED_DATA);
 
       return {
         avatarURL: profileData.avatar_url,
         authorizationData: profileData.id,
         email: primaryEmail.email,
       };
-    } catch {
-      throw new BadRequestException('Github authorization failed!');
+    } catch (err) {
+      if (err instanceof ApiError) throw err;
+
+      ApiError.throw(UserErrors.GITHUB_AUTHORIZATION_FAILED);
     }
   }
   validate(loginData: GithubLoginData): Promise<boolean> {

@@ -1,8 +1,6 @@
 import {
-  BadRequestException,
   Body,
   Controller,
-  ForbiddenException,
   Get,
   Inject,
   Post,
@@ -12,7 +10,6 @@ import {
   Request,
   Res,
   Response,
-  UnauthorizedException,
   Version,
 } from '@nestjs/common';
 import { LoginCommand } from 'src/authorization/application/useCases/LoginCommand';
@@ -38,6 +35,7 @@ import { ContinueResponse } from '../dtos/ContinueResponse';
 import { RegistartionBody } from '../dtos/RegistrationBody';
 import { RegistrationResponse } from '../dtos/RegistarationResponse';
 import { RegistrationQuery } from '../dtos/RegistrationQuery';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 
 @Controller('auth')
 export class AuthController {
@@ -70,13 +68,13 @@ export class AuthController {
     @Request() req: ExpressRequest,
   ) {
     if (!provider || !state)
-      throw new BadRequestException('Provider or state!');
+      ApiError.throw(UserErrors.PROVIDER_OR_STATE_IS_UNDEFINED);
 
     const csrfProtected = req.cookies.csrf == state;
-    if (!csrfProtected) throw new ForbiddenException('CSRF Protection failed');
+    if (!csrfProtected) ApiError.throw(UserErrors.CSRF_PROTECTION_FAILED);
 
     if (!body.code && !code && !body.password)
-      throw new BadRequestException('Credential undefined');
+      ApiError.throw(UserErrors.CREDENTIALS_ARE_UNDEFINED);
 
     const _code = (body.code || code) as string;
 
@@ -107,10 +105,10 @@ export class AuthController {
     @Request() req: ExpressRequest,
   ) {
     if (!provider || !state)
-      throw new BadRequestException('Provider or state!');
+      ApiError.throw(UserErrors.PROVIDER_OR_STATE_IS_UNDEFINED);
 
     const csrfProtected = req.cookies.csrf == state;
-    if (!csrfProtected) throw new ForbiddenException('CSRF Protection failed');
+    if (!csrfProtected) ApiError.throw(UserErrors.CSRF_PROTECTION_FAILED);
 
     const result = await this.registrationCommand.execute({
       loginData: { ...body },
@@ -133,7 +131,7 @@ export class AuthController {
     @Response({ passthrough: true }) res: ExpressResponse,
   ) {
     const csrfProtected = req.cookies.csrf == state;
-    if (!csrfProtected) throw new ForbiddenException('CSRF Protection failed');
+    if (!csrfProtected) ApiError.throw(UserErrors.CSRF_PROTECTION_FAILED);
 
     const tokens = await this.validationCommand.execute({ code, requestId });
 
@@ -154,7 +152,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: ExpressResponse,
   ) {
     const { refresh } = req.cookies as { refresh: string };
-    if (!refresh) throw new UnauthorizedException('Invalid refresh token');
+    if (!refresh) ApiError.throw(UserErrors.REFRESH_TOKEN_IS_INVALID);
 
     const result = await this.refreshCommand.execute(refresh);
 
@@ -171,7 +169,7 @@ export class AuthController {
 
   @Put('/logout')
   @Version('1')
-  @Secure(true)
+  @Secure()
   logout(@Res({ passthrough: true }) res: ExpressResponse) {
     res.clearCookie('refresh', this.configurationService.getOrThrow('cookie'));
   }
@@ -188,7 +186,7 @@ export class AuthController {
 
   @Put('/password')
   @Version('1')
-  @Secure(true)
+  @Secure()
   @ApiBasicAuth('main')
   async changePassword() {}
 }

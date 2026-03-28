@@ -6,7 +6,8 @@ import {
 import { AuthProviderEntity } from 'src/authorization/domain/entities/AuthProvider.entity';
 import { randomUUID } from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 import { AuthorizationProvider } from '../services/AuthorizationProviderService';
 
 interface GoogleLoginData {
@@ -43,17 +44,15 @@ export class GoogleAuthorizationProvider extends BaseAuthorizationProvider<Googl
       const payload = ticket.getPayload();
 
       if (!payload) {
-        throw new BadRequestException('Invalid Google token');
+        ApiError.throw(UserErrors.INVALID_LOGIN_DATA);
       }
 
       if (!payload.email_verified) {
-        throw new BadRequestException('Email not verified');
+        ApiError.throw(UserErrors.EMAIL_NOT_VERIFIED);
       }
 
       if (!payload.email || !payload.picture)
-        throw new BadRequestException(
-          'Email or Picture of this user is unedfined!',
-        );
+        ApiError.throw(UserErrors.INVALID_LOGIN_DATA);
 
       return {
         authorizationData: payload.sub,
@@ -61,7 +60,7 @@ export class GoogleAuthorizationProvider extends BaseAuthorizationProvider<Googl
         email: payload.email,
       };
     } catch {
-      throw new BadRequestException('Google authentication failed');
+      ApiError.throw(UserErrors.GOOGLE_AUTHORIZATION_FAILED);
     }
   }
   createProvider(loginData: string): AuthProviderEntity {

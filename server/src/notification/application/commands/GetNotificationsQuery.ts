@@ -1,9 +1,10 @@
 import type { PropsWithUserId } from 'src/types/PropsWithUserId';
 import { Query } from '../../../common/application/Query';
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { ReposTokens } from 'src/common/Tokens';
 import type { INotificationRepository } from '../bounds/INotificationRepository';
 import { NotificationNonPopulated } from 'src/notification/domain/entities/NotificationNonPopulated';
+import { ApiError, CommonErrors } from 'src/error/ApiError';
 
 interface QueryData {
   page: number;
@@ -23,9 +24,8 @@ export class GetNotificationsQuery extends Query<
       data.page,
     );
 
-    if (!notification)
-      throw new NotFoundException('Notification for this page is undefined!');
+    if (!notification) ApiError.throw(CommonErrors.PAGE_IS_EMPTY);
 
-    return notification;
+    return notification!;
   }
 }

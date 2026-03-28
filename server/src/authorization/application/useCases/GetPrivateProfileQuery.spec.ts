@@ -3,7 +3,7 @@ import { GetPrivateProfileQuery } from './GetPrivateProfileQuery';
 import { BaseTokens, ReposTokens } from 'src/common/Tokens';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
-import { BadRequestException } from '@nestjs/common';
+import { ApiError } from 'src/error/ApiError';
 
 describe('GetPrivateProfileQuery', () => {
   let query: GetPrivateProfileQuery;
@@ -58,9 +58,7 @@ describe('GetPrivateProfileQuery', () => {
     // Репозиторій повертає null
     mockUserRepository.findById.mockResolvedValue(null);
 
-    await expect(query.implementation(userId)).rejects.toThrow(
-      BadRequestException,
-    );
+    await expect(query.implementation(userId)).rejects.toThrow(ApiError);
     await expect(query.implementation(userId)).rejects.toThrow();
   });
 });

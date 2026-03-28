@@ -1,4 +1,5 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
+import { ApiError, FileErrors } from 'src/error/ApiError';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { ReposTokens } from 'src/common/Tokens';
 import { FileEntity } from 'src/files/domain/entities/File.entity';
@@ -25,7 +26,7 @@ export class LinkerApplicationService {
     slot: RelationString,
   ) {
     if (slot.family !== 'competition')
-      throw new BadRequestException('This slot is not for competition');
+      ApiError.throw(FileErrors.ENTITY_MISMATCH);
 
     await this.relationRepository.deleteRelationByCompetitionAndScope(
       competition,

@@ -9,7 +9,7 @@ import { randomUUID } from 'crypto';
 import { AvatarURL } from 'src/authorization/domain/objects/AvatarURL.object';
 import { ConfigService } from '@nestjs/config';
 import { Inject } from '@nestjs/common';
-import { DomainError, DomainErrors } from 'src/error/DomainError';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 
 interface LocalLoginData {
   email: string;
@@ -51,10 +51,7 @@ export class LocalAuthorizationProvider extends BaseAuthorizationProvider<LocalL
         loginData.password,
       )
     ) {
-      throw new DomainError(
-        DomainErrors.UNEXPECTED_VALUE,
-        'Password incorrect',
-      );
+      ApiError.throw(UserErrors.PASSWORD_IS_INCORRECT);
     }
 
     return true;

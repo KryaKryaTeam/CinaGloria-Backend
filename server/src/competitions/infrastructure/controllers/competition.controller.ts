@@ -62,7 +62,7 @@ export class CompetitionController {
 
   @Get('/private/:page')
   @Version('1')
-  @Secure(true)
+  @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   @ApiResponse({ status: 200, type: [PlainCompetitionDto] })
   async getPrivateCompetition(
@@ -92,7 +92,7 @@ export class CompetitionController {
 
   @Post('/create')
   @Version('1')
-  @Secure(true)
+  @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   @ApiResponse({ status: 201, type: PlainCompetitionDto })
   async createCompetition(
@@ -107,7 +107,7 @@ export class CompetitionController {
 
   @Delete('/delete/:competitionId')
   @Version('1')
-  @Secure(true)
+  @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   async deleteCompetition(
     @UserId() user: UserEntity,
@@ -118,7 +118,7 @@ export class CompetitionController {
 
   @Put('/publish/:competitionId')
   @Version('1')
-  @Secure(true)
+  @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   async publishCompetition(
     @UserId() user: UserEntity,
@@ -132,7 +132,7 @@ export class CompetitionController {
 
   @Put('/schedule/set/:competitionId')
   @Version('1')
-  @Secure(true)
+  @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   async schedulePublishingOfCompetition(
     @UserId() user: UserEntity,
@@ -148,7 +148,7 @@ export class CompetitionController {
 
   @Put('/update/:competitionId')
   @Version('1')
-  @Secure(true)
+  @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   async updateCompetition(
     @Body() dto: CreateCompetitionDto,
@@ -164,7 +164,7 @@ export class CompetitionController {
 
   @Put('/schedule/decline/:competitionId')
   @Version('1')
-  @Secure(true)
+  @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   async declineScheduledPublishOfCompetition(
     @UserId() user: UserEntity,

@@ -9,7 +9,7 @@ export default registerAs('server', () => ({
   avalibleTestEndpoints:
     process.env.AVALIBLE_TESTABLE_ENDPOINTS == 'TRUE' || false,
   setup: {
-    adminEmail: process.env.SETUP_ADMIN_EMAIL || 'admin@localhost',
-    adminPassword: process.env.SETUP_ADMIN_PASSWORD || 'admin',
+    email: process.env.SETUP_ADMIN_EMAIL || 'admin@localhost',
+    password: process.env.SETUP_ADMIN_PASSWORD || 'admin',
   },
 }));

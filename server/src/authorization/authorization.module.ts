@@ -33,6 +33,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { ValidateRegistrationCommand } from './application/useCases/ValidateRegistrationCommand';
 import { FilesModule } from 'src/files/files.module';
 import { TransfromUserIdtoEntity } from './infrastructure/pipes/TransfromUserIdToEntity.pipe';
+import { CreateSuperUserCommand } from './application/useCases/CreateSuperUser.command';
 
 const providers: Provider[] = [
   {
@@ -94,6 +95,10 @@ const providers: Provider[] = [
   {
     provide: CommandTokens.ValidateRegistrationCommand,
     useClass: ValidateRegistrationCommand,
+  },
+  {
+    provide: CommandTokens.CreateSuperUserCommand,
+    useClass: CreateSuperUserCommand,
   },
   DiscoveryService,
   GoogleAuthorizationProvider,

@@ -357,6 +357,14 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'Service is misconfigured',
     status: 500,
   },
+  TEST_001: {
+    message: 'Test endpoints is unavalible',
+    status: 403,
+  },
+  COMMAND_001: {
+    message: 'Command params are wrong',
+    status: 400,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -474,6 +482,14 @@ export const StorageErrors = {
 export const ServiceErrors = {
   MISCONFIGURED: 'SERVICE_001',
 } as const;
+
+export const TestErrors = {
+  TEST_ENDPOINTS_UNAVALIBLE: 'TEST_001',
+};
+
+export const CommandErrors = {
+  COMMAND_PARAMS_WRONG: 'COMMAND_001',
+};
 
 export type ApiErrorCode = keyof typeof ApiErrorsCodeVal;
 

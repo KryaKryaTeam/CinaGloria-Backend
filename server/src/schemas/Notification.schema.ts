@@ -23,11 +23,17 @@ export class NotificationSchema {
   @Column({ update: false, nullable: false })
   from: string;
 
+  @Column({ name: 'toId', nullable: true })
+  toId: string;
+
   @ManyToOne(() => UserSchema, (user) => user.notifications, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn()
+  @JoinColumn({ name: 'toId' })
   to: UserSchema;
+
+  @Column({ nullable: true })
+  toEmail: string;
 
   @Column({ enum: NotificationStatus, default: NotificationStatus.sended })
   status: NotificationStatus;

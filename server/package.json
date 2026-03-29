@@ -19,7 +19,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "cli": "node dist/src/cli.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1009.0",
@@ -48,6 +49,7 @@
     "juice": "^11.1.1",
     "mailgun.js": "^12.7.0",
     "marked": "^17.0.3",
+    "nest-commander": "^3.20.1",
     "node-addon-api": "^8.5.0",
     "node-gyp": "^12.2.0",
     "node-gyp-build": "^4.8.4",

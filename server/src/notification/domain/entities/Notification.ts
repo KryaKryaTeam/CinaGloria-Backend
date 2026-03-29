@@ -8,7 +8,7 @@ interface INotification {
   title: string;
   content: string;
   from: string;
-  to: UserEntity;
+  to: Record<string, string>;
   status: NotificationStatus;
   targets: string[];
   createdAt: Date;
@@ -19,7 +19,7 @@ export class Notification {
   private readonly _title: string;
   private readonly _content: string;
   private readonly _from: string;
-  private readonly _to: UserEntity;
+  private readonly _to: Record<string, string>;
   private _status: NotificationStatus;
   private readonly _targets: string[];
   private readonly _createdAt: Date;
@@ -39,15 +39,21 @@ export class Notification {
     title: string;
     content: string;
     from: string;
-    to: UserEntity;
+    to: UserEntity | Record<string, string>;
     targets: string[];
   }): Notification {
     if (props.title.length < 5 || props.title.length > 100) {
       ApiError.throw(DomainErrors.UNEXPECTED_VALUE);
     }
 
+    const _to =
+      props.to instanceof UserEntity
+        ? { ws: props.to.id, email: props.to.email }
+        : props.to;
+
     return new Notification({
       ...props,
+      to: _to,
       id: randomUUID(),
       status: NotificationStatus.sended,
       createdAt: new Date(),

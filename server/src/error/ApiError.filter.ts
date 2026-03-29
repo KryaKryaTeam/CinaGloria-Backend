@@ -1,10 +1,19 @@
-import { ArgumentsHost, Catch, ExceptionFilter, Logger } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  Inject,
+  Logger,
+} from '@nestjs/common';
 import { ApiError } from './ApiError';
 import { Response as ResponseExpress } from 'express';
+import { ConfigService } from '@nestjs/config';
 
 @Catch()
 export class ApiErrorExceptionsFilter implements ExceptionFilter {
   private readonly logger: Logger = new Logger('Exception Filter');
+
+  constructor(@Inject() private readonly configService: ConfigService) {}
 
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
@@ -21,12 +30,23 @@ export class ApiErrorExceptionsFilter implements ExceptionFilter {
       return response.status(exception.status).json(error);
     }
 
-    const error = {
+    this.logger.error({
       code: 'ERR_000',
       message: 'Something went wrong on our side',
+      cause: (exception as { message: string }).message,
+      stack: (exception as { stack: string }).stack,
       timestamp: new Date().toISOString(),
-    };
-    this.logger.error(error);
-    response.status(500).json(error);
+    });
+    response.status(500).json({
+      code: 'ERR_000',
+      message: 'Something went wrong on our side',
+      cause: this.configService.getOrThrow<boolean>('server.isPreview')
+        ? (exception as { message: string }).message
+        : 'HIDDEN',
+      stack: this.configService.getOrThrow<boolean>('server.isPreview')
+        ? (exception as { stack: string }).stack
+        : 'HIDDEN',
+      timestamp: new Date().toISOString(),
+    });
   }
 }

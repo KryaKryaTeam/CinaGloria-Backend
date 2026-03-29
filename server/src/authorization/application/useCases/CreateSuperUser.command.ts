@@ -109,8 +109,6 @@ export class CreateSuperUserCommand extends Command<
 
     user.__forceSetRole(RoleEnum.ADMIN);
 
-    console.log(user);
-
     await this.userRepository.save(user);
   }
 }

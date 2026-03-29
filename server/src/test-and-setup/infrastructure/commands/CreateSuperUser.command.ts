@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { CreateSuperUserCommand } from 'src/authorization/application/useCases/CreateSuperUser.command';
 import { Inject, Logger, OnModuleInit } from '@nestjs/common';
 import { CommandTokens } from 'src/common/Tokens';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 
 @Command({
   name: 'create:admin',
@@ -24,30 +25,48 @@ export class CreateAdminRunner extends CommandRunner implements OnModuleInit {
   }
 
   async run(passedParams: string[]): Promise<void> {
-    // 1. Спробуємо взяти аргументи з консолі
-    let email = passedParams[0];
-    let password = passedParams[1];
+    try {
+      // 1. Спробуємо взяти аргументи з консолі
+      let email = passedParams[0];
+      let password = passedParams[1];
 
-    // 2. Якщо аргументів немає, беремо з ConfigService
-    if (!email || !password) {
-      this.logger.log(
-        'ℹ️ No arguments provided. Falling back to config defaults...',
-      );
+      // 2. Якщо аргументів немає, беремо з ConfigService
+      if (!email || !password) {
+        this.logger.log(
+          'ℹ️ No arguments provided. Falling back to config defaults...',
+        );
 
-      email = this.configService.getOrThrow<string>('server.setup.email');
-      password = this.configService.getOrThrow<string>('server.setup.password');
+        email = this.configService.getOrThrow<string>('server.setup.email');
+        password = this.configService.getOrThrow<string>(
+          'server.setup.password',
+        );
+      }
+
+      if (!email || !password) {
+        this.logger.error(
+          '❌ Error: Admin credentials not found in arguments or config.',
+        );
+        this.logger.log('Usage: npm run cli create:admin <email> <password>');
+        return;
+      }
+
+      const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+      if (!passwordRegex.test(password)) {
+        ApiError.throw(UserErrors.PASSWORD_IS_INCORRECT);
+      }
+
+      this.logger.log(`⏳ Creating superuser: ${email}...`);
+      await this.createSuperUser.implementation({ email, password });
+      this.logger.log(`✅ Success: Superuser ${email} created!`);
+    } catch (err) {
+      const error = err as ApiError;
+      this.logger.error({
+        status: error.status,
+        code: error.code,
+        cause: error.cause,
+        message: error.message,
+      });
     }
-
-    if (!email || !password) {
-      this.logger.error(
-        '❌ Error: Admin credentials not found in arguments or config.',
-      );
-      this.logger.log('Usage: npm run cli create:admin <email> <password>');
-      return;
-    }
-
-    this.logger.log(`⏳ Creating superuser: ${email}...`);
-    await this.createSuperUser.implementation({ email, password });
-    this.logger.log(`✅ Success: Superuser ${email} created!`);
   }
 }

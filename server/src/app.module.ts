@@ -21,6 +21,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { CompetitionsModule } from './competitions/competitions.module';
 import { APP_FILTER } from '@nestjs/core';
 import { ApiErrorExceptionsFilter } from './error/ApiError.filter';
+import { TestAndSetupModule } from './test-and-setup/test-and-setup.module';
 
 @Module({
   providers: [
@@ -55,6 +56,7 @@ import { ApiErrorExceptionsFilter } from './error/ApiError.filter';
     FilesModule,
     ServeStaticModule.forRoot(ServeStaticConfig()),
     CompetitionsModule,
+    TestAndSetupModule,
   ],
 })
 export class AppModule {}

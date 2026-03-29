@@ -50,6 +50,7 @@ export enum CommandTokens {
   GetPublicCompetitionQuery = 'GET_PUBLIC_COMPETITION_QUERY',
   GetCompetitionPageQuery = 'GET_COMPETITION_PAGE_QUERY',
   GetPublicCompetitionsPageQuery = 'GET_PUBLIC_COMPETITIONS_PAGE_QUERY',
+  SendTestNotificationCommand = 'SEND_TEST_NOTIFICATION_COMMAND',
 }
 
 export enum ServiceTokens {

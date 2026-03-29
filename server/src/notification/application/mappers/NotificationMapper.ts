@@ -1,7 +1,4 @@
-import { Inject } from '@nestjs/common';
-import { UserMapper } from 'src/authorization/application/mappers/UserMapper';
 import { Mapper } from 'src/common/infrastructure/Mapper';
-import { MapperTokens } from 'src/common/Tokens';
 import { Notification } from 'src/notification/domain/entities/Notification';
 import { NotificationSchema } from 'src/schemas/Notification.schema';
 
@@ -9,9 +6,6 @@ export class NotificationMapper extends Mapper<
   NotificationSchema,
   Notification
 > {
-  @Inject(MapperTokens.UserMapper)
-  private userMapper: UserMapper;
-
   public toEntity(schema: NotificationSchema): Notification {
     return Notification.load({
       id: schema.id,
@@ -19,7 +13,7 @@ export class NotificationMapper extends Mapper<
       from: schema.from,
       status: schema.status,
       title: schema.title,
-      to: this.userMapper.toEntity(schema.to),
+      to: { ws: schema.toId, email: schema.toEmail },
       targets: [],
       createdAt: schema.createdAt,
     });
@@ -30,7 +24,8 @@ export class NotificationMapper extends Mapper<
     schema.content = entity.content;
     schema.createdAt = entity.createdAt;
     schema.from = entity.from;
-    schema.to = this.userMapper.toSchema(entity.to);
+    schema.toId = entity.to.ws;
+    schema.toEmail = entity.to.email;
     schema.title = entity.title;
     schema.status = entity.status;
 

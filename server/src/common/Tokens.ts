@@ -52,6 +52,8 @@ export enum CommandTokens {
   GetPublicCompetitionsPageQuery = 'GET_PUBLIC_COMPETITIONS_PAGE_QUERY',
   SendTestNotificationCommand = 'SEND_TEST_NOTIFICATION_COMMAND',
   CreateSuperUserCommand = 'CREATE_SUPER_USER_COMMAND',
+  SetRoleToAUserCommand = 'SET_ROLE_TO_A_USER_COMMAND',
+  DeleteGarbageCommand = 'DELETE_GARBAGE_COMMAND',
 }
 
 export enum ServiceTokens {

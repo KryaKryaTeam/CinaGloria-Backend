@@ -14,6 +14,8 @@ import { InternalFileInterceptor } from './infrastructure/interceptors/InternalF
 import { LinkerApplicationService } from './application/services/Linker.appService';
 import { UserCreatedHandlerFile } from './infrastructure/handlers/UserCreateHandler';
 import { CompetitionsModule } from 'src/competitions/competitions.module';
+import { DeleteGarbageCommand } from './application/useCases/DeleteGarbage.command';
+import { GarbageCollectorCronJobService } from './infrastructure/cron/GarbageCollectorCronJob.cron';
 
 const providers: Provider[] = [
   { provide: MapperTokens.FileMapper, useClass: FileMapper },
@@ -25,7 +27,11 @@ const providers: Provider[] = [
     provide: ServiceTokens.FileLinkerService,
     useClass: LinkerApplicationService,
   },
-
+  {
+    provide: CommandTokens.DeleteGarbageCommand,
+    useClass: DeleteGarbageCommand,
+  },
+  GarbageCollectorCronJobService,
   UserCreatedHandlerFile,
   S3LoadController,
   LocalLoadController,

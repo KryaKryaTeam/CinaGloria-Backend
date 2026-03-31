@@ -62,13 +62,6 @@ export class FileRelationRepository
     return relation ? this.fileRelationMapper.toEntity(relation).file : null;
   }
 
-  async deleteFilesWithNoRelation(): Promise<void> {
-    const activeRelations = await this.repository.find({ select: ['file'] });
-    const activeUrls = activeRelations.map((r) => r.file.url);
-
-    await this.fileRepository.deleteAllNonActiveByUrl(activeUrls);
-  }
-
   async findFileByRelation(
     relation: FileRelationEntity,
   ): Promise<FileEntity | null> {

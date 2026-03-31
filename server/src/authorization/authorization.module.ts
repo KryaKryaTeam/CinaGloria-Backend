@@ -34,6 +34,7 @@ import { ValidateRegistrationCommand } from './application/useCases/ValidateRegi
 import { FilesModule } from 'src/files/files.module';
 import { TransfromUserIdtoEntity } from './infrastructure/pipes/TransfromUserIdToEntity.pipe';
 import { CreateSuperUserCommand } from './application/useCases/CreateSuperUser.command';
+import { SetRoleToAUserCommand } from './application/useCases/SetRoleToAUser.command';
 
 const providers: Provider[] = [
   {
@@ -99,6 +100,10 @@ const providers: Provider[] = [
   {
     provide: CommandTokens.CreateSuperUserCommand,
     useClass: CreateSuperUserCommand,
+  },
+  {
+    provide: CommandTokens.SetRoleToAUserCommand,
+    useClass: SetRoleToAUserCommand,
   },
   DiscoveryService,
   GoogleAuthorizationProvider,

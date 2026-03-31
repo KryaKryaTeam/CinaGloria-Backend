@@ -5,7 +5,8 @@ import { FileEntity } from 'src/files/domain/entities/File.entity';
 import { Inject } from '@nestjs/common';
 import { MapperTokens } from 'src/common/Tokens';
 import { FileMapper } from 'src/files/application/mappers/FileMapper';
-import { In, Not } from 'typeorm';
+import { In } from 'typeorm';
+import { FileRelation } from 'src/schemas/FileRelation.schema';
 
 export class FileRepository
   extends BaseRepository<FileSchema>
@@ -27,13 +28,24 @@ export class FileRepository
     return this.fileMapper.toEntity(result);
   }
 
-  async deleteAllNonActiveByUrl(activeURLs: string[]): Promise<void> {
-    if (activeURLs.length > 0) {
-      await this.repository.delete({
-        url: Not(In(activeURLs)),
-      });
-    } else {
-      await this.repository.delete({});
-    }
+  async deleteFilesWithNoRelation(): Promise<FileEntity[]> {
+    const orphans = await this.repository
+      .createQueryBuilder('file')
+      .where((qb) => {
+        const subQuery = qb
+          .subQuery()
+          .select('rel.file_url')
+          .from(FileRelation, 'rel')
+          .getQuery();
+        return 'file.url NOT IN ' + subQuery;
+      })
+      .getMany();
+
+    if (orphans.length == 0) return [];
+
+    const urls = orphans.map((el) => this.fileMapper.toEntity(el));
+
+    await this.repository.delete({ url: In(urls.map((el) => el.url)) });
+    return urls;
   }
 }

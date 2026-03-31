@@ -6,4 +6,9 @@ export interface IUserRepository {
   findByEmail(email: string): Promise<UserEntity | null>;
   existsByEmail(email: string): Promise<boolean>;
   existsByUsername(username: string): Promise<boolean>;
+  getPageOfUsers(page: number): Promise<UserEntity[]>;
+  getUsersWithSimillarEmailByPages(
+    page: number,
+    email: string,
+  ): Promise<UserEntity[]>;
 }

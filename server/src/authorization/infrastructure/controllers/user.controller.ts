@@ -3,7 +3,8 @@ import {
   Controller,
   Get,
   Inject,
-  Put,
+  Param,
+  Patch,
   Query,
   Version,
 } from '@nestjs/common';
@@ -22,6 +23,14 @@ import { UpdateAvatarCommand } from 'src/authorization/application/useCases/Upda
 import { UpdateAvatarReq } from '../dtos/UpdateAvatarReq';
 import { UserId } from '../decorators/user.decorator';
 import { ApiError, UserErrors } from 'src/error/ApiError';
+import { UserEntity } from 'src/authorization/domain/entities/User.entity';
+import { AllowRoles } from '../guards/role/role.guard';
+import { RoleEnum } from 'src/types/RoleEnum';
+import { SetRoleToAUserCommand } from 'src/authorization/application/useCases/SetRoleToAUser.command';
+import { UpdateRoleBodyDto } from '../dtos/UpdateRoleBody.dto';
+import { PageQueryDto } from 'src/common/infrastructure/dto/PageQuery.dto';
+import { GetUsersPageFilterDto } from '../dtos/GetUsersPageFilter.dto';
+import { GetUsersByEmailQuery } from 'src/authorization/application/useCases/GetUsersByEmail.query';
 
 @Controller('user')
 export class UserController {
@@ -39,6 +48,12 @@ export class UserController {
 
   @Inject(CommandTokens.UpdateAvatarCommand)
   private readonly updateAvatarCommand: UpdateAvatarCommand;
+
+  @Inject(CommandTokens.SetRoleToAUserCommand)
+  private readonly setRoleToAUserCommand: SetRoleToAUserCommand;
+
+  @Inject(CommandTokens.GetUsersByEmailQuery)
+  private readonly getUsersByEmailQuery: GetUsersByEmailQuery;
 
   @Get('/me')
   @Version('1')
@@ -64,7 +79,21 @@ export class UserController {
     return await this.getPublicProfileQuery.execute(id);
   }
 
-  @Put('/additional')
+  @Get('/users/:page')
+  @Version('1')
+  @Secure()
+  @AllowRoles([RoleEnum.ADMIN])
+  async getUsersPage(
+    @Param() pageDto: PageQueryDto,
+    @Query() dto: GetUsersPageFilterDto,
+  ) {
+    return await this.getUsersByEmailQuery.execute({
+      page: pageDto.page,
+      email: dto.email,
+    });
+  }
+
+  @Patch('/additional')
   @Version('1')
   @Secure()
   @ApiBody({ type: UpdateUserAdditionalDataDto, required: true })
@@ -78,7 +107,7 @@ export class UserController {
     });
   }
 
-  @Put('/username')
+  @Patch('/username')
   @Version('1')
   @Secure()
   @ApiBody({ type: UpdateUsernameReq })
@@ -89,7 +118,7 @@ export class UserController {
     });
   }
 
-  @Put('/avatar')
+  @Patch('/avatar')
   @Version('1')
   @Secure()
   @ApiBody({ type: UpdateAvatarReq })
@@ -97,6 +126,22 @@ export class UserController {
     await this.updateAvatarCommand.execute({
       avatar: body.avatar,
       id,
+    });
+  }
+
+  @Patch('/role')
+  @Version('1')
+  @Secure()
+  @AllowRoles([RoleEnum.ADMIN])
+  @ApiBody({ type: UpdateRoleBodyDto })
+  async updateRole(
+    @UserId() actor: UserEntity,
+    @Body() dto: UpdateRoleBodyDto,
+  ) {
+    return await this.setRoleToAUserCommand.execute({
+      actor,
+      role: dto.role,
+      userToChangeId: dto.userId,
     });
   }
 }

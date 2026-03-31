@@ -6,7 +6,6 @@ import { RelationString } from 'src/files/domain/objects/RelationSlots';
 
 export interface IFileRelationsRepository {
   save(relation: FileRelationEntity): Promise<void>;
-  deleteFilesWithNoRelation(): Promise<void>;
   deleteRelation(relation: FileRelationEntity): Promise<void>;
   deleteRelationByUserAndScope(
     user: UserEntity,

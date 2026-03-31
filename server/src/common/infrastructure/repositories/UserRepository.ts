@@ -42,4 +42,27 @@ export class UserRepository
   async existsByUsername(username: string): Promise<boolean> {
     return await this.repository.exists({ where: { username } });
   }
+
+  async getPageOfUsers(page: number): Promise<UserEntity[]> {
+    return (await this.repository.find({ skip: 20 * page, take: 20 })).map(
+      (el) => this.userMapper.toEntity(el),
+    );
+  }
+
+  async getUsersWithSimillarEmailByPages(
+    page: number,
+    email: string,
+  ): Promise<UserEntity[]> {
+    const result = await this.repository
+      .createQueryBuilder('user')
+      .where('user.email ILIKE :pattern', { pattern: `%${email}%` })
+      .orWhere('user.email % :input', { input: email })
+      .orderBy(`similarity(user.email, :input)`, 'DESC')
+      .skip(page * 20)
+      .take(20)
+      .getMany();
+    if (!result || result.length == 0) return [];
+
+    return result.map((el) => this.userMapper.toEntity(el));
+  }
 }

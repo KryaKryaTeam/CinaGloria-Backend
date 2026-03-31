@@ -29,7 +29,7 @@ export class UpdateAvatarCommand extends Command<
     const file = await this.fileRepository.findByUrl(data.avatar);
     if (!file) ApiError.throw(FileErrors.FILE_WITH_THIS_ID_UNDEFINED);
 
-    user!.changeAvatarURL(
+    user.changeAvatarURL(
       InternalFile.define<typeof RelationSlots.user.avatar>(
         data.avatar,
         'user:avatar',
@@ -37,8 +37,8 @@ export class UpdateAvatarCommand extends Command<
       ),
     );
 
-    await this.fileLinkerService.linkAvatarToUser(file!, user!);
+    await this.fileLinkerService.linkAvatarToUser(file, user);
 
-    await this.userRepository.save(user!);
+    await this.userRepository.save(user);
   }
 }

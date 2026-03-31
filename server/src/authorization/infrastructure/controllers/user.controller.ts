@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Inject,
+  Param,
   Patch,
   Query,
   Version,
@@ -27,6 +28,9 @@ import { AllowRoles } from '../guards/role/role.guard';
 import { RoleEnum } from 'src/types/RoleEnum';
 import { SetRoleToAUserCommand } from 'src/authorization/application/useCases/SetRoleToAUser.command';
 import { UpdateRoleBodyDto } from '../dtos/UpdateRoleBody.dto';
+import { PageQueryDto } from 'src/common/infrastructure/dto/PageQuery.dto';
+import { GetUsersPageFilterDto } from '../dtos/GetUsersPageFilter.dto';
+import { GetUsersByEmailQuery } from 'src/authorization/application/useCases/GetUsersByEmail.query';
 
 @Controller('user')
 export class UserController {
@@ -47,6 +51,9 @@ export class UserController {
 
   @Inject(CommandTokens.SetRoleToAUserCommand)
   private readonly setRoleToAUserCommand: SetRoleToAUserCommand;
+
+  @Inject(CommandTokens.GetUsersByEmailQuery)
+  private readonly getUsersByEmailQuery: GetUsersByEmailQuery;
 
   @Get('/me')
   @Version('1')
@@ -70,6 +77,20 @@ export class UserController {
     if (!id) ApiError.throw(UserErrors.ID_OF_REQUESTED_USER_NOT_PROVIDED);
 
     return await this.getPublicProfileQuery.execute(id);
+  }
+
+  @Get('/users/:page')
+  @Version('1')
+  @Secure()
+  @AllowRoles([RoleEnum.ADMIN])
+  async getUsersPage(
+    @Param() pageDto: PageQueryDto,
+    @Query() dto: GetUsersPageFilterDto,
+  ) {
+    return await this.getUsersByEmailQuery.execute({
+      page: pageDto.page,
+      email: dto.email,
+    });
   }
 
   @Patch('/additional')

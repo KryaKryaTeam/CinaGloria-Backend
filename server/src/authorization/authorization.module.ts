@@ -35,6 +35,7 @@ import { FilesModule } from 'src/files/files.module';
 import { TransfromUserIdtoEntity } from './infrastructure/pipes/TransfromUserIdToEntity.pipe';
 import { CreateSuperUserCommand } from './application/useCases/CreateSuperUser.command';
 import { SetRoleToAUserCommand } from './application/useCases/SetRoleToAUser.command';
+import { GetUsersByEmailQuery } from './application/useCases/GetUsersByEmail.query';
 
 const providers: Provider[] = [
   {
@@ -104,6 +105,10 @@ const providers: Provider[] = [
   {
     provide: CommandTokens.SetRoleToAUserCommand,
     useClass: SetRoleToAUserCommand,
+  },
+  {
+    provide: CommandTokens.GetUsersByEmailQuery,
+    useClass: GetUsersByEmailQuery,
   },
   DiscoveryService,
   GoogleAuthorizationProvider,

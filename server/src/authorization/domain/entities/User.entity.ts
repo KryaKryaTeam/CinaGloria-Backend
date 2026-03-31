@@ -35,6 +35,13 @@ interface IUserEntityConstructorProps {
   _authorizationProviders: AuthProviderEntity[];
 }
 
+export interface IUserForAdminList {
+  id: string;
+  email: string;
+  avatarUrl: InternalFile<'user:avatar'>;
+  role: RoleEnum;
+}
+
 export interface IPublicProfile {
   id: string;
   username: string;
@@ -339,6 +346,15 @@ export class UserEntity extends Entity {
         lastName: this._additionalData.lastName,
         surName: this._additionalData.surName,
       },
+    };
+  }
+
+  get forAdminList(): IUserForAdminList {
+    return {
+      id: this.id,
+      avatarUrl: this.avatarURL,
+      email: this.email,
+      role: this.role,
     };
   }
 

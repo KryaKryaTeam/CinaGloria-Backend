@@ -54,6 +54,7 @@ export enum CommandTokens {
   CreateSuperUserCommand = 'CREATE_SUPER_USER_COMMAND',
   SetRoleToAUserCommand = 'SET_ROLE_TO_A_USER_COMMAND',
   DeleteGarbageCommand = 'DELETE_GARBAGE_COMMAND',
+  GetUsersByEmailQuery = 'GET_USERS_BY_EMAIL_QUERY',
 }
 
 export enum ServiceTokens {

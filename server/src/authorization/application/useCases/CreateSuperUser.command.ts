@@ -24,6 +24,7 @@ import type { IHashService } from '../bounds/IHashService';
 import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
 import { randomUUID } from 'crypto';
 import { RoleEnum } from 'src/types/RoleEnum';
+import { LinkerApplicationService } from 'src/files/application/services/Linker.appService';
 
 interface CreateSuperUserCommandInput {
   email: string;
@@ -48,6 +49,9 @@ export class CreateSuperUserCommand extends Command<
 
   @Inject(ServiceTokens.HashService)
   private readonly hashService: IHashService;
+
+  @Inject(ServiceTokens.FileLinkerService)
+  private readonly linkerService: LinkerApplicationService;
 
   async implementation(data: CreateSuperUserCommandInput): Promise<void> {
     const userEx = await this.userRepository.existsByEmail(data.email);
@@ -94,6 +98,8 @@ export class CreateSuperUserCommand extends Command<
         'user:avatar',
       ),
     );
+
+    await this.linkerService.linkAvatarToUser(file, user);
 
     const authProvider = new AuthProviderEntity({
       passwordHash: this.hashService.hash(data.password),

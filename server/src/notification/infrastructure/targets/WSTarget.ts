@@ -18,7 +18,7 @@ export class WSTarget extends BaseNotificationTarget {
     return {
       title: notification.title,
       content: notification.content,
-      to: notification.to.id,
+      to: notification.to.ws, // should be ws type it in future
     };
   }
 }

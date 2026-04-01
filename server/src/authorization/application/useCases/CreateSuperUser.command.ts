@@ -99,8 +99,6 @@ export class CreateSuperUserCommand extends Command<
       ),
     );
 
-    await this.linkerService.linkAvatarToUser(file, user);
-
     const authProvider = new AuthProviderEntity({
       passwordHash: this.hashService.hash(data.password),
       providerId: undefined,
@@ -116,5 +114,7 @@ export class CreateSuperUserCommand extends Command<
     user.__forceSetRole(RoleEnum.ADMIN);
 
     await this.userRepository.save(user);
+
+    await this.linkerService.linkAvatarToUser(file, user);
   }
 }

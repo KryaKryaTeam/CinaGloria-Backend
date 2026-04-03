@@ -38,6 +38,7 @@ services:
       - db
     ports:
       - ${PORT}:${PORT}
+      - ${WEBSOCKET_PORT}:${WEBSOCKET_PORT}
 
 volumes:
   CinaGloriaDB:

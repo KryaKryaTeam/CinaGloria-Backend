@@ -1,17 +1,15 @@
 import { Notification } from './Notification'; // Adjust the path as needed
-import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { NotificationStatus } from 'src/types/NotificationStatus';
 import { ApiError } from 'src/error/ApiError';
 
 describe('Notification Entity', () => {
   // Mock User helper
-  const makeUser = (id: string) => ({ id }) as UserEntity;
 
   const validProps = {
     title: 'Valid Title',
     content: 'This is the notification content.',
     from: 'System',
-    to: makeUser('user-123'),
+    to: { ws: 'user-123', email: 'example@localhost.com' },
     targets: ['web', 'email'],
   };
 

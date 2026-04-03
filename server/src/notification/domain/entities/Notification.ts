@@ -90,7 +90,7 @@ export class Notification {
   }
 
   public markAsRead(actorId: string): void {
-    if (this._to.id !== actorId) {
+    if (this._to.ws !== actorId) {
       ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
     }
 

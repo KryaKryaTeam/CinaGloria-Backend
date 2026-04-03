@@ -26,6 +26,6 @@ export class GetNotificationsQuery extends Query<
 
     if (!notification) ApiError.throw(CommonErrors.PAGE_IS_EMPTY);
 
-    return notification!;
+    return notification;
   }
 }

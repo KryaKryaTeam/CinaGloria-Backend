@@ -9,4 +9,5 @@ export interface INotificationRepository {
     page: number,
   ): Promise<null | NotificationNonPopulated[]>;
   getById(id: string): Promise<Notification | null>;
+  getAllUnreadByUserId(id: string): Promise<Notification[]>;
 }

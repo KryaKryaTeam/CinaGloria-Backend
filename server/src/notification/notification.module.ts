@@ -16,6 +16,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { GetNotificationsQuery } from './application/commands/GetNotificationsQuery';
 import { NotificationsController } from './infrastructure/controllers/NotificationsController';
 import { MakeNotificationReaded } from './application/commands/MakeNotificationReadedCommand';
+import { MarkAllNotificationsReadCommand } from './application/commands/MarkAllNotificationsRead.command';
 
 const providers: Provider[] = [
   DiscoveryService,
@@ -42,6 +43,10 @@ const providers: Provider[] = [
   {
     provide: CommandTokens.MakeNotificationReaded,
     useClass: MakeNotificationReaded,
+  },
+  {
+    provide: CommandTokens.MarkAllNotificationsReadCommand,
+    useClass: MarkAllNotificationsReadCommand,
   },
   EmailNotificationTarget,
   NotificationSendEventHandler,

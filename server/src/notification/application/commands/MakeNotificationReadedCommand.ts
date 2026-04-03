@@ -4,15 +4,14 @@ import { ReposTokens } from 'src/common/Tokens';
 import { PropsWithUserId } from 'src/types/PropsWithUserId';
 import type { INotificationRepository } from '../bounds/INotificationRepository';
 import { ApiError, NotificationErrors } from 'src/error/ApiError';
+import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 
 interface CommandInput {
   notificationId: string;
+  user: UserEntity;
 }
 
-export class MakeNotificationReaded extends Command<
-  PropsWithUserId<CommandInput>,
-  void
-> {
+export class MakeNotificationReaded extends Command<CommandInput, void> {
   @Inject(ReposTokens.NotificationRepository)
   private readonly notification_repo: INotificationRepository;
   async implementation(data: PropsWithUserId<CommandInput>): Promise<void> {
@@ -23,7 +22,7 @@ export class MakeNotificationReaded extends Command<
     if (!notification)
       return ApiError.throw(NotificationErrors.NOTIFICATION_IS_UNDEFINED);
 
-    notification.markAsRead(data.id);
+    notification.markAsRead(data.user.id);
 
     await this.notification_repo.save(notification);
   }

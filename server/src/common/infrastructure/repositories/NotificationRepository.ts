@@ -6,6 +6,7 @@ import { Inject } from '@nestjs/common';
 import { MapperTokens } from 'src/common/Tokens';
 import { NotificationMapper } from 'src/notification/application/mappers/NotificationMapper';
 import { NotificationNonPopulated } from 'src/notification/domain/entities/NotificationNonPopulated';
+import { NotificationStatus } from 'src/types/NotificationStatus';
 
 export class NotificationRepository
   extends BaseRepository<NotificationSchema>
@@ -63,5 +64,16 @@ export class NotificationRepository
         to: sch.to as unknown as string,
       }),
     );
+  }
+
+  async getAllUnreadByUserId(id: string): Promise<Notification[]> {
+    const result = await this.repository.find({
+      where: {
+        status: NotificationStatus.sended,
+        toId: id,
+      },
+    });
+
+    return result.map((el) => this.notificationMapper.toEntity(el));
   }
 }

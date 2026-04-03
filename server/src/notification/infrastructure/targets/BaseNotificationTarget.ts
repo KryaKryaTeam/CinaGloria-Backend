@@ -6,6 +6,8 @@ export interface INotificationData {
   title: string;
   content: string;
   to: string;
+  createdAt: Date;
+  id: string;
 }
 
 @Injectable()

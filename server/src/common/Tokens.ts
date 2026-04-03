@@ -55,6 +55,7 @@ export enum CommandTokens {
   SetRoleToAUserCommand = 'SET_ROLE_TO_A_USER_COMMAND',
   DeleteGarbageCommand = 'DELETE_GARBAGE_COMMAND',
   GetUsersByEmailQuery = 'GET_USERS_BY_EMAIL_QUERY',
+  MarkAllNotificationsReadCommand = 'MARK_ALL_NOTIFICATIONS_READ_COMMAND',
 }
 
 export enum ServiceTokens {

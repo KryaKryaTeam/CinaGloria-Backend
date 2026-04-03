@@ -54,6 +54,8 @@ export class EmailNotificationTarget extends BaseNotificationTarget {
       content: ready,
       to: notification.to.email,
       title: notification.title,
+      createdAt: new Date(),
+      id: notification.id,
     };
   }
   protected async _send(data: INotificationData): Promise<void> {

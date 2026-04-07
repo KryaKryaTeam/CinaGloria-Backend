@@ -47,6 +47,10 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'Page is empty',
     status: 404,
   },
+  ERR_002: {
+    message: 'Validation error',
+    status: 400,
+  },
   FILE_001: {
     message: 'File with this id is undefined',
     status: 404,
@@ -384,6 +388,7 @@ export const NotificationErrors = {
 
 export const CommonErrors = {
   PAGE_IS_EMPTY: 'ERR_001',
+  VALIDATION_ERROR: 'ERR_002',
 } as const;
 
 export const UserErrors = {

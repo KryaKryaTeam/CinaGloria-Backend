@@ -4,12 +4,20 @@ import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import cookieParser from 'cookie-parser';
+import { ApiError, CommonErrors } from './error/ApiError';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.useGlobalPipes(
     new ValidationPipe({
+      disableErrorMessages: false,
+      exceptionFactory(errors) {
+        return ApiError.returnNew(
+          CommonErrors.VALIDATION_ERROR,
+          JSON.stringify(errors),
+        );
+      },
       transform: true,
       transformOptions: {
         enableImplicitConversion: true,

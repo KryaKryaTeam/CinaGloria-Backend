@@ -1,9 +1,9 @@
 import {
   IsString,
-  IsISO8601,
   IsArray,
   IsOptional,
   ValidateNested,
+  IsDate,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
@@ -25,25 +25,25 @@ export class CreateCompetitionDto implements ICreateCompetitionRAW {
 
   @ApiProperty({ required: false, example: '2026-08-30T12:00:00Z' })
   @IsOptional()
-  @IsISO8601({}, { message: 'INVALID_DATE_FORMAT' })
+  @IsDate()
   @Type(() => Date)
   dateOfEnd: Date | null;
 
   @ApiProperty({ required: false, example: '2026-08-30T12:00:00Z' })
   @IsOptional()
-  @IsISO8601()
+  @IsDate()
   @Type(() => Date)
   dateOfEndRegistration: Date | null;
 
   @ApiProperty({ required: false, example: '2026-08-30T12:00:00Z' })
   @IsOptional()
-  @IsISO8601()
+  @IsDate()
   @Type(() => Date)
   dateOfStart: Date | null;
 
   @ApiProperty({ required: false, example: '2026-08-30T12:00:00Z' })
   @IsOptional()
-  @IsISO8601()
+  @IsDate()
   @Type(() => Date)
   dateOfStartRegistration: Date | null;
 

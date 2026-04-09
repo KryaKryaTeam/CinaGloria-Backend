@@ -6,6 +6,7 @@ import { RoundSchema } from 'src/schemas/Round.schema';
 import { RoundMapper } from 'src/competitions/application/mapper/Round.mapper';
 import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
 import { RoundStatus } from 'src/types/RoundStatus';
+import { LessThan } from 'typeorm';
 
 export class RoundRepository
   extends BaseRepository<RoundSchema>
@@ -36,6 +37,7 @@ export class RoundRepository
       .getMany();
     return rounds.map((el) => this.mapper.toEntity(el));
   }
+  
   async findAllStartedButNotProcessed(): Promise<RoundEntity[]> {
     const rounds = await this.repository
       .createQueryBuilder('round')
@@ -51,5 +53,18 @@ export class RoundRepository
     if (!_round) return null;
 
     return _round.competition.id;
+  }
+
+  async findFinishedROunds(): Promise<RoundEntity[] | null> {
+    const schema = await this.repository.findBy({
+      endOfRound: LessThan(new Date()),
+    });
+    return schema.map((el) => {
+      return this.mapper.toEntity(el);
+    });
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.repository.delete({ id });
   }
 }

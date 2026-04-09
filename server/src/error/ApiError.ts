@@ -381,6 +381,14 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'Command params are wrong',
     status: 400,
   },
+  ROUND_008: {
+    message: "This round wasn't found",
+    status: 404,
+  },
+  ROUND_009: {
+    message: "Invalid date span. Rounds mustn't be held at the same time.",
+    status: 400,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -465,6 +473,8 @@ export const RoundErrors = {
   ROUND_IS_READONLY: 'ROUND_005',
   TASK_NOT_FOUND_IN_ROUND: 'ROUND_006',
   CONTENT_LENGTH_RESTRICTION: 'ROUND_007',
+  ROUND_NOT_FOUND: 'ROUND_008',
+  SPAN_IS_INVALID: 'ROUND_009',
 } as const;
 
 export const TaskErrors = {

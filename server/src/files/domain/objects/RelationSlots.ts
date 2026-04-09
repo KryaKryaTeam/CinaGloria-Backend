@@ -79,16 +79,17 @@ export class RelationString {
   private _config: RelationSlotConfig;
 
   private constructor(value: string) {
-    const splited = value.split(':');
-
-    if (!splited[0]) ApiError.throw(FileErrors.INVALID_RELATION_FORMAT);
-    if (!splited[1]) ApiError.throw(FileErrors.INVALID_RELATION_FORMAT);
-
     this._value = value;
   }
 
   static define(value: string) {
+    const splited = value.split(':');
+
+    if (!splited[0]) ApiError.throw(FileErrors.INVALID_RELATION_FORMAT, value);
+    if (!splited[1]) ApiError.throw(FileErrors.INVALID_RELATION_FORMAT, value);
+
     const obj = new RelationString(value);
+
     obj.validate();
     return obj;
   }

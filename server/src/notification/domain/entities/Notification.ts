@@ -3,7 +3,7 @@ import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { ApiError, DomainErrors } from 'src/error/ApiError';
 import { NotificationStatus } from 'src/types/NotificationStatus';
 
-interface INotification {
+export interface INotificationPlain {
   id: string;
   title: string;
   content: string;
@@ -24,7 +24,7 @@ export class Notification {
   private readonly _targets: string[];
   private readonly _createdAt: Date;
 
-  private constructor(props: INotification) {
+  private constructor(props: INotificationPlain) {
     this._id = props.id;
     this._title = props.title;
     this._content = props.content;
@@ -60,7 +60,7 @@ export class Notification {
     });
   }
 
-  public static load(props: INotification): Notification {
+  public static load(props: INotificationPlain): Notification {
     return new Notification(props);
   }
 

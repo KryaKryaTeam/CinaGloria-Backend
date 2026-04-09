@@ -20,14 +20,14 @@ export class CompetitionMapper extends Mapper<
             'competition:avatar',
             'competition:avatar',
           )
-        : null,
+        : undefined,
       banner: schema.banner
         ? InternalFile.define<typeof RelationSlots.competition.banner>(
             schema.banner,
             'competition:banner',
             'competition:banner',
           )
-        : null,
+        : undefined,
       dateOfEnd: schema.dateOfEnd,
       dateOfEndRegistration: schema.dateOfEndRegistration,
       dateOfStart: schema.dateOfStart,
@@ -43,7 +43,7 @@ export class CompetitionMapper extends Mapper<
             'competition:socialMedia',
             'competition:socialMedia',
           )
-        : null,
+        : undefined,
       status: schema.status,
       publishAt: schema.publishedAt,
       ultraWideBanner: schema.ultraWideBanner
@@ -52,7 +52,7 @@ export class CompetitionMapper extends Mapper<
             'competition:ultraWideBanner',
             'competition:ultraWideBanner',
           )
-        : null,
+        : undefined,
     });
   }
   public toSchema(entity: CompetitionEntity): CompetitionSchema {
@@ -66,20 +66,24 @@ export class CompetitionMapper extends Mapper<
     schema.dateOfEnd = entity.dateOfEnd;
     schema.dateOfEndRegistration = entity.dateOfEndRegistration;
     schema.banner =
-      typeof entity.banner?.value === 'undefined' ? null : entity.banner.value;
+      typeof entity.banner?.value === 'undefined'
+        ? undefined
+        : entity.banner.value;
     schema.ultraWideBanner =
       typeof entity.ultraWideBanner?.value === 'undefined'
-        ? null
+        ? undefined
         : entity.ultraWideBanner.value;
     schema.avatar =
-      typeof entity.avatar?.value === 'undefined' ? null : entity.avatar.value;
+      typeof entity.avatar?.value === 'undefined'
+        ? undefined
+        : entity.avatar.value;
     schema.socialMedia =
       typeof entity.socialMedia?.value === 'undefined'
-        ? null
+        ? undefined
         : entity.socialMedia.value;
     schema.status = entity.status;
     schema.publishedAt = entity.publishAt;
-    schema.rules = entity.rules.map((el) => el.toJSON);
+    schema.rules = entity.rules.map((el) => el.toJSON());
 
     return schema;
   }

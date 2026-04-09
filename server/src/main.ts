@@ -22,6 +22,7 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
+      skipNullProperties: true,
     }),
   );
 

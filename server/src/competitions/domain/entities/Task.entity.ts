@@ -82,4 +82,13 @@ export class TaskEntity extends Entity {
   set color(color: Color) {
     this._color = color;
   }
+
+  toJSON(): ITaskPlain {
+    return {
+      id: this.id,
+      color: this.color,
+      description: this.description,
+      name: this.name,
+    };
+  }
 }

@@ -30,11 +30,11 @@ export interface IRoundPlain {
 export class RoundEntity extends Entity {
   public readonly id: string;
   private _hidden: boolean;
-  private _name: string | null;
-  private _description: string | null;
-  private _icon: Icons | null;
-  private _startOfRound: Date | null;
-  private _endOfRound: Date | null;
+  private _name: string;
+  private _description: string;
+  private _icon: Icons;
+  private _startOfRound: Date;
+  private _endOfRound: Date;
   private _relatedTasks: TaskEntity[];
   private _status: RoundStatus;
 
@@ -126,16 +126,16 @@ export class RoundEntity extends Entity {
     return this._description ?? '';
   }
 
-  get icon(): Icons | null {
-    return this._icon ?? null;
+  get icon(): Icons {
+    return this._icon;
   }
 
   get startOfRound() {
-    return this._startOfRound!;
+    return this._startOfRound;
   }
 
   get endOfRound(): Date {
-    return this._endOfRound!;
+    return this._endOfRound;
   }
 
   get relatedTasks() {
@@ -160,5 +160,18 @@ export class RoundEntity extends Entity {
     });
     if (i == -1) ApiError.throw(RoundErrors.TASK_NOT_FOUND_IN_ROUND);
     this._relatedTasks.splice(i, 1);
+  }
+  toJSON(): IRoundPlain {
+    return {
+      id: this.id,
+      name: this.name,
+      description: this.description,
+      startOfRound: this._startOfRound,
+      status: this.status,
+      hidden: this.hidden,
+      endOfRound: this.endOfRound,
+      icon: this.icon,
+      relatedTasks: this.relatedTasks,
+    };
   }
 }

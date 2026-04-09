@@ -2,12 +2,13 @@ import {
   Controller,
   Get,
   Inject,
+  Param,
   Post,
   Query,
   Req,
   Version,
 } from '@nestjs/common';
-import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiResponse } from '@nestjs/swagger';
 import { Secure } from 'src/authorization/infrastructure/guards/auth/auth.guard';
 import busboy from 'busboy';
 import type { Request as RequestExpress } from 'express';
@@ -17,6 +18,7 @@ import { GetLinkQuery } from 'src/files/application/useCases/GetLinkQuery';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
 import { RelationStringTransfromPipe } from '../dto/RelationString.dto';
 import { ApiError, FileErrors } from 'src/error/ApiError';
+import { FileDto } from '../dto/File.dto';
 
 @Controller('file')
 @Secure()
@@ -42,9 +44,10 @@ export class FileController {
       },
     },
   })
+  @ApiResponse({ status: 201, type: FileDto })
   async uploadFile(
     @Req() req: RequestExpress,
-    @Query('relationString', RelationStringTransfromPipe)
+    @Param('relationString', RelationStringTransfromPipe)
     relationString: RelationString,
   ) {
     const bb = busboy({
@@ -82,6 +85,10 @@ export class FileController {
   }
 
   @Get('/link/:fileURL')
+  @ApiResponse({
+    status: 200,
+    example: 'http://localhost:4000/static/meow.webp',
+  })
   async getLink(@Query('fileURL') fileUrl: string) {
     return await this.getLinkQuery.execute({ fileUrl });
   }

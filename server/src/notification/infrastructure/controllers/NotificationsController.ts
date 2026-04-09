@@ -1,13 +1,17 @@
 import { Controller, Get, Inject, Param, Put, Version } from '@nestjs/common';
+import { ApiResponse } from '@nestjs/swagger';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 
 import { UserId } from 'src/authorization/infrastructure/decorators/user.decorator';
 import { Secure } from 'src/authorization/infrastructure/guards/auth/auth.guard';
 import { CommandTokens } from 'src/common/Tokens';
-import { ApiError, CommonErrors } from 'src/error/ApiError';
+import { CommonErrors, documentError } from 'src/error/ApiError';
 import { GetNotificationsQuery } from 'src/notification/application/commands/GetNotificationsQuery';
 import { MakeNotificationReaded } from 'src/notification/application/commands/MakeNotificationReadedCommand';
 import { MarkAllNotificationsReadCommand } from 'src/notification/application/commands/MarkAllNotificationsRead.command';
+import { NotificationDto } from '../dto/Notification.dto';
+import { PageQueryDto } from 'src/common/infrastructure/dto/PageQuery.dto';
+import { randomUUID } from 'crypto';
 
 @Controller('/notification')
 @Secure()
@@ -22,13 +26,15 @@ export class NotificationsController {
   private readonly markAllNotificationsReadCommand: MarkAllNotificationsReadCommand;
   @Get('/:page')
   @Version('1')
-  async getByPage(@Param() { page }: { page: number }, @UserId() id: string) {
-    if (!page) ApiError.throw(CommonErrors.PAGE_IS_EMPTY);
-    return await this.getNotificationQuery.execute({ page, id });
+  @ApiResponse({ status: 200, type: [NotificationDto] })
+  @documentError([CommonErrors.PAGE_IS_EMPTY])
+  async getByPage(@Param() pageDto: PageQueryDto, @UserId() id: string) {
+    return await this.getNotificationQuery.execute({ page: pageDto.page, id });
   }
 
   @Put('/one/:notificationId')
   @Version('1')
+  @ApiResponse({ status: 200, example: { notificationId: randomUUID() } })
   async promoteToReaded(
     @Param() { notificationId }: { notificationId: string },
     @UserId() user: UserEntity,

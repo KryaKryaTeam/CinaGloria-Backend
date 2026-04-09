@@ -20,37 +20,37 @@ export class CompetitionSchema {
   id: string;
 
   @Column({ type: 'varchar', nullable: true })
-  name: string | null;
+  name?: string;
 
   @Column({ type: 'text', nullable: true })
-  description: string | null;
+  description?: string;
 
   @Column({ type: 'varchar', nullable: true })
-  ultraWideBanner: string | null;
+  ultraWideBanner?: string;
 
   @Column({ type: 'varchar', nullable: true })
-  banner: string | null;
+  banner?: string;
 
   @Column({ type: 'varchar', nullable: true })
-  avatar: string | null;
+  avatar?: string;
 
   @Column({ type: 'varchar', nullable: true })
-  socialMedia: string | null;
+  socialMedia?: string;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  dateOfStart: Date | null;
+  dateOfStart?: Date;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  dateOfEnd: Date | null;
+  dateOfEnd?: Date;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  dateOfStartRegistration: Date | null;
+  dateOfStartRegistration?: Date;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  dateOfEndRegistration: Date | null;
+  dateOfEndRegistration?: Date;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  publishedAt: Date | null;
+  publishedAt?: Date;
 
   @Column({ type: 'jsonb', default: [] })
   rules: ICompetitionRule[];

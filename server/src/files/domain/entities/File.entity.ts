@@ -74,7 +74,7 @@ export class FileEntity extends Entity {
     this._slot = value;
   }
 
-  get toJSON(): IFilePlain {
+  toJSON(): IFilePlain {
     return {
       url: this.url,
       mimeType: this._mimeType.value,

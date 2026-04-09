@@ -35,64 +35,66 @@ export interface ICompetitionOnPage {
 
 export interface ICompetitionPlain {
   id: string;
-  name: string | null;
-  description: string | null;
-  ultraWideBanner: InternalFile<'competition:ultraWideBanner'> | null;
-  banner: InternalFile<'competition:banner'> | null;
-  avatar: InternalFile<'competition:avatar'> | null;
-  socialMedia: InternalFile<'competition:socialMedia'> | null;
-  dateOfStart: Date | null;
-  dateOfEnd: Date | null;
-  dateOfStartRegistration: Date | null;
-  dateOfEndRegistration: Date | null;
-  publishAt: Date | null;
+  name?: string;
+  description?: string;
+  ultraWideBanner?: InternalFile<'competition:ultraWideBanner'>;
+  banner?: InternalFile<'competition:banner'>;
+  avatar?: InternalFile<'competition:avatar'>;
+  socialMedia?: InternalFile<'competition:socialMedia'>;
+  dateOfStart?: Date;
+  dateOfEnd?: Date;
+  dateOfStartRegistration?: Date;
+  dateOfEndRegistration?: Date;
+  publishAt?: Date;
   status: CompetitionStatus;
   rules: CompetitionRule[];
 }
 
 export interface ICreateCompetition {
-  name: string | null;
-  description: string | null;
-  ultraWideBanner: InternalFile<'competition:ultraWideBanner'> | null;
-  banner: InternalFile<'competition:banner'> | null;
-  avatar: InternalFile<'competition:avatar'> | null;
-  socialMedia: InternalFile<'competition:socialMedia'> | null;
-  dateOfStart: Date | null;
-  dateOfEnd: Date | null;
-  dateOfStartRegistration: Date | null;
-  dateOfEndRegistration: Date | null;
+  name?: string;
+  description?: string;
+  ultraWideBanner?: InternalFile<'competition:ultraWideBanner'>;
+  banner?: InternalFile<'competition:banner'>;
+  avatar?: InternalFile<'competition:avatar'>;
+  socialMedia?: InternalFile<'competition:socialMedia'>;
+  dateOfStart?: Date;
+  dateOfEnd?: Date;
+  dateOfStartRegistration?: Date;
+  dateOfEndRegistration?: Date;
   rules: CompetitionRule[];
 }
 
 export interface ICreateCompetitionRAW {
-  name: string | null;
-  description: string | null;
-  ultraWideBanner: string | null;
-  banner: string | null;
-  avatar: string | null;
-  socialMedia: string | null;
-  dateOfStart: Date | null;
-  dateOfEnd: Date | null;
-  dateOfStartRegistration: Date | null;
-  dateOfEndRegistration: Date | null;
+  name?: string;
+  description?: string;
+  ultraWideBanner?: string;
+  banner?: string;
+  avatar?: string;
+  socialMedia?: string;
+  dateOfStart?: Date;
+  dateOfEnd?: Date;
+  dateOfStartRegistration?: Date;
+  dateOfEndRegistration?: Date;
   rules: { name: string; description: string; icon: string }[];
 }
 
 export class CompetitionEntity extends Entity {
   public readonly id: string;
-  private _name: string | null;
-  private _description: string | null;
+  private _name: string | undefined;
+  private _description: string | undefined;
 
-  private _ultraWideBanner: InternalFile<'competition:ultraWideBanner'> | null;
-  private _banner: InternalFile<'competition:banner'> | null;
-  private _avatar: InternalFile<'competition:avatar'> | null;
-  private _socialMedia: InternalFile<'competition:socialMedia'> | null;
+  private _ultraWideBanner:
+    | InternalFile<'competition:ultraWideBanner'>
+    | undefined;
+  private _banner: InternalFile<'competition:banner'> | undefined;
+  private _avatar: InternalFile<'competition:avatar'> | undefined;
+  private _socialMedia: InternalFile<'competition:socialMedia'> | undefined;
 
-  private _dateOfStart: Date | null;
-  private _dateOfEnd: Date | null;
-  private _dateOfStartRegistration: Date | null;
-  private _dateOfEndRegistration: Date | null;
-  private _publishAt: Date | null;
+  private _dateOfStart: Date | undefined;
+  private _dateOfEnd: Date | undefined;
+  private _dateOfStartRegistration: Date | undefined;
+  private _dateOfEndRegistration: Date | undefined;
+  private _publishAt: Date | undefined;
 
   private _status: CompetitionStatus;
   private _rules: CompetitionRule[];
@@ -162,11 +164,8 @@ export class CompetitionEntity extends Entity {
     ].every((el) => el !== null);
 
     if (
-      !(
-        plain.rules.length > 0 &&
-        filledIn &&
-        plain.status != CompetitionStatus.DRAFT
-      )
+      plain.status != CompetitionStatus.DRAFT &&
+      !(plain.rules.length > 0 && filledIn)
     )
       ApiError.throw(CompetitionErrors.LOAD_FROM_DB_FAILED, plain.id);
 
@@ -180,7 +179,6 @@ export class CompetitionEntity extends Entity {
       id: randomUUID(),
       rules: plain.rules || [],
       status: CompetitionStatus.DRAFT,
-      publishAt: null,
     });
   }
 
@@ -266,11 +264,11 @@ export class CompetitionEntity extends Entity {
   }
 
   private static datesValid(
-    publishAt: Date | null,
-    startReg: Date | null,
-    endReg: Date | null,
-    start: Date | null,
-    end: Date | null,
+    publishAt: Date | undefined,
+    startReg: Date | undefined,
+    endReg: Date | undefined,
+    start: Date | undefined,
+    end: Date | undefined,
   ): boolean {
     if (publishAt && startReg && publishAt >= startReg) return false;
     if (startReg && endReg && startReg >= endReg) return false;
@@ -400,7 +398,7 @@ export class CompetitionEntity extends Entity {
       );
 
     this._status = CompetitionStatus.DRAFT;
-    this._publishAt = null;
+    this._publishAt = undefined;
   }
 
   set ultraWideBanner(value: InternalFile<'competition:ultraWideBanner'>) {
@@ -458,37 +456,39 @@ export class CompetitionEntity extends Entity {
     this._status = value;
   }
 
-  get name(): string | null {
+  get name(): string | undefined {
     return this._name;
   }
-  get description(): string | null {
+  get description(): string | undefined {
     return this._description;
   }
-  get ultraWideBanner(): InternalFile<'competition:ultraWideBanner'> | null {
+  get ultraWideBanner():
+    | InternalFile<'competition:ultraWideBanner'>
+    | undefined {
     return this._ultraWideBanner;
   }
-  get banner(): InternalFile<'competition:banner'> | null {
+  get banner(): InternalFile<'competition:banner'> | undefined {
     return this._banner;
   }
-  get avatar(): InternalFile<'competition:avatar'> | null {
+  get avatar(): InternalFile<'competition:avatar'> | undefined {
     return this._avatar;
   }
-  get socialMedia(): InternalFile<'competition:socialMedia'> | null {
+  get socialMedia(): InternalFile<'competition:socialMedia'> | undefined {
     return this._socialMedia;
   }
-  get dateOfStart(): Date | null {
+  get dateOfStart(): Date | undefined {
     return this._dateOfStart;
   }
-  get dateOfEnd(): Date | null {
+  get dateOfEnd(): Date | undefined {
     return this._dateOfEnd;
   }
-  get dateOfStartRegistration(): Date | null {
+  get dateOfStartRegistration(): Date | undefined {
     return this._dateOfStartRegistration;
   }
-  get dateOfEndRegistration(): Date | null {
+  get dateOfEndRegistration(): Date | undefined {
     return this._dateOfEndRegistration;
   }
-  get publishAt(): Date | null {
+  get publishAt(): Date | undefined {
     return this._publishAt;
   }
   get status() {
@@ -534,7 +534,7 @@ export class CompetitionEntity extends Entity {
       };
   }
 
-  get toJSON(): ICompetitionPlain {
+  toJSON(): ICompetitionPlain {
     return {
       id: this.id,
       name: this._name,

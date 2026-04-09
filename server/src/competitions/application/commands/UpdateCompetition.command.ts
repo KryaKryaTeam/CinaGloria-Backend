@@ -54,7 +54,7 @@ export class UpdateCompetitionCommand extends Command<
     ].map(async (el, i) => {
       if (el) {
         const file = await this.fileRepository.findByUrl(el);
-        if (!file) return null;
+        if (!file) return undefined;
         await this.linkerService.linkFileToCompetitionSlot(
           file,
           competition,
@@ -62,10 +62,10 @@ export class UpdateCompetitionCommand extends Command<
         );
 
         return file;
-      } else return null;
+      } else return undefined;
     });
 
-    const files_promised: (FileEntity | null)[] = await Promise.all(files);
+    const files_promised: (FileEntity | undefined)[] = await Promise.all(files);
 
     const files_mapped = {
       avatar: files_promised[0]
@@ -74,28 +74,28 @@ export class UpdateCompetitionCommand extends Command<
             'competition:avatar',
             'competition:avatar',
           )
-        : null,
+        : undefined,
       banner: files_promised[1]
         ? InternalFile.define<typeof RelationSlots.competition.banner>(
             files_promised[1].url,
             'competition:banner',
             'competition:banner',
           )
-        : null,
+        : undefined,
       ultraWideBanner: files_promised[3]
         ? InternalFile.define<typeof RelationSlots.competition.ultraWideBanner>(
             files_promised[3].url,
             'competition:ultraWideBanner',
             'competition:ultraWideBanner',
           )
-        : null,
+        : undefined,
       socialMedia: files_promised[2]
         ? InternalFile.define<typeof RelationSlots.competition.socialMedia>(
             files_promised[2].url,
             'competition:socialMedia',
             'competition:socialMedia',
           )
-        : null,
+        : undefined,
     };
 
     UserAndCompetitionService.editCompetition(

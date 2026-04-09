@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Inject,
+  Param,
   Post,
   Put,
   Query,
@@ -77,7 +78,7 @@ export class CompetitionController {
   @Get('/public/page/:page')
   @Version('1')
   @ApiResponse({ status: 200, type: [PublicInListCompetitionDto] })
-  async getPageOfPublicCompetitions(@Query() pageDto: PageQueryDto) {
+  async getPageOfPublicCompetitions(@Param() pageDto: PageQueryDto) {
     return (
       await this.getPublicCompetitionsPageQuery.execute({ page: pageDto.page })
     ).competitions;
@@ -85,7 +86,7 @@ export class CompetitionController {
 
   @Get('/public/single/:competitionId')
   @Version('1')
-  async getPublicCompetition(@Query('competitionId') competitionId: string) {
+  async getPublicCompetition(@Param('competitionId') competitionId: string) {
     return (await this.getPublicCompetitionQuery.execute({ competitionId }))
       .competition;
   }
@@ -111,7 +112,7 @@ export class CompetitionController {
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   async deleteCompetition(
     @UserId() user: UserEntity,
-    @Query('competitionId') competitionId: string,
+    @Param('competitionId') competitionId: string,
   ) {
     return await this.deletecompetitionCommand.execute({ competitionId, user });
   }
@@ -122,7 +123,7 @@ export class CompetitionController {
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   async publishCompetition(
     @UserId() user: UserEntity,
-    @Query('competitionId') competitionId: string,
+    @Param('competitionId') competitionId: string,
   ) {
     return await this.publishCompetitionCommand.execute({
       user,
@@ -136,7 +137,7 @@ export class CompetitionController {
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   async schedulePublishingOfCompetition(
     @UserId() user: UserEntity,
-    @Query('competitionId') competitionId: string,
+    @Param('competitionId') competitionId: string,
     @Body() dto: SchedulePublishCompetitionDto,
   ) {
     return await this.scheduleCompetitionPublishCommand.execute({
@@ -153,7 +154,7 @@ export class CompetitionController {
   async updateCompetition(
     @Body() dto: CreateCompetitionDto,
     @UserId() user: UserEntity,
-    @Query('competitionId') competitionId: string,
+    @Param('competitionId') competitionId: string,
   ) {
     return await this.updateCompetitionCommand.execute({
       competitionData: dto,
@@ -168,7 +169,7 @@ export class CompetitionController {
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   async declineScheduledPublishOfCompetition(
     @UserId() user: UserEntity,
-    @Query('competitionId') competitionId: string,
+    @Param('competitionId') competitionId: string,
   ) {
     return await this.declineScheduledPublishCommand.execute({
       user,

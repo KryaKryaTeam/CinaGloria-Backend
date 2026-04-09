@@ -3,19 +3,19 @@ import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { Command } from 'src/common/application/Command';
 import { ReposTokens, ServiceTokens } from 'src/common/Tokens';
 import {
+  CompetitionEntity,
   ICompetitionPlain,
   ICreateCompetitionRAW,
 } from 'src/competitions/domain/entities/Competition.entity';
 import type { IFileRepository } from 'src/files/application/bounds/IFileRepository';
 import { LinkerApplicationService } from 'src/files/application/services/Linker.appService';
-import { FileEntity } from 'src/files/domain/entities/File.entity';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
-import { RelationSlots } from 'src/types/RelationSlots';
 import type { ICompetitionRepository } from '../bounds/CompetitionRepository';
 import { UserAndCompetitionService } from 'src/competitions/domain/services/UserAndCompetitionService';
 import { CompetitionRule } from 'src/competitions/domain/objects/CompetitionRule.object';
 import { Icons } from 'src/types/Icons';
+import { AppSlotCode } from 'src/types/RelationSlots';
 
 interface CommandInput {
   user: UserEntity;
@@ -28,81 +28,54 @@ export class CreateCompetitionCommand extends Command<
 > {
   @Inject(ReposTokens.FileRepository)
   private readonly fileRepository: IFileRepository;
-
   @Inject(ReposTokens.CompetitionRepository)
   private readonly competitionRepository: ICompetitionRepository;
-
   @Inject(ServiceTokens.FileLinkerService)
   private readonly linkerService: LinkerApplicationService;
 
   async implementation(data: CommandInput): Promise<ICompetitionPlain> {
-    const slots = [
-      RelationString.define('competition:avatar'),
-      RelationString.define('competition:banner'),
-      RelationString.define('competition:socialMedia'),
-      RelationString.define('competition:ulraWideBanner'),
-    ];
-
-    const files = [
-      data.competition.avatar,
-      data.competition.banner,
-      data.competition.socialMedia,
-      data.competition.ultraWideBanner,
-    ].map(async (el, i) => {
-      if (el) {
-        const file = await this.fileRepository.findByUrl(el);
-        if (!file) return null;
-        await this.linkerService.linkFileToCompetitionSlot(
-          file,
-          comp,
-          slots[i],
-        );
-
-        return file;
-      } else return null;
-    });
-
     const comp = UserAndCompetitionService.createCompetition(
       {
         ...data.competition,
-        banner: null,
-        avatar: null,
-        socialMedia: null,
-        ultraWideBanner: null,
+        banner: undefined,
+        avatar: undefined,
+        socialMedia: undefined,
+        ultraWideBanner: undefined,
         rules: [],
       },
       data.user,
     );
 
-    const files_promised: (FileEntity | null)[] = await Promise.all(files);
+    await this.competitionRepository.save(comp);
 
-    if (files_promised[0])
-      comp.avatar = InternalFile.define<
-        typeof RelationSlots.competition.avatar
-      >(files_promised[0].url, 'competition:avatar', 'competition:avatar');
+    const fileMappings = [
+      { url: data.competition.avatar, slot: 'competition:avatar' },
+      { url: data.competition.banner, slot: 'competition:banner' },
+      { url: data.competition.socialMedia, slot: 'competition:socialMedia' },
+      {
+        url: data.competition.ultraWideBanner,
+        slot: 'competition:ultraWideBanner',
+      },
+    ];
 
-    if (files_promised[1])
-      comp.banner = InternalFile.define<
-        typeof RelationSlots.competition.banner
-      >(files_promised[1].url, 'competition:banner', 'competition:banner');
+    await Promise.all(
+      fileMappings.map(async ({ url, slot }) => {
+        if (!url) return;
 
-    if (files_promised[2])
-      comp.socialMedia = InternalFile.define<
-        typeof RelationSlots.competition.socialMedia
-      >(
-        files_promised[2].url,
-        'competition:socialMedia',
-        'competition:socialMedia',
-      );
+        const file = await this.fileRepository.findByUrl(url);
+        if (!file) return;
 
-    if (files_promised[3])
-      comp.ultraWideBanner = InternalFile.define<
-        typeof RelationSlots.competition.ultraWideBanner
-      >(
-        files_promised[3].url,
-        'competition:ultraWideBanner',
-        'competition:ultraWideBanner',
-      );
+        const relation = RelationString.define(slot);
+
+        await this.linkerService.linkFileToCompetitionSlot(
+          file,
+          comp,
+          relation,
+        );
+
+        this.assignFileToEntity(comp, slot as AppSlotCode, file.url);
+      }),
+    );
 
     data.competition.rules.forEach((el) => {
       comp.addRule(
@@ -113,5 +86,46 @@ export class CreateCompetitionCommand extends Command<
     await this.competitionRepository.save(comp);
 
     return comp;
+  }
+
+  // Допоміжний метод, щоб не роздувати основну логіку
+  private assignFileToEntity(
+    comp: CompetitionEntity,
+    slot: AppSlotCode,
+    url: string,
+  ) {
+    if (slot === 'competition:avatar') {
+      const internalFile = InternalFile.define<'competition:avatar'>(
+        url,
+        slot,
+        'competition:avatar',
+      );
+      comp.avatar = internalFile;
+    }
+
+    if (slot === 'competition:banner') {
+      const internalFile = InternalFile.define<'competition:banner'>(
+        url,
+        slot,
+        'competition:banner',
+      );
+      comp.banner = internalFile;
+    }
+    if (slot === 'competition:socialMedia') {
+      const internalFile = InternalFile.define<'competition:socialMedia'>(
+        url,
+        slot,
+        'competition:socialMedia',
+      );
+      comp.socialMedia = internalFile;
+    }
+    if (slot === 'competition:ultraWideBanner') {
+      const internalFile = InternalFile.define<'competition:ultraWideBanner'>(
+        url,
+        slot,
+        'competition:ultraWideBanner',
+      );
+      comp.ultraWideBanner = internalFile;
+    }
   }
 }

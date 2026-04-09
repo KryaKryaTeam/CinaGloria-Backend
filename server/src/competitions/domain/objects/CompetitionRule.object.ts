@@ -37,7 +37,7 @@ export class CompetitionRule {
     };
   }
 
-  get toJSON() {
+  toJSON() {
     return this.value;
   }
 }

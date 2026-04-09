@@ -20,7 +20,7 @@ import type {
 } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { CreateUserLocal } from '../dtos/CreateUserLocal';
-import { ApiBasicAuth, ApiBody, ApiResponse } from '@nestjs/swagger';
+import { ApiBody, ApiResponse } from '@nestjs/swagger';
 import { LoginResponse } from '../dtos/LoginResponse';
 import { RefreshResponse } from '../dtos/RefreshResponse';
 import { RefreshCommand } from 'src/authorization/application/useCases/RefreshCommand';
@@ -184,9 +184,9 @@ export class AuthController {
     return { csrf: token };
   }
 
-  @Put('/password')
-  @Version('1')
-  @Secure()
-  @ApiBasicAuth('main')
-  async changePassword() {}
+  // @Put('/password')
+  // @Version('1')
+  // @Secure()
+  // @ApiBasicAuth('main')
+  // async changePassword() {}
 }

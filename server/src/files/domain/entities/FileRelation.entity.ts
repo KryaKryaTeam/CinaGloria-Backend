@@ -94,4 +94,14 @@ export class FileRelationEntity extends Entity {
       ApiError.throw(FileErrors.INCOMPLETE_RELATION, 'Slot is not defined');
     return this._slot.value;
   }
+
+  toJSON(): Record<string, unknown> {
+    return {
+      id: this.id,
+      file: this.file,
+      slot: this.slot,
+      user: this.user?.id,
+      competition: this.competition?.id,
+    };
+  }
 }

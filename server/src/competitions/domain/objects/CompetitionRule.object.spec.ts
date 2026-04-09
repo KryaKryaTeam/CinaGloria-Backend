@@ -1,6 +1,6 @@
 import { CompetitionRule } from './CompetitionRule.object';
 import { Icons } from 'src/types/Icons';
-import { ApiError, DomainErrors } from 'src/error/ApiError';
+import { ApiError } from 'src/error/ApiError';
 
 describe('CompetitionRule', () => {
   const validName = 'Fair Play';
@@ -56,7 +56,7 @@ describe('CompetitionRule', () => {
         validDescription,
         validIcon,
       );
-      expect(rule.toJSON).toEqual(rule.value);
+      expect(rule.toJSON()).toEqual(rule.value);
     });
 
     it('should not allow external modification of internal state', () => {

@@ -16,36 +16,36 @@ export class CreateCompetitionDto implements ICreateCompetitionRAW {
   @ApiProperty({ required: false, example: 'Summer Cup 2026' })
   @IsOptional()
   @IsString({ message: CompetitionErrors.RULE_NAME_INVALID })
-  name: string | null;
+  name?: string;
 
   @ApiProperty({ required: false, example: 'Description' })
   @IsOptional()
   @IsString({ message: CompetitionErrors.RULE_DESCRIPTION_INVALID })
-  description: string | null;
+  description?: string;
 
   @ApiProperty({ required: false, example: '2026-08-30T12:00:00Z' })
   @IsOptional()
   @IsDate()
   @Type(() => Date)
-  dateOfEnd: Date | null;
+  dateOfEnd: Date | undefined;
 
-  @ApiProperty({ required: false, example: '2026-08-30T12:00:00Z' })
+  @ApiProperty({ required: false, example: '2026-08-10T12:00:00Z' })
   @IsOptional()
   @IsDate()
   @Type(() => Date)
-  dateOfEndRegistration: Date | null;
+  dateOfEndRegistration: Date | undefined;
 
-  @ApiProperty({ required: false, example: '2026-08-30T12:00:00Z' })
+  @ApiProperty({ required: false, example: '2026-08-12T12:00:00Z' })
   @IsOptional()
   @IsDate()
   @Type(() => Date)
-  dateOfStart: Date | null;
+  dateOfStart: Date | undefined;
 
-  @ApiProperty({ required: false, example: '2026-08-30T12:00:00Z' })
+  @ApiProperty({ required: false, example: '2026-08-01T12:00:00Z' })
   @IsOptional()
   @IsDate()
   @Type(() => Date)
-  dateOfStartRegistration: Date | null;
+  dateOfStartRegistration: Date | undefined;
 
   @ApiProperty({
     type: [CompetitionRuleDto],
@@ -60,20 +60,20 @@ export class CreateCompetitionDto implements ICreateCompetitionRAW {
   @InternalFileLink(false)
   @IsOptional()
   @IsString()
-  socialMedia: string | null;
+  socialMedia?: string;
 
   @InternalFileLink(false)
   @IsOptional()
   @IsString()
-  ultraWideBanner: string | null;
+  ultraWideBanner?: string;
 
   @InternalFileLink(false)
   @IsOptional()
   @IsString()
-  avatar: string | null;
+  avatar?: string;
 
   @InternalFileLink(false)
   @IsOptional()
   @IsString()
-  banner: string | null;
+  banner?: string;
 }

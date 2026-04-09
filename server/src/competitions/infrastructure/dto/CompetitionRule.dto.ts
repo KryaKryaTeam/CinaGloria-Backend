@@ -16,5 +16,5 @@ export class CompetitionRuleDto {
   @ApiProperty({ enum: Icons, enumName: 'icons' })
   @IsNotEmpty()
   @IsEnum(Icons)
-  icon: string;
+  icon: Icons;
 }

@@ -9,16 +9,16 @@ import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionStatus } from 'src/types/CompetitionStatus';
 
 export interface ICompetitionChangeFields {
-  name: string | null;
-  description: string | null;
-  avatar: InternalFile<'competition:avatar'> | null;
-  banner: InternalFile<'competition:banner'> | null;
-  ultraWideBanner: InternalFile<'competition:ultraWideBanner'> | null;
-  socialMedia: InternalFile<'competition:socialMedia'> | null;
-  dateOfStart: Date | null;
-  dateOfEnd: Date | null;
-  dateOfStartRegistration: Date | null;
-  dateOfEndRegistration: Date | null;
+  name?: string;
+  description?: string;
+  avatar?: InternalFile<'competition:avatar'>;
+  banner?: InternalFile<'competition:banner'>;
+  ultraWideBanner?: InternalFile<'competition:ultraWideBanner'>;
+  socialMedia?: InternalFile<'competition:socialMedia'>;
+  dateOfStart?: Date;
+  dateOfEnd?: Date;
+  dateOfStartRegistration?: Date;
+  dateOfEndRegistration?: Date;
 }
 
 export class UserAndCompetitionService {

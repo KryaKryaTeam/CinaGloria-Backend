@@ -12,6 +12,12 @@ import { UpdateCompetitionCommand } from './application/commands/UpdateCompetiti
 import { FilesModule } from 'src/files/files.module';
 import { CompetitionController } from './infrastructure/controllers/competition.controller';
 import { DeleteCompetitionCommand } from './application/commands/DeleteCompetition';
+import { CreateRoundCommand } from './application/commands/CreateRound.command';
+import { DeleteRoundCommand } from './application/commands/DeleteRound.command';
+import { PatchRoundCommand } from './application/commands/PatchRound.command';
+import { RoundMapper } from './application/mapper/Round.mapper';
+import { TaskMapper } from './application/mapper/Task.mapper';
+import { RoundController } from './infrastructure/controllers/round.controller';
 
 const providers: Provider[] = [
   {
@@ -54,12 +60,32 @@ const providers: Provider[] = [
     provide: CommandTokens.DeleteCompetitionCommand,
     useClass: DeleteCompetitionCommand,
   },
+  {
+    provide: CommandTokens.CreateRoundCommand,
+    useClass: CreateRoundCommand,
+  },
+  {
+    provide: CommandTokens.DeleteRoundCommand,
+    useClass: DeleteRoundCommand,
+  },
+  {
+    provide: CommandTokens.PatchRoundCommand,
+    useClass: PatchRoundCommand,
+  },
+  {
+    provide: MapperTokens.RoundMapper,
+    useClass: RoundMapper,
+  },
+  {
+    provide: MapperTokens.TaskMapper,
+    useClass: TaskMapper,
+  }
 ];
 
 @Module({
   providers,
   exports: [...providers],
   imports: [forwardRef(() => FilesModule)],
-  controllers: [CompetitionController],
+  controllers: [CompetitionController, RoundController],
 })
 export class CompetitionsModule {}

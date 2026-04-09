@@ -22,6 +22,7 @@ export enum ReposTokens {
   FileRepository = 'FILE_REPOSITORY',
   FileRelationRepository = 'FILE_RELATION_REPOSITORY',
   CompetitionRepository = 'COMPETITION_REPOSITORY',
+  RoundRepository = 'ROUND_REPOSITORY',
 }
 
 export enum CommandTokens {
@@ -55,6 +56,9 @@ export enum CommandTokens {
   SetRoleToAUserCommand = 'SET_ROLE_TO_A_USER_COMMAND',
   DeleteGarbageCommand = 'DELETE_GARBAGE_COMMAND',
   GetUsersByEmailQuery = 'GET_USERS_BY_EMAIL_QUERY',
+  CreateRoundCommand = 'CREATE_ROUND_COMMAND',
+  DeleteRoundCommand = 'DELETE_ROUND_COMMAND',
+  PatchRoundCommand = 'PATCH_ROUND_COMMAND',
 }
 
 export enum ServiceTokens {

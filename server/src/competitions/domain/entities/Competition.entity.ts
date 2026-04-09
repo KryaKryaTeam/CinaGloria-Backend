@@ -498,6 +498,10 @@ export class CompetitionEntity extends Entity {
     return [...this._rules];
   }
 
+  get rounds() {
+    return [...this._rounds];
+  }
+
   get canBeDeleted() {
     return this.canBeChanged;
   }

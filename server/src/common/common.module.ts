@@ -1,5 +1,5 @@
 import { forwardRef, Global, Module, Provider } from '@nestjs/common';
-import { BaseTokens, ReposTokens } from './Tokens';
+import { BaseTokens, CommandTokens, ReposTokens } from './Tokens';
 import { EventDispatcher } from './application/events/EventDispatcher';
 import { EventHandler } from './application/events/EventHandler';
 import { DBContext } from './infrastructure/DBContext';
@@ -22,6 +22,7 @@ import { CompetitionSchema } from 'src/schemas/Competition.schema';
 import { CompetitionRepository } from './infrastructure/repositories/CompetitionRepository';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { JsonInterceptor } from './infrastructure/interceptors/JsonInterceptor';
+import { RoundRepository } from './infrastructure/repositories/RoundRepository';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -44,6 +45,10 @@ const providers: Provider[] = [
   {
     provide: ReposTokens.CompetitionRepository,
     useClass: CompetitionRepository,
+  },
+  {
+    provide: ReposTokens.RoundRepository,
+    useClass: RoundRepository,
   },
 ];
 

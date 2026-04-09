@@ -1,3 +1,4 @@
+import { ApiError, RoundErrors } from 'src/error/ApiError';
 import {
   CompetitionEntity,
   ICreateCompetition,
@@ -6,27 +7,39 @@ import { RoundEntity, type ICreateRound } from '../entities/Round.entity';
 import { ICreateTask, TaskEntity } from '../entities/Task.entity';
 
 export class RoundAndCompetitionService {
-  createRound(data: ICreateRound) {
-    return RoundEntity.create(data);
+  static createRound(round: ICreateRound, competition: CompetitionEntity) {
+    const valid = competition.rounds.every(
+      (a) =>
+        a.startOfRound > round.endOfRound || a.endOfRound < round.startOfRound,
+    );
+
+    if (!valid) ApiError.throw(RoundErrors.SPAN_IS_INVALID);
+
+    const entity = RoundEntity.create(round);
+    competition.addRound(entity);
+    return entity;
   }
 
-  createCompetition(data: ICreateCompetition) {
+  static createCompetition(data: ICreateCompetition) {
     return CompetitionEntity.create(data);
   }
 
-  createTask(data: ICreateTask) {
+  static createTask(data: ICreateTask) {
     return TaskEntity.create(data);
   }
 
-  addTaskToRound(task: TaskEntity, round: RoundEntity) {
+  static addTaskToRound(task: TaskEntity, round: RoundEntity) {
     round.addTask(task);
   }
 
-  addRoundToCompetition(round: RoundEntity, competition: CompetitionEntity) {
+  static addRoundToCompetition(
+    round: RoundEntity,
+    competition: CompetitionEntity,
+  ) {
     competition.addRound(round);
   }
 
-  deleteRoundFromCompetition(
+  static deleteRoundFromCompetition(
     round: RoundEntity,
     competition: CompetitionEntity,
   ) {

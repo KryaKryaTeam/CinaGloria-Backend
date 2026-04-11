@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Mapper } from 'src/common/infrastructure/Mapper';
 import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
 import { CompetitionRule } from 'src/competitions/domain/objects/CompetitionRule.object';
+import { CompetitionSettings } from 'src/competitions/domain/objects/CompetitionSettings';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionSchema } from 'src/schemas/Competition.schema';
 import { RelationSlots } from 'src/types/RelationSlots';
@@ -21,6 +22,7 @@ export class CompetitionMapper extends Mapper<
             'competition:avatar',
           )
         : undefined,
+      settings: CompetitionSettings.fromPlain(schema.settings),
       banner: schema.banner
         ? InternalFile.define<typeof RelationSlots.competition.banner>(
             schema.banner,
@@ -84,6 +86,7 @@ export class CompetitionMapper extends Mapper<
     schema.status = entity.status;
     schema.publishedAt = entity.publishAt;
     schema.rules = entity.rules.map((el) => el.toJSON());
+    schema.settings = entity.settings.toJSON();
 
     return schema;
   }

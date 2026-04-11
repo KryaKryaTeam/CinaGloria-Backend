@@ -4,6 +4,7 @@ import { CompetitionStatus } from 'src/types/CompetitionStatus';
 import { CompetitionRuleDto } from './CompetitionRule.dto';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionRule } from 'src/competitions/domain/objects/CompetitionRule.object';
+import { CompetitionSettings } from 'src/competitions/domain/objects/CompetitionSettings';
 
 export class PlainCompetitionDto implements ICompetitionPlain {
   @ApiProperty({
@@ -119,4 +120,11 @@ export class PlainCompetitionDto implements ICompetitionPlain {
     required: false,
   })
   rules: CompetitionRule[];
+
+  @ApiProperty({
+    example: '{...}',
+    required: false,
+    description: 'A settings of competition',
+  })
+  settings: CompetitionSettings;
 }

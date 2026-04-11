@@ -5,7 +5,6 @@ import {
   createMockEventDispatcher,
   EventDispatcher,
 } from 'src/common/application/events/EventDispatcher';
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { UserCreated } from '../events/UserCreated.event';
 import { RegisterEvent } from 'src/common/domain/EventRegister';
 import { AuthProviderEntity } from './AuthProvider.entity';

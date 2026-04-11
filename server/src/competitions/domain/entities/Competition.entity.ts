@@ -5,6 +5,7 @@ import { CompetitionRule } from '../objects/CompetitionRule.object';
 import { randomUUID } from 'crypto';
 import { RoundEntity } from './Round.entity';
 import { ApiError, CompetitionErrors } from 'src/error/ApiError';
+import { CompetitionSettings } from '../objects/CompetitionSettings';
 
 export interface ICompetitionInList {
   id: string;
@@ -48,6 +49,7 @@ export interface ICompetitionPlain {
   publishAt?: Date;
   status: CompetitionStatus;
   rules: CompetitionRule[];
+  settings: CompetitionSettings;
 }
 
 export interface ICreateCompetition {
@@ -100,6 +102,8 @@ export class CompetitionEntity extends Entity {
   private _rules: CompetitionRule[];
   private _rounds: RoundEntity[];
 
+  private _settings: CompetitionSettings;
+
   private readonly createdAt: Date;
 
   /* some relations from other modules like tasks or judging */
@@ -120,6 +124,7 @@ export class CompetitionEntity extends Entity {
     this._dateOfEndRegistration = plain.dateOfEndRegistration;
     this._status = plain.status;
     this._rules = plain.rules || [];
+    this._settings = plain.settings;
   }
 
   private static validate(plain: ICompetitionPlain | ICreateCompetition) {
@@ -179,6 +184,7 @@ export class CompetitionEntity extends Entity {
       id: randomUUID(),
       rules: plain.rules || [],
       status: CompetitionStatus.DRAFT,
+      settings: CompetitionSettings.createDefaults(),
     });
   }
 
@@ -417,6 +423,14 @@ export class CompetitionEntity extends Entity {
     this.canChangeCheck();
     this._socialMedia = value;
   }
+  set settings(value: CompetitionSettings | null) {
+    this.canChangeCheck();
+    if (!value) {
+      this._settings = CompetitionSettings.createDefaults();
+      return;
+    }
+    this._settings = value;
+  }
 
   public addRule(rule: CompetitionRule | CompetitionRule[]) {
     this.canChangeCheck();
@@ -497,6 +511,9 @@ export class CompetitionEntity extends Entity {
   get rules() {
     return [...this._rules];
   }
+  get settings(): CompetitionSettings {
+    return this._settings;
+  }
 
   get canBeDeleted() {
     return this.canBeChanged;
@@ -550,6 +567,7 @@ export class CompetitionEntity extends Entity {
       publishAt: this._publishAt,
       rules: this.rules,
       status: this._status,
+      settings: this._settings,
     };
   }
 }

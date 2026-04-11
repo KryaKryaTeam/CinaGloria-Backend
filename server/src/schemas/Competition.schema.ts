@@ -67,7 +67,10 @@ export class CompetitionSchema {
   })
   status: CompetitionStatus;
 
-  @Column({ type: 'jsonb' })
+  @Column({
+    type: 'jsonb',
+    default: () => `'{}'`,
+  })
   settings: Record<string, unknown>;
 
   @CreateDateColumn()

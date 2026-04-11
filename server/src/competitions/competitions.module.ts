@@ -12,6 +12,7 @@ import { UpdateCompetitionCommand } from './application/commands/UpdateCompetiti
 import { FilesModule } from 'src/files/files.module';
 import { CompetitionController } from './infrastructure/controllers/competition.controller';
 import { DeleteCompetitionCommand } from './application/commands/DeleteCompetition';
+import { UpdateSettingsOfCompetitionCommand } from './application/commands/UpdateSettingsOfCompetition.command';
 
 const providers: Provider[] = [
   {
@@ -53,6 +54,10 @@ const providers: Provider[] = [
   {
     provide: CommandTokens.DeleteCompetitionCommand,
     useClass: DeleteCompetitionCommand,
+  },
+  {
+    provide: CommandTokens.UpdateSettingsOfCompetitionCommand,
+    useClass: UpdateSettingsOfCompetitionCommand,
   },
 ];
 

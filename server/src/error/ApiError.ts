@@ -312,6 +312,18 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'Page is not found',
     status: 404,
   },
+  COMPETITION_016: {
+    message: 'Settings is incomplete',
+    status: 400,
+  },
+  COMPETITION_017: {
+    message: 'Setting type is invalid',
+    status: 500,
+  },
+  COMPETITION_018: {
+    message: 'Setting is invalid',
+    status: 500,
+  },
   ROUND_001: {
     message: 'Start date of round must be in the future',
     status: 400,
@@ -440,6 +452,9 @@ export const CompetitionErrors = {
   CANNOT_EDIT: 'COMPETITION_013',
   UNDEFINED: 'COMPETITION_014',
   PAGE_NOT_FOUND: 'COMPETITION_015',
+  NOT_ALL_SETTINGS_PROVIDED: 'COMPETITION_16',
+  SETTING_TYPE_NOT_VALID: 'COMPETITION_17',
+  SETTING_IS_INVALID: 'COMPETITION_18',
 } as const;
 
 export const RoundErrors = {

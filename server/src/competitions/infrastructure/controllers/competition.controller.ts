@@ -5,6 +5,7 @@ import {
   Get,
   Inject,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -31,6 +32,8 @@ import { PageQueryDto } from 'src/common/infrastructure/dto/PageQuery.dto';
 import { ApiResponse } from '@nestjs/swagger';
 import { PlainCompetitionDto } from '../dto/PlainCompetition.dto';
 import { PublicInListCompetitionDto } from '../dto/PublicInListCompetition.dto';
+import { CompetitionSettingsDto } from '../dto/CompetitionSettings.dto';
+import { UpdateSettingsOfCompetitionCommand } from 'src/competitions/application/commands/UpdateSettingsOfCompetition.command';
 
 @Controller('/competition')
 export class CompetitionController {
@@ -60,6 +63,9 @@ export class CompetitionController {
 
   @Inject(CommandTokens.UpdateCompetitionCommand)
   private readonly updateCompetitionCommand: UpdateCompetitionCommand;
+
+  @Inject(CommandTokens.UpdateSettingsOfCompetitionCommand)
+  private readonly updateSettingsOfCompetitionCommand: UpdateSettingsOfCompetitionCommand;
 
   @Get('/private/:page')
   @Version('1')
@@ -174,6 +180,22 @@ export class CompetitionController {
     return await this.declineScheduledPublishCommand.execute({
       user,
       competitionId,
+    });
+  }
+
+  @Patch('/settings/:competitionId')
+  @Version('1')
+  @Secure()
+  @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
+  async updateSettingsOfCompetition(
+    @UserId() user: UserEntity,
+    @Param('competitionId') competitionId: string,
+    @Body() settings: CompetitionSettingsDto,
+  ) {
+    return await this.updateSettingsOfCompetitionCommand.execute({
+      competitionId,
+      user,
+      settings: settings.settings,
     });
   }
 }

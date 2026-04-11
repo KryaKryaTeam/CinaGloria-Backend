@@ -66,7 +66,7 @@ export class FileController {
             stream,
             relationString,
           })
-          .then(({ file }) => resolve(file.toJSON))
+          .then(({ file }) => resolve(file.toJSON()))
           .catch(reject);
       });
 

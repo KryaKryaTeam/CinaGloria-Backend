@@ -56,6 +56,7 @@ export enum CommandTokens {
   DeleteGarbageCommand = 'DELETE_GARBAGE_COMMAND',
   GetUsersByEmailQuery = 'GET_USERS_BY_EMAIL_QUERY',
   MarkAllNotificationsReadCommand = 'MARK_ALL_NOTIFICATIONS_READ_COMMAND',
+  UpdateSettingsOfCompetitionCommand = 'UPDATE_SETTINGS_OF_COMPETTION_COMMAND',
 }
 
 export enum ServiceTokens {

@@ -7,6 +7,7 @@ import { RoleEnum } from 'src/types/RoleEnum';
 import { ApiError, CompetitionErrors } from 'src/error/ApiError';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionStatus } from 'src/types/CompetitionStatus';
+import { CompetitionSettings } from '../objects/CompetitionSettings';
 
 export interface ICompetitionChangeFields {
   name?: string;
@@ -92,5 +93,15 @@ export class UserAndCompetitionService {
   static userHasAccessToSeePrivateCompetitions(user: UserEntity) {
     UserAndCompetitionService.userCanEditCompetitions(user);
     return true;
+  }
+
+  static chanegeSettingsOfCompetition(
+    competition: CompetitionEntity,
+    user: UserEntity,
+    settings: CompetitionSettings,
+  ) {
+    this.userCanEditCompetitions(user);
+
+    competition.settings = settings;
   }
 }

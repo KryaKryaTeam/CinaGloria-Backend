@@ -22,7 +22,9 @@ export class CompetitionMapper extends Mapper<
             'competition:avatar',
           )
         : undefined,
-      settings: CompetitionSettings.fromPlain(schema.settings),
+      settings: schema.settings[0]
+        ? CompetitionSettings.fromPlain(schema.settings)
+        : CompetitionSettings.createDefaults(),
       banner: schema.banner
         ? InternalFile.define<typeof RelationSlots.competition.banner>(
             schema.banner,

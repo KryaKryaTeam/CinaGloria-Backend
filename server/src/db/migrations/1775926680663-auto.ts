@@ -5,6 +5,9 @@ export class Auto1775926680663 implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
+      `ALTER TABLE "competition" ADD "settings" jsonb NOT NULL DEFAULT '{}'`,
+    );
+    await queryRunner.query(
       `ALTER TABLE "competition" ALTER COLUMN "settings" SET DEFAULT '{}'`,
     );
 

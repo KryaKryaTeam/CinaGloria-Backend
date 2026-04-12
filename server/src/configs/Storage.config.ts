@@ -5,6 +5,8 @@ import path from 'path';
 export default registerAs('storage', () => ({
   controller: process.env.STORAGE_CONTROLLER || 'ls',
   limit: Number(process.env.STORAGE_LIMIT) || 64 * 1024 * 1024,
+  concurrency: Number(process.env.STORAGE_CONCURRENCY) || 1,
+  cache: process.env.STORAGE_CACHE == 'TRUE' || false,
   s3: {
     id: process.env.S3_ID,
     accessKey: process.env.S3_ACCESS_KEY,

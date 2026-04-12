@@ -39,6 +39,7 @@ export class LoadFileService implements ILoadFileService, OnModuleInit {
   }
 
   async loadFile(file: Readable, rel: RelationString): Promise<FileEntity> {
+    this.logger.log(`File is being uploaded for relation: ${rel.value}`);
     return await this.controller.load(file, rel);
   }
   async deleteFile(file: FileEntity): Promise<void> {

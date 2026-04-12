@@ -12,9 +12,12 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { LoadController } from '../services/LoadFileService';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { FileTypeResult } from 'file-type';
+import { Logger } from '@nestjs/common';
 
 @LoadController('s3')
 export class S3LoadController extends BaseLoadController {
+  protected logger = new Logger(S3LoadController.name);
+
   private get S3Client() {
     return new S3Client({
       credentials: {
@@ -31,6 +34,8 @@ export class S3LoadController extends BaseLoadController {
     const mm = await mimeType;
     const file = FileEntity.create(null, new MimeType(mm?.mime));
 
+    this.logger.log(`[S3] Starting upload to bucket. Mime: ${mm?.mime}`);
+
     const upload = new Upload({
       params: {
         Bucket: this.configService.getOrThrow('storage.s3.bucket'),
@@ -43,7 +48,21 @@ export class S3LoadController extends BaseLoadController {
       partSize: 5 * 1024 * 1024,
     });
 
-    await upload.done();
+    upload.on('httpUploadProgress', (progress) => {
+      this.logger.debug(
+        `[S3 PROGRESS] Loaded: ${progress.loaded} bytes for ${file.url}`,
+      );
+    });
+
+    try {
+      await upload.done();
+      this.logger.log(`[S3 SUCCESS] Uploaded to S3: ${file.url}`);
+    } catch (e) {
+      this.logger.error(
+        `[S3 ERROR] Failed to upload ${file.url}: ${(e as Error).message}`,
+      );
+      throw e;
+    }
 
     return file;
   }

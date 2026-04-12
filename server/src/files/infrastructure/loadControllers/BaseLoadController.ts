@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { FileEntity } from 'src/files/domain/entities/File.entity';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
@@ -12,10 +12,19 @@ export abstract class BaseLoadController {
   @Inject()
   protected readonly configService: ConfigService;
 
+  protected readonly logger = new Logger('BaseLoadController');
+
   async load(stream: Readable, relationString: RelationString) {
     const config = relationString.config;
 
+    this.logger.debug(
+      `[LOAD] Applying config for ${relationString.value}. Processing: ${relationString.config.shouldBeProcessed}`,
+    );
+
     let size = 0;
+
+    sharp.concurrency(this.configService.getOrThrow('storage.concurrency'));
+    sharp.cache(this.configService.getOrThrow('storage.cache'));
 
     const source = config.shouldBeProcessed
       ? stream.pipe(
@@ -31,22 +40,34 @@ export abstract class BaseLoadController {
     const pass = new PassThrough();
     const pass2 = new PassThrough();
 
+    let chunkCount = 0;
+
     const validateSize = new Promise((resolve, reject) => {
       source.on('data', (chunk: { length: number }) => {
+        chunkCount++;
         size += chunk.length;
         if (size > config.maxSize) {
           stream.destroy();
           reject(ApiError.returnNew(FileErrors.FILE_TOO_LARGE));
         }
+        if (chunkCount % 10 == 0) {
+          this.logger.log(
+            `[LOAD] Chunks loaded: ${chunkCount}, on total size: ${size}/${config.maxSize}`,
+          );
+        }
       });
       source.on('end', () => resolve(size));
-      source.on('error', (err) => reject(err));
+      source.on('error', (err) => {
+        this.logger.error(`[STREAM ERROR] ${err.message}`);
+        reject(err);
+      });
     });
 
     source.pipe(pass);
     source.pipe(pass2);
 
     const validateMimeType = fileTypeFromStream(pass).then((val) => {
+      this.logger.log(`[LOAD] Mime type detected: ${val?.mime}`);
       if (
         !config.shouldBeProcessed &&
         (!val ||

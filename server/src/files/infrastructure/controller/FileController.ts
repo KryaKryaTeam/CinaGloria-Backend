@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Inject,
+  Logger,
   Param,
   Post,
   Query,
@@ -28,6 +29,8 @@ export class FileController {
 
   @Inject(CommandTokens.GetLinkQuery)
   private readonly getLinkQuery: GetLinkQuery;
+
+  private readonly logger: Logger = new Logger(FileController.name);
 
   @Post('/upload/:relationString')
   @Version('1')
@@ -58,21 +61,33 @@ export class FileController {
     const pr = new Promise((resolve, reject) => {
       let fileProcessed = false;
 
-      bb.on('file', (name, stream) => {
+      bb.on('file', (name, stream, info) => {
         fileProcessed = true;
+        this.logger.log(
+          `[BUSBOY] Started receiving file: ${info.filename} (${info.mimeType})`,
+        );
 
         this.uploadFileCommand
           .execute({
             stream,
             relationString,
           })
-          .then(({ file }) => resolve(file.toJSON()))
-          .catch(reject);
+          .then(({ file }) => {
+            this.logger.log(`[SUCCESS] File processed: ${info.filename}`);
+            resolve(file.toJSON());
+          })
+          .catch((err) => {
+            this.logger.error(
+              `[ERROR] Command execution failed: ${(err as Error).message}`,
+            );
+            reject(err as Error);
+          });
       });
 
       bb.on('error', (err: Error) => reject(err));
 
       bb.on('finish', () => {
+        this.logger.log('[BUSBOY] Finished parsing multipart form');
         if (!fileProcessed) {
           reject(ApiError.returnNew(FileErrors.FILE_UNPROCESSED));
         }

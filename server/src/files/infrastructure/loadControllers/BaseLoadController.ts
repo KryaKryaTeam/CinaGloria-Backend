@@ -32,7 +32,9 @@ export abstract class BaseLoadController {
             .toFormat('webp')
             .webp({ quality: 80 })
             .resize(config.dimensions[0], config.dimensions[1], {
-              fit: 'cover',
+              fit: 'contain',
+              withoutEnlargement: true,
+              background: { r: 32, g: 32, b: 32, alpha: 1 },
             }),
         )
       : stream;

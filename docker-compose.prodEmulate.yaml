@@ -1,0 +1,44 @@
+# @format
+
+services:
+  db:
+    image: "postgres:${DB_VERSION}"
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - CinaGloriaDB:/var/lib/postgresql/${DB_VERSION}/docker
+    ports:
+      - "${DB_PORT}:5432"
+    networks:
+      - db
+  app:
+    container_name: app-prod-emulated
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+          cpus: "0.5"
+        reservations:
+          memory: 50M
+    build:
+      context: ./server
+      dockerfile: Dockerfile      
+    depends_on:
+      - db
+    volumes:
+      - ./server/uploads:/app/uploads:rw
+    env_file:
+      - ./.env
+    command: sh -c "node ./dist/src/main.js"
+    networks:
+      - db
+    ports:
+      - ${PORT}:${PORT}
+      - ${WEBSOCKET_PORT}:${WEBSOCKET_PORT}
+volumes:
+  CinaGloriaDB:
+networks:
+  db:

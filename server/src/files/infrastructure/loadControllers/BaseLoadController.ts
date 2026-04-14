@@ -3,10 +3,15 @@ import { ConfigService } from '@nestjs/config';
 import { FileEntity } from 'src/files/domain/entities/File.entity';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { PassThrough, Readable } from 'stream';
-import { fileTypeFromStream, FileTypeResult } from 'file-type';
+import { fileTypeFromBuffer, FileTypeResult } from 'file-type';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
 import sharp from 'sharp';
 import { ApiError, FileErrors } from 'src/error/ApiError';
+import path from 'path';
+import os from 'os';
+import { randomUUID } from 'crypto';
+import fs from 'fs';
+import { pipeline } from 'stream/promises';
 
 export abstract class BaseLoadController {
   @Inject()
@@ -17,83 +22,87 @@ export abstract class BaseLoadController {
   async load(stream: Readable, relationString: RelationString) {
     const config = relationString.config;
 
-    this.logger.debug(
-      `[LOAD] Applying config for ${relationString.value}. Processing: ${relationString.config.shouldBeProcessed}`,
-    );
+    // 1. Determine Output MIME & Format
+    // If processing, we know the format (e.g., webp). If not, we peek at the input.
+    let mimeType: FileTypeResult;
+    const targetFormat = config.shouldBeProcessed ? 'webp' : null;
 
+    if (config.shouldBeProcessed) {
+      mimeType = { mime: 'image/webp', ext: 'webp' };
+    } else {
+      // Peek at the first 4100 bytes of the INPUT stream
+      const firstChunk = await new Promise<Buffer>((resolve) => {
+        stream.once('readable', () => {
+          const chunk = (stream.read(4100) || stream.read()) as Buffer;
+          resolve(chunk);
+        });
+      });
+      if (firstChunk) stream.unshift(firstChunk); // Put it back for Sharp/PassThrough
+
+      // We import fileTypeFromBuffer for this
+      const detected = await fileTypeFromBuffer(firstChunk);
+      if (
+        !detected ||
+        !config.allowedMimeTypes.includes(detected.mime as any)
+      ) {
+        throw ApiError.returnNew(FileErrors.MIME_TYPE_IS_UNDEFINED);
+      }
+      mimeType = detected;
+    }
+
+    // 2. Setup Transformer
+    const transformer = config.shouldBeProcessed
+      ? sharp()
+          .toFormat(targetFormat as any)
+          .webp({ quality: 80 })
+          .resize({
+            width: config.dimensions[0],
+            height: config.dimensions[1],
+            fit: 'contain',
+            background: { r: 32, g: 32, b: 32, alpha: 1 },
+          })
+      : new PassThrough();
+
+    // 3. Prepare Temp File & Pipeline
+    const tempDir = path.join(os.tmpdir(), 'cinaGloria');
+    if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir, { recursive: true });
+
+    const tempFilePath = path.join(tempDir, `${randomUUID()}.temp`);
+    const finalPass = new PassThrough();
     let size = 0;
 
-    sharp.concurrency(this.configService.getOrThrow('storage.concurrency'));
-    sharp.cache(this.configService.getOrThrow('storage.cache'));
-
-    const source = config.shouldBeProcessed
-      ? stream.pipe(
-          sharp()
-            .toFormat('webp')
-            .webp({ quality: 80 })
-            .resize(config.dimensions[0], config.dimensions[1], {
-              fit: 'contain',
-              withoutEnlargement: true,
-              background: { r: 32, g: 32, b: 32, alpha: 1 },
-            }),
-        )
-      : stream;
-
-    const pass = new PassThrough();
-    const pass2 = new PassThrough();
-
-    let chunkCount = 0;
-
-    const validateSize = new Promise((resolve, reject) => {
-      source.on('data', (chunk: { length: number }) => {
-        chunkCount++;
-        size += chunk.length;
-        if (size > config.maxSize) {
-          stream.destroy();
-          reject(ApiError.returnNew(FileErrors.FILE_TOO_LARGE));
-        }
-        if (chunkCount % 10 == 0) {
-          this.logger.log(
-            `[LOAD] Chunks loaded: ${chunkCount}, on total size: ${size}/${config.maxSize}`,
-          );
-        }
-      });
-      source.on('end', () => resolve(size));
-      source.on('error', (err) => {
-        this.logger.error(`[STREAM ERROR] ${err.message}`);
-        reject(err);
-      });
-    });
-
-    source.pipe(pass);
-    source.pipe(pass2);
-
-    const validateMimeType = fileTypeFromStream(pass).then((val) => {
-      this.logger.log(`[LOAD] Mime type detected: ${val?.mime}`);
-      if (
-        !config.shouldBeProcessed &&
-        (!val ||
-          !config.allowedMimeTypes.includes(val.mime as `${string}/${string}`))
-      ) {
-        ApiError.throw(FileErrors.MIME_TYPE_IS_UNDEFINED);
+    finalPass.on('data', (chunk) => {
+      size += (chunk as { length: number }).length;
+      if (size > config.maxSize) {
+        stream.destroy();
+        transformer.destroy();
+        throw ApiError.returnNew(FileErrors.FILE_TOO_LARGE);
       }
-
-      return config.shouldBeProcessed
-        ? ({ mime: 'image/webp', ext: 'webp' } as FileTypeResult)
-        : val;
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_1, _2, file_] = await Promise.all([
-      validateMimeType,
-      validateSize,
-      this._load(pass2, validateMimeType),
-    ]);
+    // Execute the pipeline: Input -> Transformer -> Validation -> Disk
+    // We use stream.pipe manually here because we need to handle the flow
+    stream.pipe(transformer).pipe(finalPass);
 
-    file_.size = size;
-    file_.slot = relationString;
+    await pipeline(finalPass, fs.createWriteStream(tempFilePath));
 
-    return file_;
+    // 4. Upload from Disk to S3
+    try {
+      const file_ = await this._load(
+        fs.createReadStream(tempFilePath),
+        Promise.resolve(mimeType),
+      );
+
+      file_.size = size;
+      file_.slot = relationString;
+      return file_;
+    } finally {
+      // 5. Cleanup: Always delete the temp file
+      fs.unlink(tempFilePath, (err) => {
+        if (err)
+          this.logger.error(`Failed to delete temp file: ${tempFilePath}`);
+      });
+    }
   }
   protected abstract _load(
     stream: Readable,

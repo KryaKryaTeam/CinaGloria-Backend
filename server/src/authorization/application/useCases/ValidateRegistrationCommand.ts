@@ -37,11 +37,11 @@ export class ValidateRegistrationCommand extends Command<
     }>(`registration:${data.requestId}`);
 
     if (!userAndCode) ApiError.throw(UserErrors.REQUEST_ID_INCORRECT);
-    if (userAndCode!.code != data.code)
+    if (userAndCode.code != data.code)
       ApiError.throw(UserErrors.VALIDATION_CODE_INCORRECT);
 
     console.log(userAndCode);
-    const user = UserEntity.load(userAndCode!.user);
+    const user = UserEntity.load(userAndCode.user);
 
     user.pullEvents(this.eventDispatcher);
 

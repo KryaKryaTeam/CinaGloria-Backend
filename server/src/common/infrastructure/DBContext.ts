@@ -1,42 +1,52 @@
 import { Injectable } from '@nestjs/common';
 import { IDBContext } from '../application/IDBcontext';
-import { DataSource, EntityManager } from 'typeorm';
+import { DataSource, EntityManager, QueryRunner } from 'typeorm';
 import { AsyncLocalStorage } from 'async_hooks';
 
 export const dbStorage = new AsyncLocalStorage<EntityManager>();
 
 @Injectable()
 export class DBContext implements IDBContext {
+  private static readonly qrStorage = new AsyncLocalStorage<QueryRunner>();
   private _manager: EntityManager;
 
   constructor(private readonly datasource: DataSource) {}
   async commitTransaction() {
-    if (this.manager) {
-      await this.manager.queryRunner!.commitTransaction();
-
-      await this.manager.release();
+    const qr = DBContext.qrStorage.getStore();
+    if (qr) {
+      try {
+        if (qr.isTransactionActive) {
+          await qr.commitTransaction();
+        }
+      } finally {
+        if (!qr.isReleased) await qr.release();
+      }
     }
   }
   async rollbackTransaction() {
-    if (this.manager) {
-      await this.manager.queryRunner!.rollbackTransaction();
-
-      await this.manager.release();
+    const qr = DBContext.qrStorage.getStore();
+    if (qr) {
+      try {
+        if (qr.isTransactionActive) {
+          await qr.rollbackTransaction();
+        }
+      } finally {
+        if (!qr.isReleased) await qr.release();
+      }
     }
   }
   async startTransaction() {
-    this._manager = this.datasource.createQueryRunner().manager;
-
-    await this._manager.queryRunner!.startTransaction();
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    DBContext.qrStorage.enterWith(queryRunner);
   }
 
   get manager() {
-    const storeManager = dbStorage.getStore();
-    if (storeManager) return storeManager;
+    const storeManager = DBContext.qrStorage.getStore();
+    if (storeManager) return storeManager.manager;
 
-    if (this._manager && this._manager.queryRunner?.isReleased)
-      return this.datasource.manager;
-    return this._manager ?? this.datasource.manager;
+    return this.datasource.manager;
   }
 
   async isolate(fun: () => Promise<void> | void): Promise<void> {

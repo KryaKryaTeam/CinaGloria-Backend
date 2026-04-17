@@ -25,6 +25,8 @@ export class RunEndEventOnAllEndedRoundsCommand extends Command<void, void> {
         if (!competition) return;
 
         competition.showNextRound();
+
+        await this.competitionRepo.save(competition);
       }),
     );
   }

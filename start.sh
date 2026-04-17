@@ -3,12 +3,16 @@
 # Кольори для зручності
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
+RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}=== NestJS Docker Manager ===${NC}"
 echo "1) Development (Watch mode, Hot-reload)"
 echo "2) Production Emulate (Build, 200MB Limit, No Watch)"
-echo -ne "Choose an option [1-2]: "
+echo "3) Clear docker cache and volumes"
+echo "4) Generate new migration"
+echo "5) Create new migration"
+echo -ne "Choose an option [1-5]: "
 read -r opt
 
 case $opt in
@@ -29,6 +33,28 @@ case $opt in
     
     # Запускаємо в фоні, щоб відкрити stats
     docker compose -f $PROD_CONF up --build
+    ;;
+  3)
+    echo -e "${RED}🕯️ Clearing docker...${NC}"
+    docker system prune -a -f
+    docker volume prune -f
+    [ -d "./server/uploads" ] && rm -rf ./server/uploads && echo "Uploads cleared."
+    echo -e "${GREEN}Done!${NC}"
+  ;;
+  4)
+    echo -e "${GREEN}✏️ Generate new migration...${NC}"
+    docker compose down
+    docker compose up --build -d
+    cd server
+    npm run migration:generate
+    docker compose down
+    echo -e "${GREEN}✅ Migration generated!${NC}"
+    ;;
+  5)
+    echo -e "${GREEN}✏️ Create new migration...${NC}"
+    cd server
+    npm run migration:create
+    echo -e "${GREEN}✅ Migration created!${NC}"
     ;;
   *)
     echo "Invalid option. Exiting."

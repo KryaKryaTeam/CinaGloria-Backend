@@ -13,6 +13,10 @@ import { FilesModule } from 'src/files/files.module';
 import { CompetitionController } from './infrastructure/controllers/competition.controller';
 import { DeleteCompetitionCommand } from './application/commands/DeleteCompetition';
 import { UpdateSettingsOfCompetitionCommand } from './application/commands/UpdateSettingsOfCompetition.command';
+import { RunEndEventOnAllEndedRoundsCommand } from './application/commands/RunEndEventOnAllEndedRounds.command';
+import { RoundsStartAndEndSearchCronService } from './infrastructure/cronJobs/RoundsStartAndEndSearch.cron';
+import { RoundMapper } from './application/mapper/Round.mapper';
+import { TaskMapper } from './application/mapper/Task.mapper';
 
 const providers: Provider[] = [
   {
@@ -59,6 +63,19 @@ const providers: Provider[] = [
     provide: CommandTokens.UpdateSettingsOfCompetitionCommand,
     useClass: UpdateSettingsOfCompetitionCommand,
   },
+  {
+    provide: CommandTokens.RunEndEventOnAllEndedRoundsCommand,
+    useClass: RunEndEventOnAllEndedRoundsCommand,
+  },
+  {
+    provide: MapperTokens.RoundMapper,
+    useClass: RoundMapper,
+  },
+  {
+    provide: MapperTokens.TaskMapper,
+    useClass: TaskMapper,
+  },
+  RoundsStartAndEndSearchCronService,
 ];
 
 @Module({

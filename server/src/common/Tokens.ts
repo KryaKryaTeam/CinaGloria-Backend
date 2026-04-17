@@ -22,6 +22,7 @@ export enum ReposTokens {
   FileRepository = 'FILE_REPOSITORY',
   FileRelationRepository = 'FILE_RELATION_REPOSITORY',
   CompetitionRepository = 'COMPETITION_REPOSITORY',
+  RoundRepository = 'ROUND_REPOSITORY',
 }
 
 export enum CommandTokens {
@@ -57,6 +58,7 @@ export enum CommandTokens {
   GetUsersByEmailQuery = 'GET_USERS_BY_EMAIL_QUERY',
   MarkAllNotificationsReadCommand = 'MARK_ALL_NOTIFICATIONS_READ_COMMAND',
   UpdateSettingsOfCompetitionCommand = 'UPDATE_SETTINGS_OF_COMPETTION_COMMAND',
+  RunEndEventOnAllEndedRoundsCommand = 'RUN_END_EVENT_ON_ALL_ENDED_ROUNDS_COMMAND',
 }
 
 export enum ServiceTokens {

@@ -76,6 +76,14 @@ export class RoundEntity extends Entity {
     return possibleStatuses.includes(status);
   }
 
+  public hide() {
+    this._hidden = true;
+  }
+
+  public show() {
+    this._hidden = false;
+  }
+
   set name(name: string) {
     if (name.trim().length == 0 || name.trim().length > 255)
       ApiError.throw(RoundErrors.CONTENT_LENGTH_RESTRICTION);
@@ -112,10 +120,6 @@ export class RoundEntity extends Entity {
     if (!this.canChangeStatusTo(status))
       ApiError.throw(RoundErrors.STATUS_FLOW_BREAKS);
     this._status = status;
-  }
-
-  set hidden(hidden: boolean) {
-    this._hidden = hidden;
   }
 
   get name() {

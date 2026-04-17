@@ -389,6 +389,10 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: "Invalid date span. Rounds mustn't be held at the same time.",
     status: 400,
   },
+  ROUND_010: {
+    message: 'This round is hidden',
+    status: 400,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -475,6 +479,7 @@ export const RoundErrors = {
   CONTENT_LENGTH_RESTRICTION: 'ROUND_007',
   ROUND_NOT_FOUND: 'ROUND_008',
   SPAN_IS_INVALID: 'ROUND_009',
+  ROUND_IS_HIDDEN: 'ROUND_010',
 } as const;
 
 export const TaskErrors = {

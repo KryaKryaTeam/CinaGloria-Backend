@@ -57,6 +57,10 @@ export enum CommandTokens {
   DeleteGarbageCommand = 'DELETE_GARBAGE_COMMAND',
   GetUsersByEmailQuery = 'GET_USERS_BY_EMAIL_QUERY',
   MarkAllNotificationsReadCommand = 'MARK_ALL_NOTIFICATIONS_READ_COMMAND',
+  CreateRoundCommand = 'CREATE_ROUND_COMMAND',
+  DeleteRoundCommand = 'DELETE_ROUND_COMMAND',
+  PatchRoundCommand = 'PATCH_ROUND_COMMAND',
+  ReadRoundCommand = 'READ_ROUND_COMMAND',
 }
 
 export enum ServiceTokens {

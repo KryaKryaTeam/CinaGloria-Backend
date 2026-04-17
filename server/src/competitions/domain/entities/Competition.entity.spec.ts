@@ -64,7 +64,7 @@ describe('CompetitionEntity', () => {
       } as unknown as ICompetitionPlain;
 
       const entity = CompetitionEntity.load(plain);
-      expect(entity.toJSON).toEqual(plain);
+      expect(entity.toJSON()).toEqual(plain);
     });
 
     it('should prevent loading a non-DRAFT entity if required fields are missing', () => {

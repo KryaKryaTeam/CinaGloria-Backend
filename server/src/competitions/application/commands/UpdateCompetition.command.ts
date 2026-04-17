@@ -6,9 +6,8 @@ import { ICreateCompetitionRAW } from 'src/competitions/domain/entities/Competit
 import type { ICompetitionRepository } from '../bounds/CompetitionRepository';
 import { UserAndCompetitionService } from 'src/competitions/domain/services/UserAndCompetitionService';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
-import { FileEntity } from 'src/files/domain/entities/File.entity';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
-import { RelationSlots } from 'src/types/RelationSlots';
+import { AppSlotCode } from 'src/types/RelationSlots';
 import { LinkerApplicationService } from 'src/files/application/services/Linker.appService';
 import type { IFileRepository } from 'src/files/application/bounds/IFileRepository';
 import { ApiError, CompetitionErrors } from 'src/error/ApiError';
@@ -18,6 +17,15 @@ interface UpdateCompetitionCommandInput {
   user: UserEntity;
   competitionData: ICreateCompetitionRAW;
 }
+
+const COMPETITION_FILE_SLOTS = {
+  avatar: 'competition:avatar',
+  banner: 'competition:banner',
+  socialMedia: 'competition:socialMedia',
+  ultraWideBanner: 'competition:ultraWideBanner',
+} as const;
+
+type FileKeys = keyof typeof COMPETITION_FILE_SLOTS;
 
 export class UpdateCompetitionCommand extends Command<
   UpdateCompetitionCommandInput,
@@ -36,73 +44,53 @@ export class UpdateCompetitionCommand extends Command<
     const competition = await this.competitionRepository.findById(
       data.competitionId,
     );
-
     if (!competition) ApiError.throw(CompetitionErrors.UNDEFINED);
 
-    const slots = [
-      RelationString.define('competition:avatar'),
-      RelationString.define('competition:banner'),
-      RelationString.define('competition:socialMedia'),
-      RelationString.define('competition:ulraWideBanner'),
-    ];
+    const fileEntries = await Promise.all(
+      Object.entries(COMPETITION_FILE_SLOTS).map(async ([key, slotName]) => {
+        const url = data.competitionData[key as FileKeys];
+        if (!url) return [key, undefined];
 
-    const files = [
-      data.competitionData.avatar,
-      data.competitionData.banner,
-      data.competitionData.socialMedia,
-      data.competitionData.ultraWideBanner,
-    ].map(async (el, i) => {
-      if (el) {
-        const file = await this.fileRepository.findByUrl(el);
-        if (!file) return undefined;
+        const file = await this.fileRepository.findByUrl(url);
+        if (!file) return [key, undefined];
+
         await this.linkerService.linkFileToCompetitionSlot(
           file,
           competition,
-          slots[i],
+          RelationString.define(slotName),
         );
 
-        return file;
-      } else return undefined;
-    });
+        const internalFile = InternalFile.define(
+          file.url,
+          slotName as AppSlotCode,
+          slotName as AppSlotCode,
+        );
 
-    const files_promised: (FileEntity | undefined)[] = await Promise.all(files);
+        return [slotName, internalFile];
+      }),
+    );
 
-    const files_mapped = {
-      avatar: files_promised[0]
-        ? InternalFile.define<typeof RelationSlots.competition.avatar>(
-            files_promised[0].url,
-            'competition:avatar',
-            'competition:avatar',
-          )
-        : undefined,
-      banner: files_promised[1]
-        ? InternalFile.define<typeof RelationSlots.competition.banner>(
-            files_promised[1].url,
-            'competition:banner',
-            'competition:banner',
-          )
-        : undefined,
-      ultraWideBanner: files_promised[3]
-        ? InternalFile.define<typeof RelationSlots.competition.ultraWideBanner>(
-            files_promised[3].url,
-            'competition:ultraWideBanner',
-            'competition:ultraWideBanner',
-          )
-        : undefined,
-      socialMedia: files_promised[2]
-        ? InternalFile.define<typeof RelationSlots.competition.socialMedia>(
-            files_promised[2].url,
-            'competition:socialMedia',
-            'competition:socialMedia',
-          )
-        : undefined,
-    };
+    const mappedFiles = Object.fromEntries(fileEntries) as Record<
+      AppSlotCode,
+      InternalFile<AppSlotCode>
+    >;
 
     UserAndCompetitionService.editCompetition(
       competition,
       {
         ...data.competitionData,
-        ...files_mapped,
+        ultraWideBanner: mappedFiles['competition:ultraWideBanner'] as
+          | InternalFile<'competition:ultraWideBanner'>
+          | undefined,
+        avatar: mappedFiles['competition:avatar'] as
+          | InternalFile<'competition:avatar'>
+          | undefined,
+        banner: mappedFiles['competition:banner'] as
+          | InternalFile<'competition:banner'>
+          | undefined,
+        socialMedia: mappedFiles['competition:socialMedia'] as
+          | InternalFile<'competition:socialMedia'>
+          | undefined,
       },
       data.user,
     );

@@ -8,7 +8,6 @@ import {
   Patch,
   Post,
   Put,
-  Query,
   Version,
 } from '@nestjs/common';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
@@ -73,7 +72,7 @@ export class CompetitionController {
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   @ApiResponse({ status: 200, type: [PlainCompetitionDto] })
   async getPrivateCompetition(
-    @Query() pageDto: PageQueryDto,
+    @Param() pageDto: PageQueryDto,
     @UserId() user: UserEntity,
   ) {
     return (

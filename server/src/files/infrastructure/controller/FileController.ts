@@ -104,7 +104,7 @@ export class FileController {
     status: 200,
     example: 'http://localhost:4000/static/meow.webp',
   })
-  async getLink(@Query('fileURL') fileUrl: string) {
+  async getLink(@Param('fileURL') fileUrl: string) {
     return await this.getLinkQuery.execute({ fileUrl });
   }
 }

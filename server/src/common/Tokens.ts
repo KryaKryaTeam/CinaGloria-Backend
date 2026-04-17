@@ -59,6 +59,7 @@ export enum CommandTokens {
   CreateRoundCommand = 'CREATE_ROUND_COMMAND',
   DeleteRoundCommand = 'DELETE_ROUND_COMMAND',
   PatchRoundCommand = 'PATCH_ROUND_COMMAND',
+  ReadRoundCommand = 'READ_ROUND_COMMAND',
 }
 
 export enum ServiceTokens {

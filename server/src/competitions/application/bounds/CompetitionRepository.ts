@@ -5,4 +5,9 @@ export interface ICompetitionRepository {
   findById(id: string): Promise<CompetitionEntity | null>;
   deleteById(id: string): Promise<void>;
   getPage(pageNum: number): Promise<CompetitionEntity[]>;
+  findAllScheduledNotProcessed(): Promise<CompetitionEntity[]>;
+  findAllRegistrationStartedNotProcessed(): Promise<CompetitionEntity[]>;
+  findAllRegistrationEndedNotProcessed(): Promise<CompetitionEntity[]>;
+  findAllStartedNotProcessed(): Promise<CompetitionEntity[]>;
+  findAllEndedNotProcessed(): Promise<CompetitionEntity[]>;
 }

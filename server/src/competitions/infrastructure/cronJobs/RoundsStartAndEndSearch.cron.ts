@@ -1,6 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { Cron, SchedulerRegistry } from '@nestjs/schedule';
+import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CommandTokens } from 'src/common/Tokens';
+import { HandleCompetitionScheduledEventsCommand } from 'src/competitions/application/commands/HandleCompetitionScheduledEvents.command';
 import { RunEndEventOnAllEndedRoundsCommand } from 'src/competitions/application/commands/RunEndEventOnAllEndedRounds.command';
 import { RunStartEventOnAllStartedRoundsCommand } from 'src/competitions/application/commands/RunStartEventOnAllStartedRounds.command';
 
@@ -16,27 +17,24 @@ export class RoundsStartAndEndSearchCronService {
   @Inject(CommandTokens.RunStartedEventOnAllStartedRoundsCommand)
   private readonly runStartedEventOnAllStartedRoundsCommand: RunStartEventOnAllStartedRoundsCommand;
 
-  @Cron('0 * * * * *')
-  async handleCronEnd() {
-    const date = Date.now();
-    this.logger.log('Start handling ended rounds');
+  @Inject(CommandTokens.HandleCompetitionScheduledEventsCommand as string)
+  private readonly handleCompetitionScheduledEventsCommand: HandleCompetitionScheduledEventsCommand;
 
-    await this.runEndEventOnAllEndedRoundsCommand.execute();
+  @Cron(CronExpression.EVERY_MINUTE, { waitForCompletion: true })
+  async handleRoundsLifecycle() {
+    this.logger.log('🚀 Starting rounds lifecycle sync...');
+    const startTime = Date.now();
 
-    this.logger.log(
-      `All ended rounds were handled, time: ${Date.now() - date}ms`,
-    );
-  }
+    try {
+      await this.runEndEventOnAllEndedRoundsCommand.execute();
+      await this.runStartedEventOnAllStartedRoundsCommand.execute();
+      await this.handleCompetitionScheduledEventsCommand.execute();
 
-  @Cron('0 * * * * *')
-  async handleCronStart() {
-    const date = Date.now();
-    this.logger.log('Start handling started rounds');
-
-    await this.runStartedEventOnAllStartedRoundsCommand.execute();
-
-    this.logger.log(
-      `All started round are handled, time: ${Date.now() - date}ms`,
-    );
+      this.logger.log(
+        `✅ Lifecycle sync finished in ${Date.now() - startTime}ms`,
+      );
+    } catch (error) {
+      this.logger.error('❌ Error during lifecycle cron:', error);
+    }
   }
 }

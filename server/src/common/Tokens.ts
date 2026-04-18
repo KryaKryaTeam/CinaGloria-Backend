@@ -60,6 +60,7 @@ export enum CommandTokens {
   UpdateSettingsOfCompetitionCommand = 'UPDATE_SETTINGS_OF_COMPETTION_COMMAND',
   RunEndEventOnAllEndedRoundsCommand = 'RUN_END_EVENT_ON_ALL_ENDED_ROUNDS_COMMAND',
   RunStartedEventOnAllStartedRoundsCommand = 'RUN_START_EVENT_ON_ALL_STARTED_ROUNDS_COMMAND',
+  HandleCompetitionScheduledEventsCommand = 'HANDLE_COMPETITION_SCHEDULED_EVENTS_COMMAND',
 }
 
 export enum ServiceTokens {

@@ -7,6 +7,10 @@ import { RoundEntity } from './Round.entity';
 import { ApiError, CompetitionErrors, DomainErrors } from 'src/error/ApiError';
 import { CompetitionSettings } from '../objects/CompetitionSettings';
 import { RoundStatus } from 'src/types/RoundStatus';
+import { CompetitionRegistrationStarted } from '../events/CompetititonRegistrationStarted.event';
+import { CompetitionStarted } from '../events/CompetitionStarted.event';
+import { CompetitionFinished } from '../events/CompetitionFinished.event';
+import { CompetitionRegistrationEnded } from '../events/CompetitionRegistrationEnded';
 
 export interface ICompetitionInList {
   id: string;
@@ -410,6 +414,47 @@ export class CompetitionEntity extends Entity {
       ApiError.throw(DomainErrors.UNEXPECTED_VALUE);
 
     this._rounds[nextRoundIndex].show();
+  }
+
+  public startRegistration() {
+    if (
+      !this.canChangeStatusTo(CompetitionStatus.REGISTRATION) ||
+      this.dateOfStartRegistration!.getTime() < Date.now()
+    )
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    this.addEvent(new CompetitionRegistrationStarted(this));
+    this.status = CompetitionStatus.REGISTRATION;
+  }
+  public endRegistration() {
+    if (
+      !this.canChangeStatusTo(CompetitionStatus.WAITING_FOR_START) ||
+      this.dateOfEndRegistration!.getTime() < Date.now()
+    )
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    this.addEvent(new CompetitionRegistrationEnded(this));
+    this.status = CompetitionStatus.WAITING_FOR_START;
+  }
+  public start() {
+    if (
+      !this.canChangeStatusTo(CompetitionStatus.STARTED) ||
+      this.dateOfStart!.getTime() < Date.now()
+    )
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    this.addEvent(new CompetitionStarted(this));
+    this.status = CompetitionStatus.STARTED;
+  }
+  public end() {
+    if (
+      !this.canChangeStatusTo(CompetitionStatus.ARCHIVED) ||
+      this.dateOfEnd!.getTime() < Date.now()
+    )
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    this.addEvent(new CompetitionFinished(this));
+    this.status = CompetitionStatus.ARCHIVED;
   }
 
   public schedule(date: Date) {

@@ -18,6 +18,7 @@ import { RoundsStartAndEndSearchCronService } from './infrastructure/cronJobs/Ro
 import { RoundMapper } from './application/mapper/Round.mapper';
 import { TaskMapper } from './application/mapper/Task.mapper';
 import { RunStartEventOnAllStartedRoundsCommand } from './application/commands/RunStartEventOnAllStartedRounds.command';
+import { HandleCompetitionScheduledEventsCommand } from './application/commands/HandleCompetitionScheduledEvents.command';
 
 const providers: Provider[] = [
   {
@@ -79,6 +80,10 @@ const providers: Provider[] = [
   {
     provide: CommandTokens.RunStartedEventOnAllStartedRoundsCommand,
     useClass: RunStartEventOnAllStartedRoundsCommand,
+  },
+  {
+    provide: CommandTokens.HandleCompetitionScheduledEventsCommand as string,
+    useClass: HandleCompetitionScheduledEventsCommand,
   },
   RoundsStartAndEndSearchCronService,
 ];

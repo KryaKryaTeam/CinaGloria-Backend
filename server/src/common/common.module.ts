@@ -22,6 +22,7 @@ import { CompetitionSchema } from 'src/schemas/Competition.schema';
 import { CompetitionRepository } from './infrastructure/repositories/CompetitionRepository';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { JsonInterceptor } from './infrastructure/interceptors/JsonInterceptor';
+import { RoundRepository } from './infrastructure/repositories/RoundRepository';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -44,6 +45,10 @@ const providers: Provider[] = [
   {
     provide: ReposTokens.CompetitionRepository,
     useClass: CompetitionRepository,
+  },
+  {
+    provide: ReposTokens.RoundRepository,
+    useClass: RoundRepository,
   },
 ];
 

@@ -22,6 +22,7 @@ export abstract class Command<Data, Result> {
 
       return result;
     } catch (err) {
+      console.log(err);
       await this.DBContext.rollbackTransaction();
       throw err;
     }

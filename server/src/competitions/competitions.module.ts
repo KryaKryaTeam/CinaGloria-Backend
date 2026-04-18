@@ -13,6 +13,12 @@ import { FilesModule } from 'src/files/files.module';
 import { CompetitionController } from './infrastructure/controllers/competition.controller';
 import { DeleteCompetitionCommand } from './application/commands/DeleteCompetition';
 import { UpdateSettingsOfCompetitionCommand } from './application/commands/UpdateSettingsOfCompetition.command';
+import { RunEndEventOnAllEndedRoundsCommand } from './application/commands/RunEndEventOnAllEndedRounds.command';
+import { RoundsStartAndEndSearchCronService } from './infrastructure/cronJobs/RoundsStartAndEndSearch.cron';
+import { RoundMapper } from './application/mapper/Round.mapper';
+import { TaskMapper } from './application/mapper/Task.mapper';
+import { RunStartEventOnAllStartedRoundsCommand } from './application/commands/RunStartEventOnAllStartedRounds.command';
+import { HandleCompetitionScheduledEventsCommand } from './application/commands/HandleCompetitionScheduledEvents.command';
 
 const providers: Provider[] = [
   {
@@ -59,6 +65,27 @@ const providers: Provider[] = [
     provide: CommandTokens.UpdateSettingsOfCompetitionCommand,
     useClass: UpdateSettingsOfCompetitionCommand,
   },
+  {
+    provide: CommandTokens.RunEndEventOnAllEndedRoundsCommand,
+    useClass: RunEndEventOnAllEndedRoundsCommand,
+  },
+  {
+    provide: MapperTokens.RoundMapper,
+    useClass: RoundMapper,
+  },
+  {
+    provide: MapperTokens.TaskMapper,
+    useClass: TaskMapper,
+  },
+  {
+    provide: CommandTokens.RunStartedEventOnAllStartedRoundsCommand,
+    useClass: RunStartEventOnAllStartedRoundsCommand,
+  },
+  {
+    provide: CommandTokens.HandleCompetitionScheduledEventsCommand as string,
+    useClass: HandleCompetitionScheduledEventsCommand,
+  },
+  RoundsStartAndEndSearchCronService,
 ];
 
 @Module({

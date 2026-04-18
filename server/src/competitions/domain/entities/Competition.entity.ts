@@ -4,8 +4,13 @@ import { CompetitionStatus } from 'src/types/CompetitionStatus';
 import { CompetitionRule } from '../objects/CompetitionRule.object';
 import { randomUUID } from 'crypto';
 import { RoundEntity } from './Round.entity';
-import { ApiError, CompetitionErrors } from 'src/error/ApiError';
+import { ApiError, CompetitionErrors, DomainErrors } from 'src/error/ApiError';
 import { CompetitionSettings } from '../objects/CompetitionSettings';
+import { RoundStatus } from 'src/types/RoundStatus';
+import { CompetitionRegistrationStarted } from '../events/CompetititonRegistrationStarted.event';
+import { CompetitionStarted } from '../events/CompetitionStarted.event';
+import { CompetitionFinished } from '../events/CompetitionFinished.event';
+import { CompetitionRegistrationEnded } from '../events/CompetitionRegistrationEnded';
 
 export interface ICompetitionInList {
   id: string;
@@ -368,6 +373,88 @@ export class CompetitionEntity extends Entity {
       ApiError.throw(CompetitionErrors.INVALID_DATES);
 
     this._dateOfEndRegistration = value;
+  }
+
+  public publish() {
+    if (
+      this.status == CompetitionStatus.SCHEDULED &&
+      (this._publishAt?.getTime() || 0) < Date.now()
+    )
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    if (!this.canChangeStatusTo(CompetitionStatus.PUBLISHED))
+      ApiError.throw(
+        CompetitionErrors.STATUS_FLOW_BREAKS,
+        `Change from ${this.status} to ${CompetitionStatus.PUBLISHED}`,
+      );
+
+    const showRoundsOneByOne = this.settings.get('showRoundsOneByOne');
+    if (showRoundsOneByOne) {
+      this._rounds.forEach((el, i) => {
+        if (i == 0) return;
+        el.hide();
+      });
+    }
+
+    this.status = CompetitionStatus.PUBLISHED;
+  }
+
+  public showNextRound() {
+    if (this.status != CompetitionStatus.STARTED)
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    const haveActive = this._rounds.some(
+      (a) => a.status == RoundStatus.IN_PROGRESS,
+    );
+    const nextRoundIndex = this._rounds.findIndex(
+      (a) => a.status == RoundStatus.CREATED,
+    );
+
+    if (nextRoundIndex == -1 || haveActive)
+      ApiError.throw(DomainErrors.UNEXPECTED_VALUE);
+
+    this._rounds[nextRoundIndex].show();
+  }
+
+  public startRegistration() {
+    if (
+      !this.canChangeStatusTo(CompetitionStatus.REGISTRATION) ||
+      this.dateOfStartRegistration!.getTime() < Date.now()
+    )
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    this.addEvent(new CompetitionRegistrationStarted(this));
+    this.status = CompetitionStatus.REGISTRATION;
+  }
+  public endRegistration() {
+    if (
+      !this.canChangeStatusTo(CompetitionStatus.WAITING_FOR_START) ||
+      this.dateOfEndRegistration!.getTime() < Date.now()
+    )
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    this.addEvent(new CompetitionRegistrationEnded(this));
+    this.status = CompetitionStatus.WAITING_FOR_START;
+  }
+  public start() {
+    if (
+      !this.canChangeStatusTo(CompetitionStatus.STARTED) ||
+      this.dateOfStart!.getTime() < Date.now()
+    )
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    this.addEvent(new CompetitionStarted(this));
+    this.status = CompetitionStatus.STARTED;
+  }
+  public end() {
+    if (
+      !this.canChangeStatusTo(CompetitionStatus.ARCHIVED) ||
+      this.dateOfEnd!.getTime() < Date.now()
+    )
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    this.addEvent(new CompetitionFinished(this));
+    this.status = CompetitionStatus.ARCHIVED;
   }
 
   public schedule(date: Date) {

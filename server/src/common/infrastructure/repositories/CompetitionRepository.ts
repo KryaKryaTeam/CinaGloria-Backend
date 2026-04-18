@@ -5,6 +5,7 @@ import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.
 import { Inject } from '@nestjs/common';
 import { MapperTokens } from 'src/common/Tokens';
 import { CompetitionMapper } from 'src/competitions/application/mapper/Competition.mapper';
+import { CompetitionStatus } from 'src/types/CompetitionStatus';
 
 export class CompetitionRepository
   extends BaseRepository<CompetitionSchema>
@@ -34,5 +35,66 @@ export class CompetitionRepository
     return (await this.repository.find({ take: 20, skip: pageNum * 20 })).map(
       (el) => this.mapper.toEntity(el),
     );
+  }
+
+  async findAllEndedNotProcessed(): Promise<CompetitionEntity[]> {
+    const compRaw = await this.repository
+      .createQueryBuilder('competition')
+      .setLock('pessimistic_write')
+      .setOnLocked('skip_locked')
+      .where('competition.dateOfEnd < :end', { end: new Date() })
+      .andWhere('competition.status = :status', {
+        status: CompetitionStatus.STARTED,
+      })
+      .getMany();
+    return compRaw.map((ent) => this.mapper.toEntity(ent));
+  }
+  async findAllRegistrationEndedNotProcessed(): Promise<CompetitionEntity[]> {
+    const compRaw = await this.repository
+      .createQueryBuilder('competition')
+      .setLock('pessimistic_write')
+      .setOnLocked('skip_locked')
+      .where('competition.dateOfEndRegistration < :end', { end: new Date() })
+      .andWhere('competition.status = :status', {
+        status: CompetitionStatus.REGISTRATION,
+      })
+      .getMany();
+    return compRaw.map((ent) => this.mapper.toEntity(ent));
+  }
+  async findAllRegistrationStartedNotProcessed(): Promise<CompetitionEntity[]> {
+    const compRaw = await this.repository
+      .createQueryBuilder('competition')
+      .setLock('pessimistic_write')
+      .setOnLocked('skip_locked')
+      .where('competition.dateOfStartRegistration < :end', { end: new Date() })
+      .andWhere('competition.status = :status', {
+        status: CompetitionStatus.PUBLISHED,
+      })
+      .getMany();
+    return compRaw.map((ent) => this.mapper.toEntity(ent));
+  }
+  async findAllScheduledNotProcessed(): Promise<CompetitionEntity[]> {
+    const compRaw = await this.repository
+      .createQueryBuilder('competition')
+      .setLock('pessimistic_write')
+      .setOnLocked('skip_locked')
+      .where('competition.publishedAt < :end', { end: new Date() })
+      .andWhere('competition.status = :status', {
+        status: CompetitionStatus.SCHEDULED,
+      })
+      .getMany();
+    return compRaw.map((ent) => this.mapper.toEntity(ent));
+  }
+  async findAllStartedNotProcessed(): Promise<CompetitionEntity[]> {
+    const compRaw = await this.repository
+      .createQueryBuilder('competition')
+      .setLock('pessimistic_write')
+      .setOnLocked('skip_locked')
+      .where('competition.dateOfStart < :end', { end: new Date() })
+      .andWhere('competition.status = :status', {
+        status: CompetitionStatus.WAITING_FOR_START,
+      })
+      .getMany();
+    return compRaw.map((ent) => this.mapper.toEntity(ent));
   }
 }

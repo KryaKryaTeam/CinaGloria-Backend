@@ -1,13 +1,22 @@
-import { ApiError, RoundErrors } from 'src/error/ApiError';
+import { ApiError, RoundErrors, UserErrors } from 'src/error/ApiError';
 import {
   CompetitionEntity,
   ICreateCompetition,
 } from '../entities/Competition.entity';
 import { RoundEntity, type ICreateRound } from '../entities/Round.entity';
 import { ICreateTask, TaskEntity } from '../entities/Task.entity';
+import { UserEntity } from 'src/authorization/domain/entities/User.entity';
+import { RoleEnum } from 'src/types/RoleEnum';
 
 export class RoundAndCompetitionService {
-  static createRound(round: ICreateRound, competition: CompetitionEntity) {
+  static createRound(
+    round: ICreateRound,
+    competition: CompetitionEntity,
+    user: UserEntity,
+  ) {
+    if (!(user.hasRole(RoleEnum.ADMIN) || user.hasRole(RoleEnum.ORGANIZER)))
+      ApiError.throw(UserErrors.NOT_ENOUGH_RIGHTS);
+
     const valid = competition.rounds.every(
       (a) =>
         a.startOfRound > round.endOfRound || a.endOfRound < round.startOfRound,

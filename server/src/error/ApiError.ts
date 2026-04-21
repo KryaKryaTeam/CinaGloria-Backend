@@ -393,6 +393,14 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'This round is hidden',
     status: 400,
   },
+  TASK_004: {
+    message: 'The task was not found',
+    status: 404,
+  },
+  USER_031: {
+    message: "The user doesn't have enough rights to access this feature",
+    status: 403,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -446,6 +454,7 @@ export const UserErrors = {
   GOOGLE_AUTHORIZATION_FAILED: 'USER_028',
   EMAIL_NOT_VERIFIED: 'USER_029',
   INVALID_AGE: 'USER_030',
+  NOT_ENOUGH_RIGHTS: 'USER_031',
 } as const;
 
 export const CompetitionErrors = {
@@ -486,6 +495,7 @@ export const TaskErrors = {
   NAME_LENGTH_RESTRICTION: 'TASK_001',
   DESCRIPTION_LENGTH_RESTRICTION: 'TASK_002',
   INVALID_COLOR: 'TASK_003',
+  TASK_NOT_FOUND: 'TASK_004',
 } as const;
 
 export const FileErrors = {

@@ -38,6 +38,7 @@ export class CreateRoundCommand extends Command<CreateRoundCommandProps, void> {
         relatedTasks: [],
       },
       competition,
+      data.user,
     );
 
     competition.addRound(round);

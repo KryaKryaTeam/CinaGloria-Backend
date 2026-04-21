@@ -9,6 +9,7 @@ import { RoundStatus } from 'src/types/RoundStatus';
 import { LessThan } from 'typeorm';
 import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
 import { CompetitionMapper } from 'src/competitions/application/mapper/Competition.mapper';
+import { TaskEntity } from 'src/competitions/domain/entities/Task.entity';
 
 export class RoundRepository
   extends BaseRepository<RoundSchema>

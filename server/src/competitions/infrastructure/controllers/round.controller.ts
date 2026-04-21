@@ -27,7 +27,7 @@ export class RoundController {
   private readonly patchRoundCommand: PatchRoundCommand;
 
   @Inject(CommandTokens.ReadRoundCommand)
-  pricate readonly readRoundCommand: ReadRoundCommand;
+  private readonly readRoundCommand: ReadRoundCommand;
 
   @Post('create')
   @Version('1')

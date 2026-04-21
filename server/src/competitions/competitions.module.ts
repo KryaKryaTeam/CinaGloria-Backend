@@ -13,6 +13,7 @@ import { FilesModule } from 'src/files/files.module';
 import { CompetitionController } from './infrastructure/controllers/competition.controller';
 import { DeleteCompetitionCommand } from './application/commands/DeleteCompetition';
 import { RoundController } from './infrastructure/controllers/round.controller';
+import { TaskController } from './infrastructure/controllers/task.controller';
 
 const providers: Provider[] = [
   {
@@ -61,6 +62,6 @@ const providers: Provider[] = [
   providers,
   exports: [...providers],
   imports: [forwardRef(() => FilesModule)],
-  controllers: [CompetitionController, RoundController],
+  controllers: [CompetitionController, RoundController, TaskController],
 })
 export class CompetitionsModule {}

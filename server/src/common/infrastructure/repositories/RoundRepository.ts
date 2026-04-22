@@ -9,7 +9,6 @@ import { RoundStatus } from 'src/types/RoundStatus';
 import { LessThan } from 'typeorm';
 import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
 import { CompetitionMapper } from 'src/competitions/application/mapper/Competition.mapper';
-import { TaskEntity } from 'src/competitions/domain/entities/Task.entity';
 
 export class RoundRepository
   extends BaseRepository<RoundSchema>
@@ -33,7 +32,6 @@ export class RoundRepository
     return this.mapper.toEntity(round);
   }
 
-<<<<<<< HEAD
   async findAllEndedButNotProcessed(): Promise<RoundEntity[]> {
     const rounds = await this.repository
       .createQueryBuilder('round')
@@ -44,7 +42,7 @@ export class RoundRepository
       .getMany();
     return rounds.map((el) => this.mapper.toEntity(el));
   }
-  
+
   async findAllStartedButNotProcessed(): Promise<RoundEntity[]> {
     const rounds = await this.repository
       .createQueryBuilder('round')
@@ -62,13 +60,12 @@ export class RoundRepository
     return _round.competition.id;
   }
 
-  async findFinishedROunds(): Promise<RoundEntity[] | null> {
-=======
   async findFinishedRounds(): Promise<RoundEntity[] | null> {
->>>>>>> a272d42 (feat: Implement the R (read) from CRUD for rounds)
-    const schema = await this.repository.findBy({
-      endOfRound: LessThan(new Date()),
-    });
+    const schema = await this.repository
+      .createQueryBuilder('round')
+      .where('round.endOfRound < :now', { now: new Date() })
+      .getMany();
+
     return schema.map((el) => {
       return this.mapper.toEntity(el);
     });

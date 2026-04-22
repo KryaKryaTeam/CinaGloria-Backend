@@ -1,11 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { Command } from 'src/common/application/Command';
 import { RoundRepository } from 'src/common/infrastructure/repositories/RoundRepository';
 import { ReposTokens } from 'src/common/Tokens';
-import { ApiError, RoundErrors } from 'src/error/ApiError';
+import { ApiError, RoundErrors, UserErrors } from 'src/error/ApiError';
 import { Icons } from 'src/types/Icons';
+import { RoleEnum } from 'src/types/RoleEnum';
 
 interface PatchRoundCommandProps {
+  user: UserEntity;
   id: string;
   name?: string;
   description?: string;
@@ -21,13 +24,20 @@ export class PatchRoundCommand extends Command<PatchRoundCommandProps, void> {
   private readonly roundRepository: RoundRepository;
 
   async implementation(data: PatchRoundCommandProps): Promise<void> {
+    if (
+      !(
+        data.user.hasRole(RoleEnum.ADMIN) ||
+        data.user.hasRole(RoleEnum.ORGANIZER)
+      )
+    )
+      ApiError.throw(UserErrors.NOT_ENOUGH_RIGHTS);
+
     const round = await this.roundRepository.findById(data.id);
 
     if (!round) ApiError.throw(RoundErrors.ROUND_NOT_FOUND);
 
     if (data.name) round.name = data.name;
     if (data.description) round.description = data.description;
-    if (data.hidden) round.hidden = data.hidden;
     if (data.startOfRound) round.startOfRound = data.startOfRound;
     if (data.endOfRound) round.endOfRound = data.endOfRound;
     if (data.icon) round.icon = data.icon;

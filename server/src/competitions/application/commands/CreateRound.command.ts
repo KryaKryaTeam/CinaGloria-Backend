@@ -4,8 +4,9 @@ import type { ICompetitionRepository } from '../bounds/CompetitionRepository';
 import { ReposTokens } from 'src/common/Tokens';
 import { RoundAndCompetitionService } from 'src/competitions/domain/services/RoundAndCompetition.service';
 import { Icons } from 'src/types/Icons';
-import { ApiError, CompetitionErrors } from 'src/error/ApiError';
+import { ApiError, CompetitionErrors, UserErrors } from 'src/error/ApiError';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
+import { RoleEnum } from 'src/types/RoleEnum';
 
 interface CreateRoundCommandProps {
   user: UserEntity;
@@ -26,6 +27,14 @@ export class CreateRoundCommand extends Command<CreateRoundCommandProps, void> {
   private readonly competitionRepostiory: ICompetitionRepository;
 
   async implementation(data: CreateRoundCommandProps) {
+    if (
+      !(
+        data.user.hasRole(RoleEnum.ADMIN) ||
+        data.user.hasRole(RoleEnum.ORGANIZER)
+      )
+    )
+      ApiError.throw(UserErrors.NOT_ENOUGH_RIGHTS);
+
     const competition = await this.competitionRepostiory.findById(
       data.competition.id,
     );

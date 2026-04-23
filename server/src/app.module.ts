@@ -23,6 +23,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { ApiErrorExceptionsFilter } from './error/ApiError.filter';
 import { TestAndSetupModule } from './test-and-setup/test-and-setup.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { TeamsModule } from './teams/teams.module';
 
 @Module({
   providers: [
@@ -59,6 +60,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     CompetitionsModule,
     TestAndSetupModule,
     ScheduleModule.forRoot(),
+    TeamsModule,
   ],
 })
 export class AppModule {}

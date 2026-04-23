@@ -1,11 +1,11 @@
-import { ApiError, UserErrors } from 'src/error/ApiError';
+import { ApiError, DomainErrors } from 'src/error/ApiError';
 
 export class Age {
   private _value: number;
 
   constructor(value: number) {
     if (value < 14 || value > 120) {
-      ApiError.throw(UserErrors.INVALID_AGE);
+      ApiError.throw(DomainErrors.UNEXPECTED_VALUE);
     }
     this._value = value;
   }

@@ -39,7 +39,7 @@ describe('MakeNotificationReaded', () => {
   });
 
   const input = {
-    id: 'user-123',
+    user: { id: 'user-123' },
     notificationId: 'notif-456',
   };
 
@@ -57,7 +57,7 @@ describe('MakeNotificationReaded', () => {
     expect(mockNotificationRepo.getById).toHaveBeenCalledWith(
       input.notificationId,
     );
-    expect(mockNotification.markAsRead).toHaveBeenCalledWith(input.id);
+    expect(mockNotification.markAsRead).toHaveBeenCalledWith(input.user.id);
     expect(mockNotificationRepo.save).toHaveBeenCalledWith(mockNotification);
   });
 

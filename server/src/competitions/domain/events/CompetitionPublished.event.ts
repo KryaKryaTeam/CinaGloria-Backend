@@ -17,7 +17,7 @@ export class CompetitionPublished extends Event<CompetitionEntity> {
 
   toJSON(): IEventJSON<CompetitionEntity> {
     return {
-      eventType: EventType.CHANGE_ROLE,
+      eventType: EventType.COMPETITION_PUBLISHED,
       payload: this.payload,
     };
   }

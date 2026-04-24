@@ -9,6 +9,10 @@ import { MemberInvitedForCompetitionEvent } from '../events/MemberInvitedForComp
 import { CaptainChangedEvent } from '../events/CaptainChanged.event';
 import { MemberAcceptedInviteForCompetitionEvent } from '../events/MemberAcceptedInviteForCompetition.event';
 import { MemberAcceptedInviteEvent } from '../events/MemberAcceptedInvite.event';
+import {
+  ITeamHistoryPlain,
+  TeamHistoryObject,
+} from '../objects/TeamHistoryNode.object';
 
 export enum TeamStatus {
   IDLE = 'IDLE',
@@ -26,10 +30,7 @@ export interface ITeamPlain {
   status: TeamStatus;
   activeCompetition?: string;
   registrationTimeout?: Date;
-  history: {
-    placeInLeaderboard: number;
-    round: string;
-  }[];
+  history: ITeamHistoryPlain[];
   memberInvites: {
     member: string;
     forCompetition: boolean;
@@ -55,11 +56,7 @@ export class TeamEntity extends Entity {
   private _status: TeamStatus;
   private _activeCompetition?: string; // uuid
   private _registrationTimeout?: Date; // now + 1 hour
-  private _history: {
-    // should be the Valueable Object
-    placeInLeaderboard: number;
-    round: string; // uuid
-  }[];
+  private _history: TeamHistoryObject[];
 
   // invites
   private _memberInvites: {
@@ -79,7 +76,9 @@ export class TeamEntity extends Entity {
     this._members = plain.members;
     this._captain = plain.captain;
     this._activeCompetition = plain.activeCompetition;
-    this._history = plain.history;
+    this._history = plain.history.map((plain) =>
+      TeamHistoryObject.define(plain),
+    );
     this._memberInvites = plain.memberInvites;
     this._status = plain.status;
     this._registrationTimeout = plain.registrationTimeout;
@@ -201,7 +200,7 @@ export class TeamEntity extends Entity {
     this.canMakeMemberChangesCheck();
     if (!this.isCaptain(actor)) ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
 
-    const target_idx = this.members.findIndex((a) => a == target);
+    const target_idx = this._members.findIndex((a) => a == target);
     if (target_idx == -1) ApiError.throw(DomainErrors.NO_CHANGE);
 
     this._members.splice(target_idx, 1);
@@ -301,7 +300,7 @@ export class TeamEntity extends Entity {
       ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
     if (
       this._registrationTimeout.getTime() < Date.now() ||
-      !this.allIsAccepted
+      !this.allIsAccepted()
     ) {
       this.cancelRegistration('', true);
       ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
@@ -315,7 +314,9 @@ export class TeamEntity extends Entity {
   }
 
   // in competition status
-  addHistoryNode() {} // I will make V_OBJ for this in future. SO DON'T TOUCH THIS!
+  addHistoryNode(historyNode: TeamHistoryObject) {
+    this._history.push(historyNode);
+  } // I will make V_OBJ for this in future. SO DON'T TOUCH THIS!
   //generateCert() {} <--- futured functionality
 
   toJSON(): ITeamPlain {
@@ -327,7 +328,7 @@ export class TeamEntity extends Entity {
       activeCompetition: this._activeCompetition,
       captain: this._captain,
       members: this._members,
-      history: this._history,
+      history: this._history.map((node) => node.toJSON()),
       status: this._status,
       memberInvites: this._memberInvites,
     };

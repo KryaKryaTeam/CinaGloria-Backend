@@ -28,6 +28,11 @@ import { TeamSchema } from 'src/schemas/Team.schema';
 import { RoundSchema } from 'src/schemas/Round.schema';
 import { TaskSchema } from 'src/schemas/Task.schema';
 import { TeamRepository } from './infrastructure/repositories/TeamRepository';
+import { TeamsModule } from 'src/teams/teams.module';
+import { TeamSchema } from 'src/schemas/Team.schema';
+import { RoundSchema } from 'src/schemas/Round.schema';
+import { TaskSchema } from 'src/schemas/Task.schema';
+import { TeamRepository } from './infrastructure/repositories/TeamRepository';
 import { TaskRepository } from './infrastructure/repositories/TaskRepository';
 
 const providers: Provider[] = [
@@ -81,11 +86,15 @@ const providers: Provider[] = [
       TeamSchema,
       RoundSchema,
       TaskSchema,
+      TeamSchema,
+      RoundSchema,
+      TaskSchema,
     ]),
     forwardRef(() => AuthorizationModule),
     forwardRef(() => NotificationModule),
     forwardRef(() => FilesModule),
     forwardRef(() => CompetitionsModule),
+    forwardRef(() => TeamsModule),
     forwardRef(() => TeamsModule),
   ],
 })

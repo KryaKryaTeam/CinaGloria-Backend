@@ -111,7 +111,7 @@ export class RoundEntity extends Entity {
   set endOfRound(date: Date) {
     if (date < new Date()) ApiError.throw(RoundErrors.END_DATE_INVALID);
 
-    if (this._endOfRound && date.getTime() >= this._endOfRound.getTime())
+    if (this._endOfRound && date.getTime() <= this._endOfRound.getTime())
       ApiError.throw(RoundErrors.INVALID_DATE_SEQUENCE);
     this._endOfRound = date;
   }

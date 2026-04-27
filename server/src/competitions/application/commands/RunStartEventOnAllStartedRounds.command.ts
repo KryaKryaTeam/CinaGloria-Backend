@@ -17,9 +17,9 @@ export class RunStartEventOnAllStartedRoundsCommand extends Command<
 
     await Promise.all(
       rounds.map(async (el) => {
-        this.eventDispatcher.addEvent(new RoundStarted(el));
-
         el.status = RoundStatus.IN_PROGRESS;
+
+        this.eventDispatcher.addEvent(new RoundStarted(el));
 
         await this.roundRepository.save(el);
       }),

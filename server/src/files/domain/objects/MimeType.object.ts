@@ -1,10 +1,13 @@
 import { ApiError, FileErrors } from 'src/error/ApiError';
 
 export class MimeType {
-  private readonly _value: string;
+  private readonly _value: string | undefined;
 
   constructor(value: string | undefined) {
-    if (!value) ApiError.throw(FileErrors.MIME_TYPE_IS_UNDEFINED);
+    if (value !== undefined && value === '') {
+      ApiError.throw(FileErrors.MIME_TYPE_IS_UNDEFINED);
+    }
+
     this._value = value;
   }
 
@@ -13,6 +16,8 @@ export class MimeType {
   }
 
   get fileFormat() {
+    if (this._value == undefined)
+      ApiError.throw(FileErrors.MIME_TYPE_IS_UNDEFINED);
     return this._value.split('/')[1];
   }
 }

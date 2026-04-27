@@ -83,6 +83,7 @@ export class RelationString {
   }
 
   static define(value: string) {
+    console.error(value);
     const splited = value.split(':');
 
     if (!splited[0]) ApiError.throw(FileErrors.INVALID_RELATION_FORMAT, value);

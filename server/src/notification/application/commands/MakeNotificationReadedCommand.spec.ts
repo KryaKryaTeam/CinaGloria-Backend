@@ -1,10 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
 import { MakeNotificationReaded } from './MakeNotificationReadedCommand';
 import { BaseTokens, ReposTokens } from 'src/common/Tokens';
 import { ApiError, DomainErrors } from 'src/error/ApiError';
 import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
 import { createMockDBContext } from 'src/common/application/IDcontext.spec';
+import { Username } from 'src/authorization/domain/objects/Username.object';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
+import { UserEntity } from 'src/authorization/domain/entities/User.entity';
+import { RelationSlots } from 'src/types/RelationSlots';
+import { RoleEnum } from 'src/types/RoleEnum';
 
 describe('MakeNotificationReaded', () => {
   let command: MakeNotificationReaded;
@@ -38,8 +42,19 @@ describe('MakeNotificationReaded', () => {
     jest.clearAllMocks();
   });
 
+  const user = UserEntity.create(
+    'test@mail.com',
+    Username.create('valid_user_123'),
+    InternalFile.define<typeof RelationSlots.user.avatar>(
+      'avatar.png',
+      'user:avatar',
+      'user:avatar',
+    ),
+  );
+  user.__forceSetRole(RoleEnum.ADMIN);
+
   const input = {
-    id: 'user-123',
+    user,
     notificationId: 'notif-456',
   };
 
@@ -51,13 +66,13 @@ describe('MakeNotificationReaded', () => {
     mockNotificationRepo.getById.mockResolvedValue(mockNotification);
 
     // 2. Act
-    await command.implementation(input);
+    await command.execute(input);
 
     // 3. Assert
     expect(mockNotificationRepo.getById).toHaveBeenCalledWith(
       input.notificationId,
     );
-    expect(mockNotification.markAsRead).toHaveBeenCalledWith(input.id);
+    expect(mockNotification.markAsRead).toHaveBeenCalledWith(input.user.id);
     expect(mockNotificationRepo.save).toHaveBeenCalledWith(mockNotification);
   });
 
@@ -66,7 +81,7 @@ describe('MakeNotificationReaded', () => {
     mockNotificationRepo.getById.mockResolvedValue(null);
 
     // Act & Assert
-    await expect(command.implementation(input)).rejects.toThrow(ApiError);
+    await expect(command.execute(input)).rejects.toThrow(ApiError);
     expect(mockNotificationRepo.save).not.toHaveBeenCalled();
   });
 
@@ -80,7 +95,7 @@ describe('MakeNotificationReaded', () => {
     mockNotificationRepo.getById.mockResolvedValue(mockNotification);
 
     // Act & Assert
-    await expect(command.implementation(input)).rejects.toThrow(ApiError);
+    await expect(command.execute(input)).rejects.toThrow(ApiError);
     expect(mockNotificationRepo.save).not.toHaveBeenCalled();
   });
 });

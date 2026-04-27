@@ -130,6 +130,7 @@ export class CompetitionEntity extends Entity {
     this._status = plain.status;
     this._rules = plain.rules || [];
     this._settings = plain.settings;
+    this._rounds = [];
   }
 
   private static validate(plain: ICompetitionPlain | ICreateCompetition) {
@@ -482,8 +483,6 @@ export class CompetitionEntity extends Entity {
   }
 
   public declineScheduledPublish() {
-    this.canChangeCheck();
-
     if (!this.canChangeStatusTo(CompetitionStatus.DRAFT))
       ApiError.throw(
         CompetitionErrors.STATUS_FLOW_BREAKS,

@@ -21,7 +21,7 @@ describe('Age Value Object', () => {
     // Фіксуємо "сьогоднішню" дату для стабільності тестів
     beforeAll(() => {
       jest.useFakeTimers();
-      jest.setSystemTime(new Date('2024-05-20'));
+      jest.setSystemTime(new Date('2024-05-20').getTime());
     });
 
     afterAll(() => {

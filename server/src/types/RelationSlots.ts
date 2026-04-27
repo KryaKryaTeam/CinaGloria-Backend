@@ -8,6 +8,10 @@ export const RelationSlots = {
     avatar: 'competition:avatar',
     socialMedia: 'competition:socialMedia',
   },
+  team: {
+    banner: 'team:banner',
+    avatar: 'team:avatar',
+  },
 } as const;
 
 export type TMimeType = `${string}/${string}`;
@@ -70,6 +74,24 @@ export const RelationSlotsConfig = new Map<string, ISlotConfig>([
       allowedMimeTypes: imagesMimeType,
       maxSize: 2 * 1024 * 1024,
       dimensions: [128 * 2, 128 * 2],
+      shouldBeProcessed: true,
+    },
+  ],
+  [
+    'team:avatar',
+    {
+      maxSize: 2 * 1024 * 1024,
+      allowedMimeTypes: imagesMimeType,
+      dimensions: [128 * 2, 128 * 2],
+      shouldBeProcessed: true,
+    },
+  ],
+  [
+    'team:banner',
+    {
+      allowedMimeTypes: imagesMimeType,
+      maxSize: 5 * 1024 * 1024,
+      dimensions: [500, 300],
       shouldBeProcessed: true,
     },
   ],

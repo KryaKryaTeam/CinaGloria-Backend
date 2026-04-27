@@ -58,7 +58,7 @@ describe('RoundAndCompetitionService', () => {
   it('should add task to round via entity method', () => {
     const spy = jest.spyOn(round, 'addTask');
 
-    service.addTaskToRound(task, round);
+    RoundAndCompetitionService.addTaskToRound(task, round);
 
     expect(spy).toHaveBeenCalledWith(task);
   });
@@ -66,7 +66,7 @@ describe('RoundAndCompetitionService', () => {
   it('should add round to competition', () => {
     const spy = jest.spyOn(competition, 'addRound');
 
-    service.addRoundToCompetition(round, competition);
+    RoundAndCompetitionService.addRoundToCompetition(round, competition);
 
     expect(spy).toHaveBeenCalledWith(round);
   });
@@ -76,7 +76,7 @@ describe('RoundAndCompetitionService', () => {
 
     const spy = jest.spyOn(competition, 'deleteRound');
 
-    service.deleteRoundFromCompetition(round, competition);
+    RoundAndCompetitionService.deleteRoundFromCompetition(round, competition);
 
     expect(spy).toHaveBeenCalledWith(round);
   });

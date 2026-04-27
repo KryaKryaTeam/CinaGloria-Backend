@@ -55,15 +55,15 @@ export class RoundController {
   @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   @ApiResponse({ status: 200, type: PatchRoundDto })
-  async patchRound(@Body() dto: PatchRoundDto) {
-    return await this.patchRoundCommand.execute(dto);
+  async patchRound(@Body() dto: PatchRoundDto, @UserId() user: UserEntity) {
+    return await this.patchRoundCommand.execute({ ...dto, user });
   }
 
   @Get('read')
   @Version('1')
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   @ApiResponse({ status: 200, type: ReadRoundDto })
-  async readRound(@Body() dto: ReadRoundDto ) {
+  async readRound(@Body() dto: ReadRoundDto) {
     return await this.readRoundCommand.execute(dto);
   }
 }

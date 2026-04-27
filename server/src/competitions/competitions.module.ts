@@ -14,6 +14,14 @@ import { CompetitionController } from './infrastructure/controllers/competition.
 import { DeleteCompetitionCommand } from './application/commands/DeleteCompetition';
 import { RoundController } from './infrastructure/controllers/round.controller';
 import { TaskController } from './infrastructure/controllers/task.controller';
+import { RoundMapper } from './application/mapper/Round.mapper';
+import { TaskMapper } from './application/mapper/Task.mapper';
+import { UpdateSettingsOfCompetitionCommand } from './application/commands/UpdateSettingsOfCompetition.command';
+import { CreateRoundCommand } from './application/commands/CreateRound.command';
+import { DeleteRoundCommand } from './application/commands/DeleteRound.command';
+import { PatchRoundCommand } from './application/commands/PatchRound.command';
+import { ReadRoundCommand } from './application/commands/ReadRound.command';
+import { CreateTaskCommand } from './application/commands/CreateTask.command';
 
 const providers: Provider[] = [
   {
@@ -56,6 +64,23 @@ const providers: Provider[] = [
     provide: CommandTokens.DeleteCompetitionCommand,
     useClass: DeleteCompetitionCommand,
   },
+  {
+    provide: MapperTokens.RoundMapper,
+    useClass: RoundMapper,
+  },
+  {
+    provide: MapperTokens.TaskMapper,
+    useClass: TaskMapper,
+  },
+  {
+    provide: CommandTokens.UpdateSettingsOfCompetitionCommand,
+    useClass: UpdateSettingsOfCompetitionCommand,
+  },
+  { provide: CommandTokens.CreateRoundCommand, useClass: CreateRoundCommand },
+  { provide: CommandTokens.DeleteRoundCommand, useClass: DeleteRoundCommand },
+  { provide: CommandTokens.PatchRoundCommand, useClass: PatchRoundCommand },
+  { provide: CommandTokens.ReadRoundCommand, useClass: ReadRoundCommand },
+  { provide: CommandTokens.CreateTaskCommand, useClass: CreateTaskCommand },
 ];
 
 @Module({

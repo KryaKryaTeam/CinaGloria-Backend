@@ -1,4 +1,4 @@
-import { GetPublicCompetitionQuery } from './GetPublicCompetition.command';
+import { GetPublicCompetitionQuery } from './GetPublicCompetition.query';
 
 describe('GetPublicCompetitionQuery', () => {
   let query: GetPublicCompetitionQuery;
@@ -7,9 +7,18 @@ describe('GetPublicCompetitionQuery', () => {
     findById: jest.fn(),
   };
 
+  const mockEventDispatcher = {
+    dispatchEvents: jest.fn(),
+  };
+
+  const mockDbContext = {};
+
   beforeEach(() => {
     query = new GetPublicCompetitionQuery();
+
     (query as any).competitionRepository = mockRepo;
+    (query as any).eventDispatcher = mockEventDispatcher;
+    (query as any).DBContext = mockDbContext;
 
     jest.clearAllMocks();
   });
@@ -27,6 +36,7 @@ describe('GetPublicCompetitionQuery', () => {
     });
 
     expect(mockRepo.findById).toHaveBeenCalledWith('comp-1');
+
     expect(result).toEqual({
       competition: { id: 'public-comp-1' },
     });
@@ -38,6 +48,7 @@ describe('GetPublicCompetitionQuery', () => {
     await expect(query.execute({ competitionId: 'comp-1' })).rejects.toThrow();
 
     expect(mockRepo.findById).toHaveBeenCalledWith('comp-1');
+    expect(mockEventDispatcher.dispatchEvents).not.toHaveBeenCalled();
   });
 
   it('should throw if competition is not public', async () => {
@@ -51,5 +62,6 @@ describe('GetPublicCompetitionQuery', () => {
     await expect(query.execute({ competitionId: 'comp-1' })).rejects.toThrow();
 
     expect(mockRepo.findById).toHaveBeenCalledWith('comp-1');
+    expect(mockEventDispatcher.dispatchEvents).not.toHaveBeenCalled();
   });
 });

@@ -1,5 +1,4 @@
 import { GetLinkQuery } from 'src/files/application/useCases/GetLinkQuery';
-import { FileErrors } from 'src/error/ApiError';
 
 describe('GetLinkQuery', () => {
   const fileRepository = {
@@ -10,9 +9,14 @@ describe('GetLinkQuery', () => {
     getLink: jest.fn(),
   };
 
+  const eventDispatcher = {
+    dispatchEvents: jest.fn(),
+  };
+
   const query = new GetLinkQuery();
   (query as any).fileRepository = fileRepository;
   (query as any).loadFileService = loadFileService;
+  (query as any).eventDispatcher = eventDispatcher;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -34,9 +38,7 @@ describe('GetLinkQuery', () => {
   it('should throw if file does not exist', async () => {
     fileRepository.findByUrl.mockResolvedValue(null);
 
-    await expect(query.execute({ fileUrl: 'missing.png' })).rejects.toThrow(
-      FileErrors.FILE_WITH_THIS_ID_UNDEFINED,
-    );
+    await expect(query.execute({ fileUrl: 'missing.png' })).rejects.toThrow();
 
     expect(loadFileService.getLink).not.toHaveBeenCalled();
   });

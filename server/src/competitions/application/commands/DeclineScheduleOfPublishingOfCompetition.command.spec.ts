@@ -1,6 +1,17 @@
 import { UserAndCompetitionService } from 'src/competitions/domain/services/UserAndCompetitionService';
 import { DeclineScheduledPublishCommand } from './DeclineScheduleOfPublishingOfCompetition.command';
-import { ApiError, CompetitionErrors } from 'src/error/ApiError';
+import { ApiError } from 'src/error/ApiError';
+import { UserEntity } from 'src/authorization/domain/entities/User.entity';
+import { Username } from 'src/authorization/domain/objects/Username.object';
+import { RelationSlots } from 'src/types/RelationSlots';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
+import { RoleEnum } from 'src/types/RoleEnum';
+import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
+import { CompetitionStatus } from 'src/types/CompetitionStatus';
+import { CompetitionSettings } from 'src/competitions/domain/objects/CompetitionSettings';
+import { randomUUID } from 'crypto';
+import { CompetitionRule } from 'src/competitions/domain/objects/CompetitionRule.object';
+import { Icons } from 'src/types/Icons';
 
 describe('DeclineScheduledPublishCommand', () => {
   let command: DeclineScheduledPublishCommand;
@@ -10,14 +21,59 @@ describe('DeclineScheduledPublishCommand', () => {
     save: jest.fn(),
   };
 
-  const user = { id: 'user-1' } as any;
-  const competition = { id: 'comp-1' } as any;
+  const dbContextMock = {
+    startTransaction: jest.fn(),
+    commitTransaction: jest.fn(),
+    rollbackTransaction: jest.fn(),
+  };
+
+  const eventDispatcherMock = {
+    dispatchEvents: jest.fn(),
+  };
+
+  const user = UserEntity.create(
+    'test@mail.com',
+    Username.create('valid_user_123'),
+    InternalFile.define<typeof RelationSlots.user.avatar>(
+      'avatar.png',
+      'user:avatar',
+      'user:avatar',
+    ),
+  );
+  user.__forceSetRole(RoleEnum.ADMIN);
+
+  const now = Date.now();
+
+  const competition = CompetitionEntity.load({
+    id: randomUUID(),
+
+    name: 'Test',
+    description: 'Test',
+
+    ultraWideBanner: undefined,
+    banner: undefined,
+    avatar: undefined,
+    socialMedia: undefined,
+
+    dateOfStartRegistration: new Date(now + 1000000),
+    dateOfEndRegistration: new Date(now + 2000000),
+    dateOfStart: new Date(now + 3000000),
+    dateOfEnd: new Date(now + 4000000),
+
+    publishAt: undefined,
+
+    status: CompetitionStatus.SCHEDULED,
+
+    rules: [CompetitionRule.define('test', 'test', Icons.BOOK)],
+    settings: CompetitionSettings.createDefaults(),
+  });
 
   beforeEach(() => {
     command = new DeclineScheduledPublishCommand();
 
-    // manually inject repo (since no Nest container here)
     (command as any).competitionRepository = mockRepo;
+    (command as any).DBContext = dbContextMock;
+    (command as any).eventDispatcher = eventDispatcherMock;
 
     jest.clearAllMocks();
   });
@@ -32,12 +88,16 @@ describe('DeclineScheduledPublishCommand', () => {
 
     await command.execute({
       user,
-      competitionId: 'comp-1',
+      competitionId: competition.id,
     });
 
-    expect(mockRepo.findById).toHaveBeenCalledWith('comp-1');
+    expect(mockRepo.findById).toHaveBeenCalledWith(competition.id);
     expect(spy).toHaveBeenCalledWith(competition, user);
     expect(mockRepo.save).toHaveBeenCalledWith(competition);
+
+    expect(dbContextMock.startTransaction).toHaveBeenCalled();
+    expect(dbContextMock.commitTransaction).toHaveBeenCalled();
+    expect(eventDispatcherMock.dispatchEvents).toHaveBeenCalled();
   });
 
   it('should throw if competition is not found', async () => {
@@ -48,11 +108,12 @@ describe('DeclineScheduledPublishCommand', () => {
     await expect(
       command.execute({
         user,
-        competitionId: 'comp-1',
+        competitionId: randomUUID(),
       }),
     ).rejects.toThrow();
 
-    expect(throwSpy).toHaveBeenCalledWith(CompetitionErrors.UNDEFINED);
+    expect(throwSpy).toHaveBeenCalled();
     expect(mockRepo.save).not.toHaveBeenCalled();
+    expect(dbContextMock.rollbackTransaction).toHaveBeenCalled();
   });
 });

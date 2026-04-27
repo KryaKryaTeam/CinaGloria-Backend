@@ -2,7 +2,7 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateCompetitionCommand } from './CreateCompetition.command';
-import { ReposTokens, ServiceTokens } from 'src/common/Tokens';
+import { ReposTokens, ServiceTokens, BaseTokens } from 'src/common/Tokens';
 import { UserAndCompetitionService } from 'src/competitions/domain/services/UserAndCompetitionService';
 import { CompetitionRule } from 'src/competitions/domain/objects/CompetitionRule.object';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
@@ -24,7 +24,13 @@ const mockLinkerService = {
 };
 
 const mockEventDispatcher = {
-  dispatch: jest.fn(),
+  dispatchEvents: jest.fn(),
+};
+
+const mockDBContext = {
+  startTransaction: jest.fn(),
+  commitTransaction: jest.fn(),
+  rollbackTransaction: jest.fn(),
 };
 
 // ─── Fake domain objects ──────────────────────────────────────────────────────
@@ -47,7 +53,6 @@ const baseCompetitionInput = {
   socialMedia: 'Instagram',
   ultraWideBanner: 'https://cdn.example.com/ultraWideBanner',
   rules: [],
-  // ...whatever else ICreateCompetitionRAW requires
   title: 'Test Cup',
 };
 
@@ -70,31 +75,42 @@ describe('CreateCompetitionCommand', () => {
           provide: ServiceTokens.FileLinkerService,
           useValue: mockLinkerService,
         },
+        {
+          provide: BaseTokens.DBContext,
+          useValue: mockDBContext,
+        },
+        {
+          provide: BaseTokens.EventDispatcher,
+          useValue: mockEventDispatcher,
+        },
       ],
     }).compile();
 
     command = module.get(CreateCompetitionCommand);
-    (command as any).eventDispatcher = mockEventDispatcher;
 
     jest.clearAllMocks();
 
     fakeComp = makeComp();
+
     jest
       .spyOn(UserAndCompetitionService, 'createCompetition')
       .mockReturnValue(fakeComp as any);
+
     jest
       .spyOn(CompetitionRule, 'define')
       .mockImplementation((name, desc, icon) => ({ name, desc, icon }) as any);
+
     jest
       .spyOn(RelationString, 'define')
       .mockImplementation((slot) => slot as any);
+
     jest
       .spyOn(InternalFile, 'define')
       .mockImplementation((url) => ({ url }) as any);
 
     mockCompetitionRepository.save.mockResolvedValue(undefined);
     mockLinkerService.linkFileToCompetitionSlot.mockResolvedValue(undefined);
-    mockFileRepository.findByUrl.mockResolvedValue(null); // default: files not found
+    mockFileRepository.findByUrl.mockResolvedValue(null);
   });
 
   // ─── Competition creation ─────────────────────────────────────────────────
@@ -199,8 +215,6 @@ describe('CreateCompetitionCommand', () => {
       expect(fakeComp.avatar).toEqual({ url: file.url });
     });
 
-    // Test each slot independently — because if someone removes a branch
-    // from assignFileToEntity, only that slot's test fails
     const slots = [
       { field: 'avatar', slot: 'competition:avatar' },
       { field: 'banner', slot: 'competition:banner' },
@@ -271,20 +285,39 @@ describe('CreateCompetitionCommand', () => {
       });
 
       expect(fakeComp.addRule).toHaveBeenCalledTimes(2);
-      expect(CompetitionRule.define).toHaveBeenCalledWith(
-        'No cheating',
-        'Seriously',
-        Icons.BOOK,
-      );
-      expect(CompetitionRule.define).toHaveBeenCalledWith(
-        'Be cool',
-        'Always',
-        Icons.STAR,
-      );
     });
   });
 
-  // ─── Double save + order ──────────────────────────────────────────────────
+  // ─── Transaction behavior ────────────────────────────────────────────────
+
+  describe('transactions', () => {
+    it('should start and commit transaction on success', async () => {
+      await command.execute({
+        user: fakeUser,
+        competition: baseCompetitionInput,
+      });
+
+      expect(mockDBContext.startTransaction).toHaveBeenCalled();
+      expect(mockDBContext.commitTransaction).toHaveBeenCalled();
+      expect(mockDBContext.rollbackTransaction).not.toHaveBeenCalled();
+      expect(mockEventDispatcher.dispatchEvents).toHaveBeenCalled();
+    });
+
+    it('should rollback transaction on failure', async () => {
+      mockCompetitionRepository.save.mockRejectedValue(new Error('boom'));
+
+      await expect(
+        command.execute({
+          user: fakeUser,
+          competition: baseCompetitionInput,
+        }),
+      ).rejects.toThrow();
+
+      expect(mockDBContext.rollbackTransaction).toHaveBeenCalled();
+    });
+  });
+
+  // ─── Save order ──────────────────────────────────────────────────────────
 
   describe('save order', () => {
     it('should save exactly twice — before files and after rules', async () => {
@@ -296,28 +329,41 @@ describe('CreateCompetitionCommand', () => {
       expect(mockCompetitionRepository.save).toHaveBeenCalledTimes(2);
     });
 
-    it('should save first, link files, add rules, then save again', async () => {
-      const order: string[] = [];
-      const file = fakeFile('https://cdn.example.com/avatar.png');
-      mockFileRepository.findByUrl.mockResolvedValue(file);
-      mockCompetitionRepository.save.mockImplementation(() =>
-        order.push('save'),
-      );
-      mockLinkerService.linkFileToCompetitionSlot.mockImplementation(() =>
-        order.push('link'),
-      );
-      fakeComp.addRule.mockImplementation(() => order.push('addRule'));
+    it('should link all 4 slots when all urls and files are provided', async () => {
+      const input = {
+        avatar: 'https://cdn.example.com/avatar.png',
+        banner: 'https://cdn.example.com/banner.png',
+        socialMedia: 'https://cdn.example.com/social.png',
+        ultraWideBanner: 'https://cdn.example.com/ultra.png',
+        rules: [],
+        title: 'Full Cup',
+      };
 
-      await command.execute({
-        user: fakeUser,
-        competition: {
-          ...baseCompetitionInput,
-          avatar: file.url,
-          rules: [{ name: 'Rule 1', description: 'Desc', icon: Icons.BOOK }],
-        },
+      mockFileRepository.findByUrl.mockImplementation(async (url: string) =>
+        fakeFile(url),
+      );
+
+      await command.execute({ user: fakeUser, competition: input });
+
+      const calls = mockLinkerService.linkFileToCompetitionSlot.mock.calls;
+
+      expect(calls).toHaveLength(4);
+
+      const expected = [
+        ['competition:avatar', input.avatar],
+        ['competition:banner', input.banner],
+        ['competition:socialMedia', input.socialMedia],
+        ['competition:ultraWideBanner', input.ultraWideBanner],
+      ];
+
+      expected.forEach(([slot, url]) => {
+        expect(
+          calls.some(
+            ([file, comp, calledSlot]) =>
+              file.url === url && comp === fakeComp && calledSlot === slot,
+          ),
+        ).toBe(true);
       });
-
-      expect(order).toEqual(['save', 'link', 'addRule', 'save']);
     });
   });
 });

@@ -12,6 +12,16 @@ describe('HandleCompetitionScheduledEventsCommand', () => {
     save: jest.fn(),
   };
 
+  const dbContextMock = {
+    startTransaction: jest.fn(),
+    commitTransaction: jest.fn(),
+    rollbackTransaction: jest.fn(),
+  };
+
+  const eventDispatcherMock = {
+    dispatchEvents: jest.fn(),
+  };
+
   const createCompetitionMock = () => ({
     publish: jest.fn(),
     startRegistration: jest.fn(),
@@ -24,7 +34,8 @@ describe('HandleCompetitionScheduledEventsCommand', () => {
   beforeEach(() => {
     command = new HandleCompetitionScheduledEventsCommand();
     (command as any).competitionRepository = mockRepo;
-    (command as any).eventDispatcher = {}; // stub
+    (command as any).DBContext = dbContextMock;
+    (command as any).eventDispatcher = eventDispatcherMock;
 
     jest.clearAllMocks();
   });
@@ -43,6 +54,10 @@ describe('HandleCompetitionScheduledEventsCommand', () => {
     expect(comp.publish).toHaveBeenCalled();
     expect(comp.pullEvents).toHaveBeenCalled();
     expect(mockRepo.save).toHaveBeenCalledWith(comp);
+
+    expect(dbContextMock.startTransaction).toHaveBeenCalled();
+    expect(dbContextMock.commitTransaction).toHaveBeenCalled();
+    expect(eventDispatcherMock.dispatchEvents).toHaveBeenCalled();
   });
 
   it('should skip steps with no competitions', async () => {
@@ -55,6 +70,9 @@ describe('HandleCompetitionScheduledEventsCommand', () => {
     await command.execute();
 
     expect(mockRepo.save).not.toHaveBeenCalled();
+
+    expect(dbContextMock.startTransaction).toHaveBeenCalled();
+    expect(dbContextMock.commitTransaction).toHaveBeenCalled();
   });
 
   it('should process multiple competitions in parallel', async () => {

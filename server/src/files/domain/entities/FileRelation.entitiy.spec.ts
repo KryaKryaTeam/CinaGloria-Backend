@@ -7,7 +7,7 @@ import { MimeType } from '../objects/MimeType.object';
 
 describe('FileRelationEntity', () => {
   const file = FileEntity.create(100, new MimeType('image/png'));
-  const slot = RelationString.define('competition:avatar');
+  const slot = RelationString.define('user:avatar');
   const fileWithSlot = FileEntity.create(100, new MimeType('image/png'), slot);
 
   describe('create', () => {
@@ -43,9 +43,9 @@ describe('FileRelationEntity', () => {
 
       const rel = FileRelationEntity.create(fileWithSlot);
 
-      rel.slot = 'competition:avatar';
+      rel.slot = 'user:avatar';
 
-      expect(rel.slot).toBe('competition:avatar');
+      expect(rel.slot).toBe('user:avatar');
     });
   });
 
@@ -85,10 +85,10 @@ describe('FileRelationEntity', () => {
       const rel = FileRelationEntity.create(fileWithSlot);
 
       rel.user = {} as UserEntity;
-      rel.slot = RelationString.define('competition:avatar');
+      rel.slot = RelationString.define('user:avatar');
 
       expect(rel.user).toBeDefined();
-      expect(rel.slot).toBe('competition:banner');
+      expect(rel.slot).toBe('user:avatar');
     });
   });
 

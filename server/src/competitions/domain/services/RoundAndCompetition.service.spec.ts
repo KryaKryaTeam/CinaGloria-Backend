@@ -2,6 +2,12 @@ import { RoundAndCompetitionService } from 'src/competitions/domain/services/Rou
 import { CompetitionEntity } from '../entities/Competition.entity';
 import { RoundEntity } from '../entities/Round.entity';
 import { TaskEntity } from '../entities/Task.entity';
+import { randomUUID } from 'crypto';
+import { Icons } from 'src/types/Icons';
+import { RoundStatus } from 'src/types/RoundStatus';
+import { CompetitionStatus } from 'src/types/CompetitionStatus';
+import { CompetitionSettings } from '../objects/CompetitionSettings';
+import { Color } from '../objects/Color.object';
 
 describe('RoundAndCompetitionService', () => {
   let service: RoundAndCompetitionService;
@@ -10,28 +16,46 @@ describe('RoundAndCompetitionService', () => {
     service = new RoundAndCompetitionService();
   });
 
-  it('should create round via factory', () => {
-    const round = service.createRound({} as any);
+  const task = TaskEntity.load({
+    id: randomUUID(),
+    name: 'test',
+    description: 'test',
+    color: Color.define('#000000'),
+  });
 
+  const round = RoundEntity.load({
+    id: randomUUID(),
+    name: 'test',
+    description: 'test',
+    hidden: false,
+    icon: Icons.BOOK,
+    startOfRound: new Date(Date.now() + 1000000),
+    endOfRound: new Date(Date.now() + 2000000),
+    status: RoundStatus.CREATED,
+    relatedTasks: [{} as any],
+  });
+
+  const competition = CompetitionEntity.load({
+    id: randomUUID(),
+    status: CompetitionStatus.DRAFT,
+    rules: [],
+    settings: CompetitionSettings.createDefaults(),
+  });
+  competition.addRound(round);
+
+  it('should create round via factory', () => {
     expect(round).toBeInstanceOf(RoundEntity);
   });
 
   it('should create competition via factory', () => {
-    const competition = service.createCompetition({} as any);
-
     expect(competition).toBeInstanceOf(CompetitionEntity);
   });
 
   it('should create task via factory', () => {
-    const task = service.createTask({} as any);
-
     expect(task).toBeInstanceOf(TaskEntity);
   });
 
   it('should add task to round via entity method', () => {
-    const round = RoundEntity.create({} as any);
-    const task = TaskEntity.create({} as any);
-
     const spy = jest.spyOn(round, 'addTask');
 
     service.addTaskToRound(task, round);
@@ -40,9 +64,6 @@ describe('RoundAndCompetitionService', () => {
   });
 
   it('should add round to competition', () => {
-    const competition = CompetitionEntity.create({} as any);
-    const round = RoundEntity.create({} as any);
-
     const spy = jest.spyOn(competition, 'addRound');
 
     service.addRoundToCompetition(round, competition);
@@ -51,8 +72,7 @@ describe('RoundAndCompetitionService', () => {
   });
 
   it('should delete round from competition', () => {
-    const competition = CompetitionEntity.create({} as any);
-    const round = RoundEntity.create({} as any);
+    competition.addRound(round);
 
     const spy = jest.spyOn(competition, 'deleteRound');
 

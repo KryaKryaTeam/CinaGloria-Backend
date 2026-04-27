@@ -1,5 +1,10 @@
+import { Username } from 'src/authorization/domain/objects/Username.object';
 import { GetCompetitionPageQuery } from './GetPageOfCompetition.command';
 import { UserAndCompetitionService } from 'src/competitions/domain/services/UserAndCompetitionService';
+import { UserEntity } from 'src/authorization/domain/entities/User.entity';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
+import { RelationSlots } from 'src/types/RelationSlots';
+import { RoleEnum } from 'src/types/RoleEnum';
 
 describe('GetCompetitionPageQuery', () => {
   let query: GetCompetitionPageQuery;
@@ -8,12 +13,28 @@ describe('GetCompetitionPageQuery', () => {
     getPage: jest.fn(),
   };
 
-  const user = { id: 'user-1' } as any;
+  const mockEventDispatcher = {
+    dispatchEvents: jest.fn(),
+  };
+
+  const user = UserEntity.create(
+    'test@mail.com',
+    Username.create('valid_user_123'),
+    InternalFile.define<typeof RelationSlots.user.avatar>(
+      'avatar.png',
+      'user:avatar',
+      'user:avatar',
+    ),
+  );
+  user.__forceSetRole(RoleEnum.ADMIN);
+
   const competitions = [{ id: 'comp-1' }, { id: 'comp-2' }] as any;
 
   beforeEach(() => {
     query = new GetCompetitionPageQuery();
+
     (query as any).competitionRepository = mockRepo;
+    (query as any).eventDispatcher = mockEventDispatcher;
 
     jest.clearAllMocks();
   });
@@ -34,6 +55,8 @@ describe('GetCompetitionPageQuery', () => {
     expect(accessSpy).toHaveBeenCalledWith(user);
     expect(mockRepo.getPage).toHaveBeenCalledWith(1);
     expect(result).toEqual({ competitions });
+
+    expect(mockEventDispatcher.dispatchEvents).toHaveBeenCalled();
   });
 
   it('should throw if page is empty', async () => {
@@ -47,6 +70,7 @@ describe('GetCompetitionPageQuery', () => {
     ).rejects.toThrow();
 
     expect(mockRepo.getPage).toHaveBeenCalledWith(1);
+    expect(mockEventDispatcher.dispatchEvents).not.toHaveBeenCalled();
   });
 
   it('should call access check before fetching', async () => {
@@ -72,5 +96,6 @@ describe('GetCompetitionPageQuery', () => {
     });
 
     expect(order).toEqual(['access', 'repo']);
+    expect(mockEventDispatcher.dispatchEvents).toHaveBeenCalled();
   });
 });

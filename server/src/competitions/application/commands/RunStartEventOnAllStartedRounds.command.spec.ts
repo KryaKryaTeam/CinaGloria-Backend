@@ -1,6 +1,9 @@
+import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
 import { RunStartEventOnAllStartedRoundsCommand } from './RunStartEventOnAllStartedRounds.command';
 import { RoundStarted } from 'src/competitions/domain/events/RoundStarted.event';
 import { RoundStatus } from 'src/types/RoundStatus';
+import { randomUUID } from 'crypto';
+import { Icons } from 'src/types/Icons';
 
 describe('RunStartEventOnAllStartedRoundsCommand', () => {
   let command: RunStartEventOnAllStartedRoundsCommand;
@@ -10,18 +13,35 @@ describe('RunStartEventOnAllStartedRoundsCommand', () => {
     save: jest.fn(),
   };
 
-  const round = {
-    id: 'round-1',
+  const mockDBContext = {
+    startTransaction: jest.fn().mockResolvedValue(undefined),
+    commitTransaction: jest.fn().mockResolvedValue(undefined),
+    rollbackTransaction: jest.fn().mockResolvedValue(undefined),
+  };
+
+  const mockEventDispatcher = {
+    addEvent: jest.fn(),
+    dispatchEvents: jest.fn(),
+  };
+
+  const round = RoundEntity.load({
+    id: randomUUID(),
+    name: 'test',
+    description: 'tst',
+    icon: Icons.BOOK,
+    startOfRound: new Date(Date.now() + 1000000),
+    endOfRound: new Date(Date.now() + 2000000),
+    relatedTasks: [],
+    hidden: false,
     status: RoundStatus.CREATED,
-  } as any;
+  });
 
   beforeEach(() => {
     command = new RunStartEventOnAllStartedRoundsCommand();
 
     (command as any).roundRepository = roundRepository;
-    (command as any).eventDispatcher = {
-      addEvent: jest.fn(),
-    };
+    (command as any).DBContext = mockDBContext;
+    (command as any).eventDispatcher = mockEventDispatcher;
 
     jest.clearAllMocks();
   });
@@ -33,20 +53,52 @@ describe('RunStartEventOnAllStartedRoundsCommand', () => {
 
     expect(roundRepository.findAllStartedButNotProcessed).toHaveBeenCalled();
 
-    expect((command as any).eventDispatcher.addEvent).toHaveBeenCalledWith(
+    expect(mockEventDispatcher.addEvent).toHaveBeenCalledWith(
       expect.any(RoundStarted),
     );
 
     expect(round.status).toBe(RoundStatus.IN_PROGRESS);
 
     expect(roundRepository.save).toHaveBeenCalledWith(round);
+
+    expect(mockDBContext.startTransaction).toHaveBeenCalled();
+    expect(mockDBContext.commitTransaction).toHaveBeenCalled();
   });
 
   it('should process multiple rounds in parallel', async () => {
-    const r1 = { id: 'r1', status: RoundStatus.CREATED };
-    const r2 = { id: 'r2', status: RoundStatus.CREATED };
+    const r1 = RoundEntity.load({
+      id: 'r1',
+      name: 'r1',
+      description: 'aa',
+      icon: Icons.BOOK,
+      startOfRound: new Date(),
+      endOfRound: new Date(),
+      relatedTasks: [],
+      hidden: false,
+      status: RoundStatus.CREATED,
+    });
+
+    const r2 = RoundEntity.load({
+      id: 'r2',
+      name: 'r2',
+      description: 'aa',
+      icon: Icons.BOOK,
+      startOfRound: new Date(),
+      endOfRound: new Date(),
+      relatedTasks: [],
+      hidden: false,
+      status: RoundStatus.CREATED,
+    });
 
     roundRepository.findAllStartedButNotProcessed.mockResolvedValue([r1, r2]);
+    // roundRepository.findAllStartedButNotProcessed.mockImplementation(
+    //   async () => {
+    //     return [
+    //       RoundEntity.load(r1.toJSON()), // Returns a brand new memory reference
+    //       RoundEntity.load(r2.toJSON()),
+    //     ];
+    //   },
+    // );
 
     await command.execute();
 
@@ -61,12 +113,12 @@ describe('RunStartEventOnAllStartedRoundsCommand', () => {
 
     roundRepository.findAllStartedButNotProcessed.mockResolvedValue([r1, r2]);
 
-    const dispatcher = (command as any).eventDispatcher;
-
     await command.execute();
 
-    expect(dispatcher.addEvent).toHaveBeenCalledTimes(2);
-    expect(dispatcher.addEvent).toHaveBeenCalledWith(expect.any(RoundStarted));
+    expect(mockEventDispatcher.addEvent).toHaveBeenCalledTimes(2);
+    expect(mockEventDispatcher.addEvent).toHaveBeenCalledWith(
+      expect.any(RoundStarted),
+    );
   });
 
   it('should do nothing when no rounds exist', async () => {
@@ -75,6 +127,6 @@ describe('RunStartEventOnAllStartedRoundsCommand', () => {
     await command.execute();
 
     expect(roundRepository.save).not.toHaveBeenCalled();
-    expect((command as any).eventDispatcher.addEvent).not.toHaveBeenCalled();
+    expect(mockEventDispatcher.addEvent).not.toHaveBeenCalled();
   });
 });

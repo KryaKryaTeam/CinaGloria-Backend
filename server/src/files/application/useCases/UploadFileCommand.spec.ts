@@ -9,9 +9,21 @@ describe('UploadFileCommand', () => {
     save: jest.fn(),
   };
 
+  const dbContextMock = {
+    startTransaction: jest.fn(),
+    commitTransaction: jest.fn(),
+    rollbackTransaction: jest.fn(),
+  };
+
+  const eventDispatcherMock = {
+    dispatchEvents: jest.fn(),
+  };
+
   const command = new UploadFileCommand();
   (command as any).loadFileService = loadFileService;
   (command as any).fileRepository = fileRepository;
+  (command as any).DBContext = dbContextMock;
+  (command as any).eventDispatcher = eventDispatcherMock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -39,5 +51,10 @@ describe('UploadFileCommand', () => {
     expect(fileRepository.save).toHaveBeenCalledWith(file);
 
     expect(result).toEqual({ file });
+
+    // optional but smart:
+    expect(dbContextMock.startTransaction).toHaveBeenCalled();
+    expect(dbContextMock.commitTransaction).toHaveBeenCalled();
+    expect(eventDispatcherMock.dispatchEvents).toHaveBeenCalled();
   });
 });

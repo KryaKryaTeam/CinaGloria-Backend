@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SetRoleToAUserCommand } from 'src/authorization/application/useCases/SetRoleToAUser.command';
-import { ReposTokens } from 'src/common/Tokens';
+import { BaseTokens, ReposTokens } from 'src/common/Tokens';
 import { RoleEnum } from 'src/types/RoleEnum';
 
 const mockUserRepository = {
@@ -10,12 +10,19 @@ const mockUserRepository = {
 
 const mockEventDispatcher = {
   dispatch: jest.fn(),
+  dispatchEvents: jest.fn(),
 };
 
 const makeUser = () => ({
   setRoleTo: jest.fn(),
   pullEvents: jest.fn(),
 });
+
+const mockDBContext = {
+  startTransaction: jest.fn(),
+  commitTransaction: jest.fn(),
+  rollbackTransaction: jest.fn(),
+};
 
 const fakeActor = { id: 'actor-uuid', role: RoleEnum.ADMIN } as any;
 
@@ -27,11 +34,13 @@ describe('SetRoleToAUserCommand', () => {
       providers: [
         SetRoleToAUserCommand,
         { provide: ReposTokens.UserRepository, useValue: mockUserRepository },
+        { provide: BaseTokens.DBContext, useValue: mockDBContext },
+        { provide: BaseTokens.EventDispatcher, useValue: mockEventDispatcher },
       ],
     }).compile();
 
     command = module.get(SetRoleToAUserCommand);
-    (command as any).eventDispatcher = mockEventDispatcher;
+
     jest.clearAllMocks();
   });
 

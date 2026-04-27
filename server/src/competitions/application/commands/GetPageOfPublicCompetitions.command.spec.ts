@@ -7,9 +7,15 @@ describe('GetPublicCompetitionsPageQuery', () => {
     getPage: jest.fn(),
   };
 
+  const mockEventDispatcher = {
+    dispatchEvents: jest.fn(),
+  };
+
   beforeEach(() => {
     query = new GetPublicCompetitionsPageQuery();
+
     (query as any).competitionRepository = mockRepo;
+    (query as any).eventDispatcher = mockEventDispatcher;
 
     jest.clearAllMocks();
   });
@@ -29,6 +35,8 @@ describe('GetPublicCompetitionsPageQuery', () => {
     expect(result).toEqual({
       competitions: [{ id: 'pub-1' }, { id: 'pub-3' }],
     });
+
+    expect(mockEventDispatcher.dispatchEvents).toHaveBeenCalled();
   });
 
   it('should throw if repo returns empty array', async () => {
@@ -37,6 +45,7 @@ describe('GetPublicCompetitionsPageQuery', () => {
     await expect(query.execute({ page: 1 })).rejects.toThrow();
 
     expect(mockRepo.getPage).toHaveBeenCalledWith(1);
+    expect(mockEventDispatcher.dispatchEvents).not.toHaveBeenCalled();
   });
 
   it('should throw if no public competitions after filtering', async () => {
@@ -50,5 +59,6 @@ describe('GetPublicCompetitionsPageQuery', () => {
     await expect(query.execute({ page: 1 })).rejects.toThrow();
 
     expect(mockRepo.getPage).toHaveBeenCalledWith(1);
+    expect(mockEventDispatcher.dispatchEvents).not.toHaveBeenCalled();
   });
 });

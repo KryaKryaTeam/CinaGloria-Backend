@@ -1,4 +1,5 @@
 import { FileMapper } from 'src/files/application/mappers/FileMapper';
+import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { MimeType } from 'src/files/domain/objects/MimeType.object';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
 
@@ -6,10 +7,11 @@ describe('FileMapper', () => {
   const mapper = new FileMapper();
 
   const schema = {
-    url: 'https://file.com/a.png',
-    mimeType: 'image/png',
+    url: InternalFile.define('test', 'user:avatar', 'user:avatar').url,
+    mimeType: new MimeType('image/png'),
     size: 1234,
-    slot: 'file:avatar',
+    // slot: RelationString.define('user:avatar'),
+    slot: 'user:avatar',
   } as any;
 
   describe('toEntity', () => {

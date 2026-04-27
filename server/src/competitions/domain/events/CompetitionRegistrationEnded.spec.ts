@@ -1,5 +1,5 @@
-import { CompetitionRegistrationEnded } from 'src/competitions/domain/events/CompetititonRegistrationStarted.event';
 import { EventType } from 'src/common/domain/EventType';
+import { CompetitionRegistrationEnded } from './CompetitionRegistrationEnded';
 
 describe('CompetitionRegistrationEnded', () => {
   const competition = { id: 'comp-1' } as any;

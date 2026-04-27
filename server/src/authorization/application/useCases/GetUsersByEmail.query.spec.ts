@@ -1,6 +1,8 @@
+// get-users-by-email.query.spec.ts
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { GetUsersByEmailQuery } from 'src/authorization/application/useCases/GetUsersByEmail.query';
-import { ReposTokens } from 'src/common/Tokens';
+import { BaseTokens, ReposTokens } from 'src/common/Tokens';
 
 // ─── Mocks ───────────────────────────────────────────────────────────────────
 
@@ -20,10 +22,18 @@ describe('GetUsersByEmailQuery', () => {
   let query: GetUsersByEmailQuery;
 
   beforeEach(async () => {
+    const mockEventDispatcher = {
+      dispatchEvents: jest.fn(),
+    };
+
+    const mockDbContext = {};
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GetUsersByEmailQuery,
         { provide: ReposTokens.UserRepository, useValue: mockUserRepository },
+        { provide: BaseTokens.EventDispatcher, useValue: mockEventDispatcher },
+        { provide: BaseTokens.DBContext, useValue: mockDbContext },
       ],
     }).compile();
 

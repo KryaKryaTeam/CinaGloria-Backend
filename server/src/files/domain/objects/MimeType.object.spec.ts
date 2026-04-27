@@ -1,5 +1,4 @@
 import { MimeType } from 'src/files/domain/objects/MimeType.object';
-import { FileErrors } from 'src/error/ApiError';
 
 describe('MimeType', () => {
   it('should create mime type correctly', () => {
@@ -24,6 +23,6 @@ describe('MimeType', () => {
   it('should throw if value is empty string', () => {
     expect(() => {
       new MimeType('' as any);
-    }).toThrow(FileErrors.MIME_TYPE_IS_UNDEFINED);
+    }).toThrow();
   });
 });

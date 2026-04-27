@@ -9,9 +9,21 @@ describe('DeleteGarbageCommand', () => {
     deleteFile: jest.fn(),
   };
 
+  const dbContextMock = {
+    startTransaction: jest.fn(),
+    commitTransaction: jest.fn(),
+    rollbackTransaction: jest.fn(),
+  };
+
+  const eventDispatcherMock = {
+    dispatchEvents: jest.fn(),
+  };
+
   const command = new DeleteGarbageCommand();
   (command as any).fileRepository = fileRepository;
   (command as any).loadFileService = loadFileService;
+  (command as any).DBContext = dbContextMock;
+  (command as any).eventDispatcher = eventDispatcherMock;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -31,6 +43,10 @@ describe('DeleteGarbageCommand', () => {
     expect(result.failedToDelete).toBe(0);
 
     expect(loadFileService.deleteFile).toHaveBeenCalledTimes(2);
+
+    expect(dbContextMock.startTransaction).toHaveBeenCalled();
+    expect(dbContextMock.commitTransaction).toHaveBeenCalled();
+    expect(eventDispatcherMock.dispatchEvents).toHaveBeenCalled();
   });
 
   it('should count failed deletions correctly', async () => {
@@ -47,6 +63,9 @@ describe('DeleteGarbageCommand', () => {
 
     expect(result.numberOfDeleted).toBe(1);
     expect(result.failedToDelete).toBe(1);
+
+    expect(dbContextMock.startTransaction).toHaveBeenCalled();
+    expect(dbContextMock.commitTransaction).toHaveBeenCalled();
   });
 
   it('should handle empty list', async () => {
@@ -56,5 +75,8 @@ describe('DeleteGarbageCommand', () => {
 
     expect(result.numberOfDeleted).toBe(0);
     expect(result.failedToDelete).toBe(0);
+
+    expect(dbContextMock.startTransaction).toHaveBeenCalled();
+    expect(dbContextMock.commitTransaction).toHaveBeenCalled();
   });
 });

@@ -14,6 +14,17 @@ describe('RunEndEventOnAllEndedRoundsCommand', () => {
     save: jest.fn(),
   };
 
+  const mockEventDispatcher = {
+    addEvent: jest.fn(),
+    dispatchEvents: jest.fn(),
+  };
+
+  const mockDBContext = {
+    startTransaction: jest.fn(),
+    commitTransaction: jest.fn(),
+    rollbackTransaction: jest.fn(),
+  };
+
   const round = { id: 'round-1' } as any;
   const competition = {
     id: 'comp-1',
@@ -25,9 +36,8 @@ describe('RunEndEventOnAllEndedRoundsCommand', () => {
 
     (command as any).roundRepo = roundRepo;
     (command as any).competitionRepo = competitionRepo;
-    (command as any).eventDispatcher = {
-      addEvent: jest.fn(),
-    };
+    (command as any).eventDispatcher = mockEventDispatcher;
+    (command as any).DBContext = mockDBContext;
 
     jest.clearAllMocks();
   });
@@ -37,7 +47,9 @@ describe('RunEndEventOnAllEndedRoundsCommand', () => {
     roundRepo.getParentCompetitionId.mockResolvedValue('comp-1');
     competitionRepo.findById.mockResolvedValue(competition);
 
-    await command.execute();
+    await command.execute(undefined as any);
+
+    expect(mockDBContext.startTransaction).toHaveBeenCalled();
 
     expect(roundRepo.findAllEndedButNotProcessed).toHaveBeenCalled();
     expect(roundRepo.getParentCompetitionId).toHaveBeenCalledWith(round);
@@ -45,19 +57,25 @@ describe('RunEndEventOnAllEndedRoundsCommand', () => {
     expect(competition.showNextRound).toHaveBeenCalled();
     expect(competitionRepo.save).toHaveBeenCalledWith(competition);
 
-    expect((command as any).eventDispatcher.addEvent).toHaveBeenCalledWith(
+    expect(mockEventDispatcher.addEvent).toHaveBeenCalledWith(
       expect.any(RoundEnded),
     );
+
+    expect(mockDBContext.commitTransaction).toHaveBeenCalled();
+    expect(mockEventDispatcher.dispatchEvents).toHaveBeenCalled();
   });
 
   it('should skip if no competitionId', async () => {
     roundRepo.findAllEndedButNotProcessed.mockResolvedValue([round]);
     roundRepo.getParentCompetitionId.mockResolvedValue(null);
 
-    await command.execute();
+    await command.execute(undefined as any);
 
     expect(competitionRepo.findById).not.toHaveBeenCalled();
     expect(competitionRepo.save).not.toHaveBeenCalled();
+
+    expect(mockDBContext.commitTransaction).toHaveBeenCalled();
+    expect(mockEventDispatcher.dispatchEvents).toHaveBeenCalled();
   });
 
   it('should skip if competition not found', async () => {
@@ -65,9 +83,12 @@ describe('RunEndEventOnAllEndedRoundsCommand', () => {
     roundRepo.getParentCompetitionId.mockResolvedValue('comp-1');
     competitionRepo.findById.mockResolvedValue(null);
 
-    await command.execute();
+    await command.execute(undefined as any);
 
     expect(competitionRepo.save).not.toHaveBeenCalled();
+
+    expect(mockDBContext.commitTransaction).toHaveBeenCalled();
+    expect(mockEventDispatcher.dispatchEvents).toHaveBeenCalled();
   });
 
   it('should emit event for each round', async () => {
@@ -77,11 +98,23 @@ describe('RunEndEventOnAllEndedRoundsCommand', () => {
     roundRepo.findAllEndedButNotProcessed.mockResolvedValue([r1, r2]);
     roundRepo.getParentCompetitionId.mockResolvedValue(null);
 
-    const dispatcher = (command as any).eventDispatcher;
+    await command.execute(undefined as any);
 
-    await command.execute();
+    expect(mockEventDispatcher.addEvent).toHaveBeenCalledTimes(2);
+    expect(mockEventDispatcher.addEvent).toHaveBeenCalledWith(
+      expect.any(RoundEnded),
+    );
+  });
 
-    expect(dispatcher.addEvent).toHaveBeenCalledTimes(2);
-    expect(dispatcher.addEvent).toHaveBeenCalledWith(expect.any(RoundEnded));
+  it('should rollback on error', async () => {
+    roundRepo.findAllEndedButNotProcessed.mockRejectedValue(new Error('boom'));
+
+    await expect(command.execute(undefined as any)).rejects.toThrow('boom');
+
+    expect(mockDBContext.startTransaction).toHaveBeenCalled();
+    expect(mockDBContext.rollbackTransaction).toHaveBeenCalled();
+
+    expect(mockDBContext.commitTransaction).not.toHaveBeenCalled();
+    expect(mockEventDispatcher.dispatchEvents).not.toHaveBeenCalled();
   });
 });

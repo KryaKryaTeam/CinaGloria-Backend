@@ -1,5 +1,5 @@
 import { FileRelationMapper } from 'src/files/application/mappers/FileRelationMapper';
-import { RelationString } from 'src/files/domain/objects/RelationSlots';
+import { FileRelation } from 'src/schemas/FileRelation.schema';
 
 describe('FileRelationMapper', () => {
   const fileMapper = {
@@ -32,14 +32,13 @@ describe('FileRelationMapper', () => {
       fileMapper.toEntity.mockReturnValue({ id: 'file1' });
       userMapper.toEntity.mockReturnValue({ id: 'user1' });
       competitionMapper.toEntity.mockReturnValue({ id: 'comp1' });
-
       const schema = {
         id: 'rel1',
         file: { raw: 'file' },
         user: { raw: 'user' },
         competition: { raw: 'comp' },
-        slot: 'file:avatar',
-      } as any;
+        slot: 'competition:avatar',
+      } as unknown as FileRelation;
 
       const entity = mapper.toEntity(schema);
 
@@ -48,8 +47,8 @@ describe('FileRelationMapper', () => {
       expect(competitionMapper.toEntity).toHaveBeenCalled();
 
       expect(entity.id).toBe('rel1');
-      expect(entity.slot).toBeInstanceOf(RelationString);
-      expect(entity.slot.valueOf()).toBe('file:avatar');
+      expect(entity.slot).toBe('competition:avatar');
+      expect(entity.slot.valueOf()).toBe('competition:avatar');
     });
 
     it('should handle optional fields', () => {

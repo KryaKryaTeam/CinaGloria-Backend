@@ -8,10 +8,11 @@ import { ApiError } from 'src/error/ApiError';
 describe('GetPublicProfileQuery', () => {
   let query: GetPublicProfileQuery;
 
-  // 1. Створюємо мок репозиторію
   const mockUserRepository = {
     findById: jest.fn(),
   };
+
+  const mockEventDispatcher = createMockEventDispatcher();
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -27,7 +28,7 @@ describe('GetPublicProfileQuery', () => {
         },
         {
           provide: BaseTokens.EventDispatcher,
-          useValue: createMockEventDispatcher(),
+          useValue: mockEventDispatcher,
         },
       ],
     }).compile();
@@ -43,12 +44,11 @@ describe('GetPublicProfileQuery', () => {
       avatarUrl: 'https://example.com/photo.jpg',
     };
 
-    // 2. Налаштовуємо мок так, щоб він повертав об'єкт з властивістю publicProfile
     mockUserRepository.findById.mockResolvedValue({
       publicProfile: mockPublicProfile,
     });
 
-    const result = await query.implementation(userId);
+    const result = await query.execute(userId);
 
     expect(mockUserRepository.findById).toHaveBeenCalledWith(userId);
     expect(result).toEqual(mockPublicProfile);
@@ -57,10 +57,8 @@ describe('GetPublicProfileQuery', () => {
   it('should throw DomainError when user is not found', async () => {
     const userId = 'invalid-id';
 
-    // 3. Репозиторій повертає null (користувача не знайдено)
     mockUserRepository.findById.mockResolvedValue(null);
 
-    await expect(query.implementation(userId)).rejects.toThrow(ApiError);
-    await expect(query.implementation(userId)).rejects.toThrow();
+    await expect(query.execute(userId)).rejects.toThrow(ApiError);
   });
 });

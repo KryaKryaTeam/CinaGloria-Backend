@@ -5,7 +5,7 @@ import { CreateCompetitionCommand } from './application/commands/CreateCompetiti
 import { DeclineScheduledPublishCommand } from './application/commands/DeclineScheduleOfPublishingOfCompetition.command';
 import { GetPublicCompetitionsPageQuery } from './application/commands/GetPageOfPublicCompetitions.command';
 import { GetCompetitionPageQuery } from './application/commands/GetPageOfCompetition.command';
-import { GetPublicCompetitionQuery } from './application/commands/GetPublicCompetition.command';
+import { GetPublicCompetitionQuery } from './application/commands/GetPublicCompetition.query';
 import { PublishCompetitionCommand } from './application/commands/PublishCompetition.command';
 import { ScheduleCompetitionPublishCommand } from './application/commands/SchedulePublishingOfCompetition.command';
 import { UpdateCompetitionCommand } from './application/commands/UpdateCompetition.command';

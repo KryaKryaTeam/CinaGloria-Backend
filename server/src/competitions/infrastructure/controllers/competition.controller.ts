@@ -20,7 +20,7 @@ import { DeclineScheduledPublishCommand } from 'src/competitions/application/com
 import { DeleteCompetitionCommand } from 'src/competitions/application/commands/DeleteCompetition';
 import { GetCompetitionPageQuery } from 'src/competitions/application/commands/GetPageOfCompetition.command';
 import { GetPublicCompetitionsPageQuery } from 'src/competitions/application/commands/GetPageOfPublicCompetitions.command';
-import { GetPublicCompetitionQuery } from 'src/competitions/application/commands/GetPublicCompetition.command';
+import { GetPublicCompetitionQuery } from 'src/competitions/application/commands/GetPublicCompetition.query';
 import { PublishCompetitionCommand } from 'src/competitions/application/commands/PublishCompetition.command';
 import { ScheduleCompetitionPublishCommand } from 'src/competitions/application/commands/SchedulePublishingOfCompetition.command';
 import { UpdateCompetitionCommand } from 'src/competitions/application/commands/UpdateCompetition.command';

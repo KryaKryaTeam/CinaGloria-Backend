@@ -23,6 +23,11 @@ import { CompetitionRepository } from './infrastructure/repositories/Competition
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { JsonInterceptor } from './infrastructure/interceptors/JsonInterceptor';
 import { RoundRepository } from './infrastructure/repositories/RoundRepository';
+import { TeamsModule } from 'src/teams/teams.module';
+import { TeamSchema } from 'src/schemas/Team.schema';
+import { RoundSchema } from 'src/schemas/Round.schema';
+import { TaskSchema } from 'src/schemas/Task.schema';
+import { TeamRepository } from './infrastructure/repositories/TeamRepository';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -50,6 +55,7 @@ const providers: Provider[] = [
     provide: ReposTokens.RoundRepository,
     useClass: RoundRepository,
   },
+  { provide: ReposTokens.TeamRepository, useClass: TeamRepository },
 ];
 
 @Global()
@@ -70,11 +76,15 @@ const providers: Provider[] = [
       FileSchema,
       FileRelation,
       CompetitionSchema,
+      TeamSchema,
+      RoundSchema,
+      TaskSchema,
     ]),
     forwardRef(() => AuthorizationModule),
     forwardRef(() => NotificationModule),
     forwardRef(() => FilesModule),
     forwardRef(() => CompetitionsModule),
+    forwardRef(() => TeamsModule),
   ],
 })
 export class CommonModule {}

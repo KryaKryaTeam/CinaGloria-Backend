@@ -1,4 +1,16 @@
-import { Module } from '@nestjs/common';
+import { Module, Provider } from '@nestjs/common';
+import { MapperTokens } from 'src/common/Tokens';
+import { TeamMapper } from './application/team.mapper';
 
-@Module({})
+const providers: Provider[] = [
+  {
+    provide: MapperTokens.TeamMapper,
+    useClass: TeamMapper,
+  },
+];
+
+@Module({
+  providers,
+  exports: [...providers],
+})
 export class TeamsModule {}

@@ -13,18 +13,15 @@ import {
   ITeamHistoryPlain,
   TeamHistoryObject,
 } from '../objects/TeamHistoryNode.object';
-
-export enum TeamStatus {
-  IDLE = 'IDLE',
-  REGISTRATION = 'REGISTRATION',
-  ACTIVE = 'ACTIVE',
-}
+import { TeamRegistartionEndedEvent } from '../events/TeamRegistartionEnded.event';
+import { TeamRegistarationCanceledEvent } from '../events/TeamRegistarationCanceled.event';
+import { TeamStatus } from 'src/types/TeamStatus';
 
 export interface ITeamPlain {
   id: string;
   name: string;
-  avatar: InternalFile;
-  banner: InternalFile;
+  avatar: InternalFile<'team:avatar'>;
+  banner: InternalFile<'team:banner'>;
   members: string[];
   captain: string;
   status: TeamStatus;
@@ -42,15 +39,15 @@ export interface ITeamPlain {
 interface ITeamCreate {
   captain: string;
   name: string;
-  avatar: InternalFile;
-  banner: InternalFile;
+  avatar: InternalFile<'team:avatar'>;
+  banner: InternalFile<'team:banner'>;
 }
 
 export class TeamEntity extends Entity {
   public readonly id: string;
   private _name: string;
-  private _avatar: InternalFile;
-  private _banner: InternalFile;
+  private _avatar: InternalFile<'team:avatar'>;
+  private _banner: InternalFile<'team:banner'>;
   private _members: string[]; // uuids
   private _captain: string; // uuid
   private _status: TeamStatus;
@@ -133,6 +130,15 @@ export class TeamEntity extends Entity {
   }
   get invites() {
     return [...this._memberInvites];
+  }
+  get avatar(): InternalFile<'team:avatar'> {
+    return this._avatar;
+  }
+  get banner(): InternalFile<'team:banner'> {
+    return this._banner;
+  }
+  get registrationTimeout() {
+    return this._registrationTimeout;
   }
   userIsAcceptInvite(uuid: string) {
     return (
@@ -293,13 +299,22 @@ export class TeamEntity extends Entity {
     this._memberInvites = [];
     this._registrationTimeout = undefined;
 
-    // throw event
+    this.addEvent(
+      new TeamRegistarationCanceledEvent({
+        team: this,
+        competitionId: this._activeCompetition!,
+      }),
+    );
   }
   endRegistration() {
-    if (!this._registrationTimeout || this.status != TeamStatus.REGISTRATION)
+    if (
+      !this._registrationTimeout ||
+      this.status != TeamStatus.REGISTRATION ||
+      this._registrationTimeout.getTime() < Date.now()
+    )
       ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
     if (
-      this._registrationTimeout.getTime() < Date.now() ||
+      this._registrationTimeout.getTime() >= Date.now() &&
       !this.allIsAccepted()
     ) {
       this.cancelRegistration('', true);
@@ -310,7 +325,12 @@ export class TeamEntity extends Entity {
     this._registrationTimeout = undefined;
     this._memberInvites = [];
 
-    // throw event
+    this.addEvent(
+      new TeamRegistartionEndedEvent({
+        team: this,
+        competitionId: this._activeCompetition!,
+      }),
+    );
   }
 
   // in competition status

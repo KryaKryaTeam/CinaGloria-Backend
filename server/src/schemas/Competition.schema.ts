@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { RoundSchema } from './Round.schema';
+import { TeamSchema } from './Team.schema';
 
 @Entity({
   name: 'competition',
@@ -55,10 +56,13 @@ export class CompetitionSchema {
   @Column({ type: 'jsonb', default: [] })
   rules: ICompetitionRule[];
 
+  @OneToMany(() => TeamSchema, (team) => team.activeCompetition)
+  teams: TeamSchema[];
+
   @OneToMany(() => RoundSchema, (round) => round.competition, {
     onDelete: 'CASCADE',
   })
-  rounds: RoundSchema;
+  rounds: RoundSchema[];
 
   @Column({
     type: 'enum',

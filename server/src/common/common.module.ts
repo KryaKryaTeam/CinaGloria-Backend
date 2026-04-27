@@ -1,5 +1,5 @@
 import { forwardRef, Global, Module, Provider } from '@nestjs/common';
-import { BaseTokens, ReposTokens } from './Tokens';
+import { BaseTokens, CommandTokens, ReposTokens } from './Tokens';
 import { EventDispatcher } from './application/events/EventDispatcher';
 import { EventHandler } from './application/events/EventHandler';
 import { DBContext } from './infrastructure/DBContext';

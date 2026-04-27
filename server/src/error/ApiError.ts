@@ -381,6 +381,26 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'Command params are wrong',
     status: 400,
   },
+  ROUND_008: {
+    message: "This round wasn't found",
+    status: 404,
+  },
+  ROUND_009: {
+    message: "Invalid date span. Rounds mustn't be held at the same time.",
+    status: 400,
+  },
+  ROUND_010: {
+    message: 'This round is hidden',
+    status: 400,
+  },
+  TASK_004: {
+    message: 'The task was not found',
+    status: 404,
+  },
+  USER_031: {
+    message: "The user doesn't have enough rights to access this feature",
+    status: 403,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -434,6 +454,7 @@ export const UserErrors = {
   GOOGLE_AUTHORIZATION_FAILED: 'USER_028',
   EMAIL_NOT_VERIFIED: 'USER_029',
   INVALID_AGE: 'USER_030',
+  NOT_ENOUGH_RIGHTS: 'USER_031',
 } as const;
 
 export const CompetitionErrors = {
@@ -465,12 +486,16 @@ export const RoundErrors = {
   ROUND_IS_READONLY: 'ROUND_005',
   TASK_NOT_FOUND_IN_ROUND: 'ROUND_006',
   CONTENT_LENGTH_RESTRICTION: 'ROUND_007',
+  ROUND_NOT_FOUND: 'ROUND_008',
+  SPAN_IS_INVALID: 'ROUND_009',
+  ROUND_IS_HIDDEN: 'ROUND_010',
 } as const;
 
 export const TaskErrors = {
   NAME_LENGTH_RESTRICTION: 'TASK_001',
   DESCRIPTION_LENGTH_RESTRICTION: 'TASK_002',
   INVALID_COLOR: 'TASK_003',
+  TASK_NOT_FOUND: 'TASK_004',
 } as const;
 
 export const FileErrors = {

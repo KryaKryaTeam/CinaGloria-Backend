@@ -1,32 +1,54 @@
+import { ApiError, RoundErrors, UserErrors } from 'src/error/ApiError';
 import {
   CompetitionEntity,
   ICreateCompetition,
 } from '../entities/Competition.entity';
 import { RoundEntity, type ICreateRound } from '../entities/Round.entity';
 import { ICreateTask, TaskEntity } from '../entities/Task.entity';
+import { UserEntity } from 'src/authorization/domain/entities/User.entity';
+import { RoleEnum } from 'src/types/RoleEnum';
 
 export class RoundAndCompetitionService {
-  createRound(data: ICreateRound) {
-    return RoundEntity.create(data);
+  static createRound(
+    round: ICreateRound,
+    competition: CompetitionEntity,
+    user: UserEntity,
+  ) {
+    if (!(user.hasRole(RoleEnum.ADMIN) || user.hasRole(RoleEnum.ORGANIZER)))
+      ApiError.throw(UserErrors.NOT_ENOUGH_RIGHTS);
+
+    const valid = competition.rounds.every(
+      (a) =>
+        a.startOfRound > round.endOfRound || a.endOfRound < round.startOfRound,
+    );
+
+    if (!valid) ApiError.throw(RoundErrors.SPAN_IS_INVALID);
+
+    const entity = RoundEntity.create(round);
+    competition.addRound(entity);
+    return entity;
   }
 
-  createCompetition(data: ICreateCompetition) {
+  static createCompetition(data: ICreateCompetition) {
     return CompetitionEntity.create(data);
   }
 
-  createTask(data: ICreateTask) {
+  static createTask(data: ICreateTask) {
     return TaskEntity.create(data);
   }
 
-  addTaskToRound(task: TaskEntity, round: RoundEntity) {
+  static addTaskToRound(task: TaskEntity, round: RoundEntity) {
     round.addTask(task);
   }
 
-  addRoundToCompetition(round: RoundEntity, competition: CompetitionEntity) {
+  static addRoundToCompetition(
+    round: RoundEntity,
+    competition: CompetitionEntity,
+  ) {
     competition.addRound(round);
   }
 
-  deleteRoundFromCompetition(
+  static deleteRoundFromCompetition(
     round: RoundEntity,
     competition: CompetitionEntity,
   ) {

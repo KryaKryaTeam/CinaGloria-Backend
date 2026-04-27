@@ -6,6 +6,9 @@ import { RoundSchema } from 'src/schemas/Round.schema';
 import { RoundMapper } from 'src/competitions/application/mapper/Round.mapper';
 import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
 import { RoundStatus } from 'src/types/RoundStatus';
+import { LessThan } from 'typeorm';
+import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
+import { CompetitionMapper } from 'src/competitions/application/mapper/Competition.mapper';
 
 export class RoundRepository
   extends BaseRepository<RoundSchema>
@@ -15,6 +18,9 @@ export class RoundRepository
 
   @Inject(MapperTokens.RoundMapper)
   private readonly mapper: RoundMapper;
+
+  @Inject(MapperTokens.CompetitionMapper)
+  private readonly competitionMapper: CompetitionMapper;
 
   async save(ent: RoundEntity): Promise<void> {
     await this.repository.save(this.mapper.toSchema(ent));
@@ -36,6 +42,7 @@ export class RoundRepository
       .getMany();
     return rounds.map((el) => this.mapper.toEntity(el));
   }
+
   async findAllStartedButNotProcessed(): Promise<RoundEntity[]> {
     const rounds = await this.repository
       .createQueryBuilder('round')
@@ -51,5 +58,33 @@ export class RoundRepository
     if (!_round) return null;
 
     return _round.competition.id;
+  }
+
+  async findFinishedRounds(): Promise<RoundEntity[] | null> {
+    const schema = await this.repository
+      .createQueryBuilder('round')
+      .where('round.endOfRound < :now', { now: new Date() })
+      .getMany();
+
+    return schema.map((el) => {
+      return this.mapper.toEntity(el);
+    });
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.repository.delete({ id });
+  }
+
+  async findRelatedCompetition(
+    roundId: string,
+  ): Promise<CompetitionEntity | null> {
+    const roundSchema = await this.repository.findOne({
+      where: { id: roundId },
+      relations: ['competition'],
+    });
+
+    if (!roundSchema) return null;
+
+    return this.competitionMapper.toEntity(roundSchema.competition);
   }
 }

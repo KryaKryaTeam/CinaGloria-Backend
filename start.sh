@@ -12,7 +12,8 @@ echo "2) Production Emulate (Build, 200MB Limit, No Watch)"
 echo "3) Clear docker cache and volumes"
 echo "4) Generate new migration"
 echo "5) Create new migration"
-echo -ne "Choose an option [1-5]: "
+echo "6) Run tests"
+echo -ne "Choose an option [1-6]: "
 read -r opt
 
 case $opt in
@@ -55,6 +56,11 @@ case $opt in
     cd server
     npm run migration:create
     echo -e "${GREEN}✅ Migration created!${NC}"
+    ;;
+  6)
+    echo -e "${GREEN}Start testing...${NC}"
+    cd server
+    npm run test
     ;;
   *)
     echo "Invalid option. Exiting."

@@ -13,6 +13,7 @@ export enum MapperTokens {
   CompetitionMapper = 'COMPETITION_MAPPER',
   RoundMapper = 'ROUND_MAPPER',
   TaskMapper = 'TASK_MAPPER',
+  TeamMapper = 'TEAM_MAPPER',
 }
 
 export enum ReposTokens {
@@ -23,6 +24,7 @@ export enum ReposTokens {
   FileRelationRepository = 'FILE_RELATION_REPOSITORY',
   CompetitionRepository = 'COMPETITION_REPOSITORY',
   RoundRepository = 'ROUND_REPOSITORY',
+  TeamRepository = 'TEAM_REPOSITORY',
   TaskRepository = 'TASK_REPOSITORY',
 }
 
@@ -63,6 +65,10 @@ export enum CommandTokens {
   PatchRoundCommand = 'PATCH_ROUND_COMMAND',
   ReadRoundCommand = 'READ_ROUND_COMMAND',
   CreateTaskCommand = 'CREAT_TASK_COMMAND',
+  UpdateSettingsOfCompetitionCommand = 'UPDATE_SETTINGS_OF_COMPETITION_COMMAND',
+  RunEndEventOnAllEndedRoundsCommand = 'RUN_END_EVENT_ON_ALL_ENDED_ROUNDS_COMMAND',
+  RunStartedEventOnAllStartedRoundsCommand = 'RUN_STARTED_EVENT_ON_ALL_STARTED_ROUNDS_COMMAND',
+  HandleCompetitionScheduledEventsCommand = 'HANDLE_COMPETITION_SCHEDULED_EVENTS_COMMAND',
 }
 
 export enum ServiceTokens {

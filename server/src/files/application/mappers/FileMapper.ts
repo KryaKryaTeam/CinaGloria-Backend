@@ -18,7 +18,7 @@ export class FileMapper extends Mapper<FileSchema, FileEntity> {
     const sch = new FileSchema();
     sch.url = entity.url;
     sch.size = entity.size;
-    sch.mimeType = entity.mimeType.value;
+    sch.mimeType = entity.mimeType.value!;
     sch.slot = entity.slot.value;
 
     return sch;

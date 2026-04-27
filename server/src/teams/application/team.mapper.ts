@@ -41,7 +41,9 @@ export class TeamMapper extends Mapper<TeamSchema, TeamEntity> {
     );
     sch.history = entity.history.map((el) => el.toJSON());
     sch.memberInvites = entity.invites;
-    sch.registrationTimeout = entity.registrationTimeout as Date | undefined;
+    sch.registrationTimeout = entity.registrationTimeout as unknown as
+      | Date
+      | undefined;
     sch.id = entity.id;
     sch.status = entity.status;
 

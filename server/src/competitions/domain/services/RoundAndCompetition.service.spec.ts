@@ -1,4 +1,3 @@
-import { RoundAndCompetitionService } from 'src/competitions/domain/services/RoundAndCompetition.service';
 import { CompetitionEntity } from '../entities/Competition.entity';
 import { RoundEntity } from '../entities/Round.entity';
 import { TaskEntity } from '../entities/Task.entity';
@@ -8,14 +7,9 @@ import { RoundStatus } from 'src/types/RoundStatus';
 import { CompetitionStatus } from 'src/types/CompetitionStatus';
 import { CompetitionSettings } from '../objects/CompetitionSettings';
 import { Color } from '../objects/Color.object';
+import { RoundAndCompetitionService } from './RoundAndCompetition.service';
 
 describe('RoundAndCompetitionService', () => {
-  let service: RoundAndCompetitionService;
-
-  beforeEach(() => {
-    service = new RoundAndCompetitionService();
-  });
-
   const task = TaskEntity.load({
     id: randomUUID(),
     name: 'test',
@@ -32,7 +26,7 @@ describe('RoundAndCompetitionService', () => {
     startOfRound: new Date(Date.now() + 1000000),
     endOfRound: new Date(Date.now() + 2000000),
     status: RoundStatus.CREATED,
-    relatedTasks: [{} as any],
+    relatedTasks: [{} as unknown as TaskEntity],
   });
 
   const competition = CompetitionEntity.load({

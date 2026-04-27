@@ -28,11 +28,6 @@ import { TeamSchema } from 'src/schemas/Team.schema';
 import { RoundSchema } from 'src/schemas/Round.schema';
 import { TaskSchema } from 'src/schemas/Task.schema';
 import { TeamRepository } from './infrastructure/repositories/TeamRepository';
-import { TeamsModule } from 'src/teams/teams.module';
-import { TeamSchema } from 'src/schemas/Team.schema';
-import { RoundSchema } from 'src/schemas/Round.schema';
-import { TaskSchema } from 'src/schemas/Task.schema';
-import { TeamRepository } from './infrastructure/repositories/TeamRepository';
 import { TaskRepository } from './infrastructure/repositories/TaskRepository';
 
 const providers: Provider[] = [

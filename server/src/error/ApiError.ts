@@ -417,6 +417,26 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'Did not fill in the name of the criteria',
     status: 400,
   },
+  SUBMITION_001: {
+    message: 'The submition was not found',
+    status: 404,
+  },
+  SUBMITION_002: {
+    message: 'Did not provide github url',
+    status: 400,
+  },
+  SUBMITION_003: {
+    message: 'Did not provide youtube url',
+    status: 400,
+  },
+  SUBMITION_004: {
+    message: 'Did not assign to jury',
+    status: 400,
+  },
+  SUBMITION_005: {
+    message: 'Did not provide any related tasks',
+    status: 400,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -557,6 +577,14 @@ export const CriteriaErrors = {
   NAME_IS_TOO_BIG: 'CRITERIA_002',
   DESCRIPTION_TOO_BIG: 'CRITERIA_003',
   NO_NAME: 'CRITERIA_004',
+};
+
+export const SubmitionErrors = {
+  SUBMITION_NOT_FOUND: 'SUBMITION_001',
+  NO_GITHUB_URL: 'SUBMITION_002',
+  NO_YOUTUBE_URL: 'SUBMITION_003',
+  NO_JURY: 'SUBMITION_004',
+  NO_RELATED_TASKS: 'SUBMITION_005',
 };
 
 export type ApiErrorCode = keyof typeof ApiErrorsCodeVal;

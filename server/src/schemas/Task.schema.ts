@@ -1,5 +1,6 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { RoundSchema } from './Round.schema';
+import { SubmitionSchema } from './Submition.schme';
 
 @Entity({ name: 'task' })
 export class TaskSchema {
@@ -17,4 +18,7 @@ export class TaskSchema {
 
   @ManyToOne(() => RoundSchema, (round) => round.relatedTasks)
   round: RoundSchema;
+
+  @ManyToOne(() => SubmitionSchema, (submition) => submition.relatedTasks)
+  submition: SubmitionSchema;
 }

@@ -15,6 +15,7 @@ export enum MapperTokens {
   TaskMapper = 'TASK_MAPPER',
   TeamMapper = 'TEAM_MAPPER',
   CriteriaMapper = 'CRITERIA_MAPPER',
+  SubmitionMapper = 'SUBMITION_MAPPER',
 }
 
 export enum ReposTokens {
@@ -28,6 +29,7 @@ export enum ReposTokens {
   TeamRepository = 'TEAM_REPOSITORY',
   TaskRepository = 'TASK_REPOSITORY',
   CriteriaRepository = 'CRITERIA_REPOSTORY',
+  SubmitionRepository = 'SUBMITION_REPOSITORY',
 }
 
 export enum CommandTokens {

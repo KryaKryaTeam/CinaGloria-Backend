@@ -401,6 +401,10 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: "The user doesn't have enough rights to access this feature",
     status: 403,
   },
+  SCORE_001: {
+    message: 'This score was not found',
+    status: 404,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -534,6 +538,10 @@ export const TestErrors = {
 
 export const CommandErrors = {
   COMMAND_PARAMS_WRONG: 'COMMAND_001',
+};
+
+export const ScoreErrors = {
+  SCORE_NOT_FOUND: 'SCORE_001',
 };
 
 export type ApiErrorCode = keyof typeof ApiErrorsCodeVal;

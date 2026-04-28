@@ -23,6 +23,7 @@ import { CompetitionRepository } from './infrastructure/repositories/Competition
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { JsonInterceptor } from './infrastructure/interceptors/JsonInterceptor';
 import { RoundRepository } from './infrastructure/repositories/RoundRepository';
+import { ScoreRepository } from './infrastructure/repositories/ScoreRepository';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -50,6 +51,7 @@ const providers: Provider[] = [
     provide: ReposTokens.RoundRepository,
     useClass: RoundRepository,
   },
+  { provide: ReposTokens.ScoreRepository, useClass: ScoreRepository },
 ];
 
 @Global()

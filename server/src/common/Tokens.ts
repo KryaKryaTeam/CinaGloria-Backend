@@ -13,6 +13,7 @@ export enum MapperTokens {
   CompetitionMapper = 'COMPETITION_MAPPER',
   RoundMapper = 'ROUND_MAPPER',
   TaskMapper = 'TASK_MAPPER',
+  ScoreMapper = 'SCORE_MAPPER',
 }
 
 export enum ReposTokens {
@@ -24,6 +25,7 @@ export enum ReposTokens {
   CompetitionRepository = 'COMPETITION_REPOSITORY',
   RoundRepository = 'ROUND_REPOSITORY',
   TaskRepository = 'TASK_REPOSITORY',
+  ScoreRepository = 'SCORE_REPOSITORY',
 }
 
 export enum CommandTokens {

@@ -3,22 +3,15 @@ import { Command } from 'src/common/application/Command';
 import type { ICompetitionRepository } from '../bounds/CompetitionRepository';
 import { ReposTokens } from 'src/common/Tokens';
 import { RoundAndCompetitionService } from 'src/competitions/domain/services/RoundAndCompetition.service';
-import { Icons } from 'src/types/Icons';
 import { ApiError, CompetitionErrors, UserErrors } from 'src/error/ApiError';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { RoleEnum } from 'src/types/RoleEnum';
+import { ICreateRound } from 'src/competitions/domain/entities/Round.entity';
 
 interface CreateRoundCommandProps {
   user: UserEntity;
-  competition: {
-    name: string;
-    description?: string;
-    hidden: boolean;
-    startOfRound: Date;
-    endOfRound: Date;
-    icon: Icons;
-    id: string;
-  };
+  competitionId: string;
+  roundData: ICreateRound;
 }
 
 @Injectable()
@@ -36,16 +29,12 @@ export class CreateRoundCommand extends Command<CreateRoundCommandProps, void> {
       ApiError.throw(UserErrors.NOT_ENOUGH_RIGHTS);
 
     const competition = await this.competitionRepostiory.findById(
-      data.competition.id,
+      data.competitionId,
     );
     if (!competition) ApiError.throw(CompetitionErrors.UNDEFINED);
 
     const round = RoundAndCompetitionService.createRound(
-      {
-        ...data.competition,
-        description: data.competition.description ?? '',
-        relatedTasks: [],
-      },
+      data.roundData,
       competition,
       data.user,
     );

@@ -22,6 +22,7 @@ import { DeleteRoundCommand } from './application/commands/DeleteRound.command';
 import { PatchRoundCommand } from './application/commands/PatchRound.command';
 import { ReadRoundCommand } from './application/commands/ReadRound.command';
 import { CreateTaskCommand } from './application/commands/CreateTask.command';
+import { TeamsModule } from 'src/teams/teams.module';
 
 const providers: Provider[] = [
   {
@@ -86,7 +87,7 @@ const providers: Provider[] = [
 @Module({
   providers,
   exports: [...providers],
-  imports: [forwardRef(() => FilesModule)],
+  imports: [forwardRef(() => FilesModule), forwardRef(() => TeamsModule)],
   controllers: [CompetitionController, RoundController, TaskController],
 })
 export class CompetitionsModule {}

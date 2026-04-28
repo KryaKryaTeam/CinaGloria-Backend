@@ -9,11 +9,11 @@ import { RoleEnum } from 'src/types/RoleEnum';
 
 interface PatchRoundCommandProps {
   user: UserEntity;
-  id: string;
+  roundId: string;
   name?: string;
   description?: string;
-  hidden?: boolean;
   startOfRound?: Date;
+  taskTimeout?: Date;
   endOfRound?: Date;
   icon?: Icons;
 }
@@ -32,13 +32,14 @@ export class PatchRoundCommand extends Command<PatchRoundCommandProps, void> {
     )
       ApiError.throw(UserErrors.NOT_ENOUGH_RIGHTS);
 
-    const round = await this.roundRepository.findById(data.id);
+    const round = await this.roundRepository.findById(data.roundId);
 
     if (!round) ApiError.throw(RoundErrors.ROUND_NOT_FOUND);
 
     if (data.name) round.name = data.name;
     if (data.description) round.description = data.description;
     if (data.startOfRound) round.startOfRound = data.startOfRound;
+    if (data.taskTimeout) round.taskTimeout = data.taskTimeout;
     if (data.endOfRound) round.endOfRound = data.endOfRound;
     if (data.icon) round.icon = data.icon;
 

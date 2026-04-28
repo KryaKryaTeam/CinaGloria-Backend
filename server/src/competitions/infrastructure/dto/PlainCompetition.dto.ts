@@ -5,6 +5,8 @@ import { CompetitionRuleDto } from './CompetitionRule.dto';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionRule } from 'src/competitions/domain/objects/CompetitionRule.object';
 import { CompetitionSettings } from 'src/competitions/domain/objects/CompetitionSettings';
+import { IRoundPlain } from 'src/competitions/domain/entities/Round.entity';
+import { ITeamPlain } from 'src/teams/domain/entities/Team.entity';
 
 export class PlainCompetitionDto implements ICompetitionPlain {
   @ApiProperty({
@@ -127,4 +129,10 @@ export class PlainCompetitionDto implements ICompetitionPlain {
     description: 'A settings of competition',
   })
   settings: CompetitionSettings;
+
+  @ApiProperty({})
+  rounds: IRoundPlain[];
+
+  @ApiProperty({})
+  teams: ITeamPlain[];
 }

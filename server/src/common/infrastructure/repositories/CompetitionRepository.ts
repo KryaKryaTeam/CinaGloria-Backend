@@ -21,7 +21,14 @@ export class CompetitionRepository
   }
 
   async findById(id: string): Promise<CompetitionEntity | null> {
-    const result = await this.repository.findOneBy({ id });
+    const result = await this.repository.findOne({
+      where: { id },
+      relations: {
+        rounds: {
+          relatedTasks: true,
+        },
+      },
+    });
     if (!result) return null;
 
     return this.mapper.toEntity(result);
@@ -32,9 +39,18 @@ export class CompetitionRepository
   }
 
   async getPage(pageNum: number): Promise<CompetitionEntity[]> {
-    return (await this.repository.find({ take: 20, skip: pageNum * 20 })).map(
-      (el) => this.mapper.toEntity(el),
-    );
+    return (
+      await this.repository.find({
+        take: 20,
+        skip: pageNum * 20,
+        relations: {
+          rounds: {
+            relatedTasks: true,
+          },
+          teams: true,
+        },
+      })
+    ).map((el) => this.mapper.toEntity(el));
   }
 
   async findAllEndedNotProcessed(): Promise<CompetitionEntity[]> {

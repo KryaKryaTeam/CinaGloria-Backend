@@ -19,8 +19,9 @@ export class RoundMapper extends Mapper<RoundSchema, RoundEntity> {
       id: schema.id,
       name: schema.name,
       description: schema.description,
-      startOfRound: schema.startOfRound!,
-      endOfRound: schema.endOfRound!,
+      startOfRound: schema.startOfRound,
+      taskTimeout: schema.taskTimeout,
+      endOfRound: schema.endOfRound,
       hidden: schema.hidden,
       icon: schema.icon,
       relatedTasks: tasks,
@@ -36,6 +37,7 @@ export class RoundMapper extends Mapper<RoundSchema, RoundEntity> {
     schema.description = entity.description;
     schema.hidden = entity.hidden;
     schema.startOfRound = entity.startOfRound;
+    schema.taskTimeout = entity.taskTimeout;
     schema.endOfRound = entity.endOfRound;
     schema.icon = entity.icon!;
     schema.status = entity.status;

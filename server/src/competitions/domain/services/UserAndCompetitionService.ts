@@ -6,7 +6,6 @@ import {
 import { RoleEnum } from 'src/types/RoleEnum';
 import { ApiError, CompetitionErrors } from 'src/error/ApiError';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
-import { CompetitionStatus } from 'src/types/CompetitionStatus';
 import { CompetitionSettings } from '../objects/CompetitionSettings';
 
 export interface ICompetitionChangeFields {
@@ -78,7 +77,7 @@ export class UserAndCompetitionService {
   static publishCompetiton(competition: CompetitionEntity, user: UserEntity) {
     this.userCanEditCompetitions(user);
 
-    competition.status = CompetitionStatus.PUBLISHED;
+    competition.publish();
   }
 
   static deleteCompetition(competition: CompetitionEntity, user: UserEntity) {

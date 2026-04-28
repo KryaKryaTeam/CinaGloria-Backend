@@ -3,13 +3,14 @@ import { Entity } from 'src/common/domain/Entity';
 import { Icons } from 'src/types/Icons';
 import { RoundStatus } from 'src/types/RoundStatus';
 import { TaskEntity } from './Task.entity';
-import { ApiError, RoundErrors } from 'src/error/ApiError';
+import { ApiError, DomainErrors, RoundErrors } from 'src/error/ApiError';
 
 export interface ICreateRound {
   name: string;
   description: string;
   icon: Icons;
   startOfRound: Date;
+  taskTimeout: Date;
   endOfRound: Date;
   relatedTasks: TaskEntity[];
   hidden: boolean;
@@ -23,6 +24,7 @@ export interface IRoundPlain {
   icon: Icons;
   startOfRound: Date;
   endOfRound: Date;
+  taskTimeout: Date;
   relatedTasks: TaskEntity[];
   status: RoundStatus;
 }
@@ -34,11 +36,13 @@ export class RoundEntity extends Entity {
   private _description: string;
   private _icon: Icons;
   private _startOfRound: Date;
+  private _taskTimeout: Date;
   private _endOfRound: Date;
   private _relatedTasks: TaskEntity[];
   private _status: RoundStatus;
 
   private constructor(plain: IRoundPlain) {
+    RoundEntity.validate(plain);
     super();
     this.id = plain.id;
     this._hidden = plain.hidden;
@@ -46,9 +50,27 @@ export class RoundEntity extends Entity {
     this._description = plain.description;
     this._icon = plain.icon;
     this._startOfRound = plain.startOfRound;
+    this._taskTimeout = plain.taskTimeout;
     this._endOfRound = plain.endOfRound;
     this._relatedTasks = plain.relatedTasks;
     this._status = plain.status;
+  }
+
+  public static validate(plain: IRoundPlain): void {
+    if (plain.name.trim().length == 0 || plain.name.trim().length > 255)
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    if (
+      plain.description.trim().length == 0 ||
+      plain.description.trim().length > 1000
+    )
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    if (
+      plain.endOfRound.getTime() <= plain.taskTimeout.getTime() ||
+      plain.taskTimeout.getTime() <= plain.startOfRound.getTime()
+    )
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
   }
 
   public static create(data: ICreateRound) {
@@ -104,15 +126,32 @@ export class RoundEntity extends Entity {
 
     if (this._endOfRound && date.getTime() >= this._endOfRound.getTime())
       ApiError.throw(RoundErrors.INVALID_DATE_SEQUENCE);
+    if (this._taskTimeout && date.getTime() >= this._taskTimeout.getTime())
+      ApiError.throw(RoundErrors.INVALID_DATE_SEQUENCE);
 
     this._startOfRound = date;
+  }
+
+  set taskTimeout(date: Date) {
+    if (date < new Date()) ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    if (this._startOfRound && date.getTime() >= this._startOfRound.getTime())
+      ApiError.throw(RoundErrors.INVALID_DATE_SEQUENCE);
+
+    if (this._endOfRound && date.getTime() <= this._endOfRound.getTime())
+      ApiError.throw(RoundErrors.INVALID_DATE_SEQUENCE);
+
+    this._taskTimeout = date;
   }
 
   set endOfRound(date: Date) {
     if (date < new Date()) ApiError.throw(RoundErrors.END_DATE_INVALID);
 
-    if (this._endOfRound && date.getTime() <= this._endOfRound.getTime())
+    if (this._startOfRound && date.getTime() <= this._startOfRound.getTime())
       ApiError.throw(RoundErrors.INVALID_DATE_SEQUENCE);
+    if (this._taskTimeout && date.getTime() <= this._taskTimeout.getTime())
+      ApiError.throw(RoundErrors.INVALID_DATE_SEQUENCE);
+
     this._endOfRound = date;
   }
 
@@ -136,6 +175,10 @@ export class RoundEntity extends Entity {
 
   get startOfRound() {
     return this._startOfRound;
+  }
+
+  get taskTimeout() {
+    return this._taskTimeout;
   }
 
   get endOfRound(): Date {
@@ -171,6 +214,7 @@ export class RoundEntity extends Entity {
       name: this.name,
       description: this.description,
       startOfRound: this._startOfRound,
+      taskTimeout: this._taskTimeout,
       status: this.status,
       hidden: this.hidden,
       endOfRound: this.endOfRound,

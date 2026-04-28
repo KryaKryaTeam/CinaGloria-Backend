@@ -36,8 +36,9 @@ export class RoundController {
   @ApiResponse({ status: 201, type: CreateRoundDto })
   async createRound(@Body() dto: CreateRoundDto, @UserId() user: UserEntity) {
     return await this.createRoundCommand.execute({
-      competition: { ...dto, id: dto.competitionId },
-      user: user,
+      competitionId: dto.competitionId,
+      roundData: dto.round,
+      user,
     });
   }
 

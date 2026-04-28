@@ -401,6 +401,22 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: "The user doesn't have enough rights to access this feature",
     status: 403,
   },
+  CRITERIA_001: {
+    message: 'The criteria was not found',
+    status: 404,
+  },
+  CRITERIA_002: {
+    message: 'The name of this criteria is too big',
+    status: 400,
+  },
+  CRITERIA_003: {
+    message: 'The description of this criteria is too big',
+    status: 400,
+  },
+  CRITERIA_004: {
+    message: 'Did not fill in the name of the criteria',
+    status: 400,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -534,6 +550,13 @@ export const TestErrors = {
 
 export const CommandErrors = {
   COMMAND_PARAMS_WRONG: 'COMMAND_001',
+};
+
+export const CriteriaErrors = {
+  CRITERIA_NOT_FOUND: 'CRITERIA_001',
+  NAME_IS_TOO_BIG: 'CRITERIA_002',
+  DESCRIPTION_TOO_BIG: 'CRITERIA_003',
+  NO_NAME: 'CRITERIA_004',
 };
 
 export type ApiErrorCode = keyof typeof ApiErrorsCodeVal;

@@ -29,6 +29,7 @@ import { RoundSchema } from 'src/schemas/Round.schema';
 import { TaskSchema } from 'src/schemas/Task.schema';
 import { TeamRepository } from './infrastructure/repositories/TeamRepository';
 import { TaskRepository } from './infrastructure/repositories/TaskRepository';
+import { CriteriaRepository } from './infrastructure/repositories/CriteriaRepotisory';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -58,6 +59,7 @@ const providers: Provider[] = [
   },
   { provide: ReposTokens.TeamRepository, useClass: TeamRepository },
   { provide: ReposTokens.TaskRepository, useClass: TaskRepository },
+  { provide: ReposTokens.CriteriaRepository, useClass: CriteriaRepository },
 ];
 
 @Global()

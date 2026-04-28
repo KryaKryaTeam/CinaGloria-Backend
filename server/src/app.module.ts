@@ -24,6 +24,7 @@ import { ApiErrorExceptionsFilter } from './error/ApiError.filter';
 import { TestAndSetupModule } from './test-and-setup/test-and-setup.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TeamsModule } from './teams/teams.module';
+import { TaskCollectorModule } from './task-collector/task-collector.module';
 
 @Module({
   providers: [
@@ -61,6 +62,7 @@ import { TeamsModule } from './teams/teams.module';
     TestAndSetupModule,
     ScheduleModule.forRoot(),
     TeamsModule,
+    TaskCollectorModule,
   ],
 })
 export class AppModule {}

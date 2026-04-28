@@ -31,18 +31,21 @@ describe('CompetitionEntity', () => {
     };
   };
 
-  const createFullParams = (): ICreateCompetition => ({
-    name: 'Pro League 2026',
-    description: 'The ultimate showdown.',
-    banner: mockFile<typeof RelationSlots.competition.banner>('banner'),
-    avatar: mockFile<typeof RelationSlots.competition.avatar>('avatar'),
-    ultraWideBanner:
-      mockFile<typeof RelationSlots.competition.ultraWideBanner>('uw-banner'),
-    socialMedia:
-      mockFile<typeof RelationSlots.competition.socialMedia>('social'),
-    ...getValidDates(),
-    rules: [mockRule('Rule 1')],
-  });
+  const createFullParams = (): ICreateCompetition =>
+    ({
+      name: 'Pro League 2026',
+      description: 'The ultimate showdown.',
+      banner: mockFile<typeof RelationSlots.competition.banner>('banner'),
+      avatar: mockFile<typeof RelationSlots.competition.avatar>('avatar'),
+      ultraWideBanner:
+        mockFile<typeof RelationSlots.competition.ultraWideBanner>('uw-banner'),
+      socialMedia:
+        mockFile<typeof RelationSlots.competition.socialMedia>('social'),
+      ...getValidDates(),
+      rules: [mockRule('Rule 1')],
+      teams: [],
+      rounds: [],
+    }) as unknown as ICreateCompetition;
 
   // --- Tests ---
 

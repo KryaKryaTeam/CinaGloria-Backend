@@ -24,7 +24,8 @@ describe('RoundAndCompetitionService', () => {
     hidden: false,
     icon: Icons.BOOK,
     startOfRound: new Date(Date.now() + 1000000),
-    endOfRound: new Date(Date.now() + 2000000),
+    taskTimeout: new Date(Date.now() + 2000000),
+    endOfRound: new Date(Date.now() + 3000000),
     status: RoundStatus.CREATED,
     relatedTasks: [{} as unknown as TaskEntity],
   });
@@ -34,6 +35,8 @@ describe('RoundAndCompetitionService', () => {
     status: CompetitionStatus.DRAFT,
     rules: [],
     settings: CompetitionSettings.createDefaults(),
+    rounds: [],
+    teams: [],
   });
   competition.addRound(round);
 

@@ -11,7 +11,8 @@ import { CompetitionStatus } from 'src/types/CompetitionStatus';
 import { CompetitionSettings } from 'src/competitions/domain/objects/CompetitionSettings';
 import { Icons } from 'src/types/Icons';
 import { CompetitionRule } from 'src/competitions/domain/objects/CompetitionRule.object';
-import { RelationString } from 'src/files/domain/objects/RelationSlots';
+import { Test, TestingModule } from '@nestjs/testing';
+import { BaseTokens, CommandTokens, ReposTokens } from 'src/common/Tokens';
 
 describe('ScheduleCompetitionPublishCommand', () => {
   let command: ScheduleCompetitionPublishCommand;
@@ -81,14 +82,31 @@ describe('ScheduleCompetitionPublishCommand', () => {
 
     rules: [CompetitionRule.define('test', 'test', Icons.BOOK)],
     settings: CompetitionSettings.createDefaults(),
+    rounds: [],
+    teams: [],
   });
   const publishAt = new Date('2026-01-01T10:00:00Z');
 
-  beforeEach(() => {
-    command = new ScheduleCompetitionPublishCommand();
-    (command as any).competitionRepository = mockRepo;
-    (command as any).DBContext = dbContextMock;
-    (command as any).eventDispatcher = eventDispatcherMock;
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        {
+          provide: CommandTokens.ScheduleCompetitionPublishCommand,
+          useClass: ScheduleCompetitionPublishCommand,
+        },
+        { provide: BaseTokens.DBContext, useValue: dbContextMock },
+        {
+          provide: BaseTokens.EventDispatcher,
+          useValue: eventDispatcherMock,
+        },
+        {
+          provide: ReposTokens.CompetitionRepository,
+          useValue: mockRepo,
+        },
+      ],
+    }).compile();
+
+    command = module.get(CommandTokens.ScheduleCompetitionPublishCommand);
 
     jest.clearAllMocks();
   });

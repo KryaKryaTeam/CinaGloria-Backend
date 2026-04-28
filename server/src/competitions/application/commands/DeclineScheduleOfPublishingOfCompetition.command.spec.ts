@@ -12,6 +12,10 @@ import { CompetitionSettings } from 'src/competitions/domain/objects/Competition
 import { randomUUID } from 'crypto';
 import { CompetitionRule } from 'src/competitions/domain/objects/CompetitionRule.object';
 import { Icons } from 'src/types/Icons';
+import { Test, TestingModule } from '@nestjs/testing';
+import { BaseTokens, CommandTokens, ReposTokens } from 'src/common/Tokens';
+import { createMockDBContext } from 'src/common/application/IDcontext.spec';
+import { createMockEventDispatcher } from 'src/common/application/events/EventDispatcher';
 
 describe('DeclineScheduledPublishCommand', () => {
   let command: DeclineScheduledPublishCommand;
@@ -21,15 +25,9 @@ describe('DeclineScheduledPublishCommand', () => {
     save: jest.fn(),
   };
 
-  const dbContextMock = {
-    startTransaction: jest.fn(),
-    commitTransaction: jest.fn(),
-    rollbackTransaction: jest.fn(),
-  };
+  const dbContextMock = createMockDBContext();
 
-  const eventDispatcherMock = {
-    dispatchEvents: jest.fn(),
-  };
+  const eventDispatcherMock = createMockEventDispatcher();
 
   const user = UserEntity.create(
     'test@mail.com',
@@ -66,14 +64,32 @@ describe('DeclineScheduledPublishCommand', () => {
 
     rules: [CompetitionRule.define('test', 'test', Icons.BOOK)],
     settings: CompetitionSettings.createDefaults(),
+
+    rounds: [],
+    teams: [],
   });
 
-  beforeEach(() => {
-    command = new DeclineScheduledPublishCommand();
-
-    (command as any).competitionRepository = mockRepo;
-    (command as any).DBContext = dbContextMock;
-    (command as any).eventDispatcher = eventDispatcherMock;
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        {
+          provide: CommandTokens.DeclineScheduledPublishCommand,
+          useClass: DeclineScheduledPublishCommand,
+        },
+        { provide: BaseTokens.DBContext, useValue: dbContextMock },
+        {
+          provide: BaseTokens.EventDispatcher,
+          useValue: eventDispatcherMock,
+        },
+        {
+          provide: ReposTokens.CompetitionRepository,
+          useValue: mockRepo,
+        },
+      ],
+    }).compile();
+    command = module.get<DeclineScheduledPublishCommand>(
+      CommandTokens.DeclineScheduledPublishCommand,
+    );
 
     jest.clearAllMocks();
   });

@@ -4,6 +4,8 @@ import { RoundStarted } from 'src/competitions/domain/events/RoundStarted.event'
 import { RoundStatus } from 'src/types/RoundStatus';
 import { randomUUID } from 'crypto';
 import { Icons } from 'src/types/Icons';
+import { Test, TestingModule } from '@nestjs/testing';
+import { BaseTokens, CommandTokens, ReposTokens } from 'src/common/Tokens';
 
 describe('RunStartEventOnAllStartedRoundsCommand', () => {
   let command: RunStartEventOnAllStartedRoundsCommand;
@@ -30,18 +32,35 @@ describe('RunStartEventOnAllStartedRoundsCommand', () => {
     description: 'tst',
     icon: Icons.BOOK,
     startOfRound: new Date(Date.now() + 1000000),
-    endOfRound: new Date(Date.now() + 2000000),
+    taskTimeout: new Date(Date.now() + 2000000),
+    endOfRound: new Date(Date.now() + 3000000),
     relatedTasks: [],
     hidden: false,
     status: RoundStatus.CREATED,
   });
 
-  beforeEach(() => {
-    command = new RunStartEventOnAllStartedRoundsCommand();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        {
+          provide: CommandTokens.RunStartedEventOnAllStartedRoundsCommand,
+          useClass: RunStartEventOnAllStartedRoundsCommand,
+        },
+        { provide: BaseTokens.DBContext, useValue: mockDBContext },
+        {
+          provide: BaseTokens.EventDispatcher,
+          useValue: mockEventDispatcher,
+        },
+        {
+          provide: ReposTokens.RoundRepository,
+          useValue: roundRepository,
+        },
+      ],
+    }).compile();
 
-    (command as any).roundRepository = roundRepository;
-    (command as any).DBContext = mockDBContext;
-    (command as any).eventDispatcher = mockEventDispatcher;
+    command = module.get(
+      CommandTokens.RunStartedEventOnAllStartedRoundsCommand,
+    );
 
     jest.clearAllMocks();
   });
@@ -66,39 +85,29 @@ describe('RunStartEventOnAllStartedRoundsCommand', () => {
   });
 
   it('should process multiple rounds in parallel', async () => {
-    const r1 = RoundEntity.load({
-      id: 'r1',
-      name: 'r1',
+    const base = {
       description: 'aa',
       icon: Icons.BOOK,
-      startOfRound: new Date(),
-      endOfRound: new Date(),
+      startOfRound: new Date(Date.now()),
+      taskTimeout: new Date(Date.now() + 1),
+      endOfRound: new Date(Date.now() + 2),
       relatedTasks: [],
       hidden: false,
       status: RoundStatus.CREATED,
+    };
+    const r1 = RoundEntity.load({
+      id: 'r1',
+      name: 'r1',
+      ...base,
     });
 
     const r2 = RoundEntity.load({
       id: 'r2',
       name: 'r2',
-      description: 'aa',
-      icon: Icons.BOOK,
-      startOfRound: new Date(),
-      endOfRound: new Date(),
-      relatedTasks: [],
-      hidden: false,
-      status: RoundStatus.CREATED,
+      ...base,
     });
 
     roundRepository.findAllStartedButNotProcessed.mockResolvedValue([r1, r2]);
-    // roundRepository.findAllStartedButNotProcessed.mockImplementation(
-    //   async () => {
-    //     return [
-    //       RoundEntity.load(r1.toJSON()), // Returns a brand new memory reference
-    //       RoundEntity.load(r2.toJSON()),
-    //     ];
-    //   },
-    // );
 
     await command.execute();
 

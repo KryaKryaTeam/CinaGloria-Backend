@@ -1,5 +1,5 @@
-import { TaskEntity } from 'src/competitions/domain/entities/Task.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { TaskSchema } from './Task.schema';
 
 @Entity({ name: 'score' })
 export class ScoreSchema {
@@ -12,6 +12,6 @@ export class ScoreSchema {
   @Column()
   team: string;
 
-  @ManyToOne(() => TaskEntity)
-  task: TaskEntity;
+  @ManyToOne(() => TaskSchema)
+  task: TaskSchema;
 }

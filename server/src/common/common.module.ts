@@ -32,6 +32,10 @@ import { TeamRepository } from './infrastructure/repositories/TeamRepository';
 import { TaskRepository } from './infrastructure/repositories/TaskRepository';
 import { CriteriaRepository } from './infrastructure/repositories/CriteriaRepotisory';
 import { SubmitionRepository } from './infrastructure/repositories/SubmitionRepotisory';
+import { TaskCollectorModule } from 'src/task-collector/task-collector.module';
+import { SubmitionSchema } from 'src/schemas/Submition.schema';
+import { CriteriaSchema } from 'src/schemas/Criteria.schema';
+import { ScoreSchema } from 'src/schemas/Score.schema';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -90,13 +94,16 @@ const providers: Provider[] = [
       TeamSchema,
       RoundSchema,
       TaskSchema,
+      SubmitionSchema,
+      CriteriaSchema,
+      ScoreSchema,
     ]),
     forwardRef(() => AuthorizationModule),
     forwardRef(() => NotificationModule),
     forwardRef(() => FilesModule),
     forwardRef(() => CompetitionsModule),
     forwardRef(() => TeamsModule),
-    forwardRef(() => TeamsModule),
+    forwardRef(() => TaskCollectorModule),
   ],
 })
 export class CommonModule {}

@@ -1,4 +1,4 @@
-import { Icons } from 'src/types/Icons';
+import { Icons } from '../types/Icons';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'criteria' })

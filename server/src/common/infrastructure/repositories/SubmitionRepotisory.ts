@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { BaseRepository } from './BaseRepository';
-import { SubmitionSchema } from 'src/schemas/Submition.schme';
+import { SubmitionSchema } from 'src/schemas/Submition.schema';
 import { ISubmitionRepository } from 'src/task-collector/application/bounds/ISubmitionRepository';
 import { MapperTokens } from 'src/common/Tokens';
 import { SubmitionEntity } from 'src/task-collector/domain/entities/Submition.entity';

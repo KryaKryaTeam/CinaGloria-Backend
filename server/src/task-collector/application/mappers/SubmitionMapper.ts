@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Mapper } from 'src/common/infrastructure/Mapper';
 import { MapperTokens } from 'src/common/Tokens';
 import { TaskMapper } from 'src/competitions/application/mapper/Task.mapper';
-import { SubmitionSchema } from 'src/schemas/Submition.schme';
+import { SubmitionSchema } from 'src/schemas/Submition.schema';
 import { SubmitionEntity } from 'src/task-collector/domain/entities/Submition.entity';
 
 @Injectable()

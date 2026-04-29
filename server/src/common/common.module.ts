@@ -1,5 +1,5 @@
 import { forwardRef, Global, Module, Provider } from '@nestjs/common';
-import { BaseTokens, CommandTokens, ReposTokens } from './Tokens';
+import { BaseTokens, ReposTokens } from './Tokens';
 import { EventDispatcher } from './application/events/EventDispatcher';
 import { EventHandler } from './application/events/EventHandler';
 import { DBContext } from './infrastructure/DBContext';
@@ -24,6 +24,14 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { JsonInterceptor } from './infrastructure/interceptors/JsonInterceptor';
 import { RoundRepository } from './infrastructure/repositories/RoundRepository';
 import { ScoreRepository } from './infrastructure/repositories/ScoreRepository';
+import { TeamsModule } from 'src/teams/teams.module';
+import { TeamSchema } from 'src/schemas/Team.schema';
+import { RoundSchema } from 'src/schemas/Round.schema';
+import { TaskSchema } from 'src/schemas/Task.schema';
+import { TeamRepository } from './infrastructure/repositories/TeamRepository';
+import { TaskRepository } from './infrastructure/repositories/TaskRepository';
+import { CriteriaRepository } from './infrastructure/repositories/CriteriaRepotisory';
+import { SubmitionRepository } from './infrastructure/repositories/SubmitionRepotisory';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -52,6 +60,10 @@ const providers: Provider[] = [
     useClass: RoundRepository,
   },
   { provide: ReposTokens.ScoreRepository, useClass: ScoreRepository },
+  { provide: ReposTokens.TeamRepository, useClass: TeamRepository },
+  { provide: ReposTokens.TaskRepository, useClass: TaskRepository },
+  { provide: ReposTokens.CriteriaRepository, useClass: CriteriaRepository },
+  { provide: ReposTokens.SubmitionRepository, useClass: SubmitionRepository },
 ];
 
 @Global()
@@ -72,11 +84,19 @@ const providers: Provider[] = [
       FileSchema,
       FileRelation,
       CompetitionSchema,
+      TeamSchema,
+      RoundSchema,
+      TaskSchema,
+      TeamSchema,
+      RoundSchema,
+      TaskSchema,
     ]),
     forwardRef(() => AuthorizationModule),
     forwardRef(() => NotificationModule),
     forwardRef(() => FilesModule),
     forwardRef(() => CompetitionsModule),
+    forwardRef(() => TeamsModule),
+    forwardRef(() => TeamsModule),
   ],
 })
 export class CommonModule {}

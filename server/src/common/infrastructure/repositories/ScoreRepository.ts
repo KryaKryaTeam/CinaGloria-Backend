@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MapperTokens } from 'src/common/Tokens';
-import { ScoreMapper } from 'src/judging/appliaction/mapper/ScoreMapper';
 import { BaseRepository } from './BaseRepository';
-import { IScoreRepository } from 'src/judging/appliaction/bounds/IScoreRepotirory';
 import { ScoreEntity } from 'src/judging/domain/entities/Score.entity';
 import { ScoreSchema } from 'src/schemas/Score.schema';
 import { ApiError, ScoreErrors } from 'src/error/ApiError';
+import { ScoreMapper } from 'src/judging/application/mappers/ScoreMapper';
+import { IScoreRepository } from 'src/judging/application/bounds/IScoreRepository';
 
 @Injectable()
 export class ScoreRepository

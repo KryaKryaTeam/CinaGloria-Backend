@@ -3,6 +3,7 @@ import { MapperTokens } from 'src/common/Tokens';
 import { CriteriaMapper } from './application/mappers/CriteriaMapper';
 import { SubmitionMapper } from './application/mappers/SubmitionMapper';
 import { CompetitionsModule } from 'src/competitions/competitions.module';
+import { ScoreMapper } from './application/mappers/ScoreMapper';
 
 const providers: Provider[] = [
   { provide: MapperTokens.CriteriaMapper, useClass: CriteriaMapper },

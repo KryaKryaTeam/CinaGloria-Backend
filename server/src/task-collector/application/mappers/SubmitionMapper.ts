@@ -1,9 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { Mapper } from 'src/common/infrastructure/Mapper';
-import { MapperTokens } from 'src/common/Tokens';
-import { TaskMapper } from 'src/competitions/application/mapper/Task.mapper';
 import { SubmitionSchema } from 'src/schemas/Submition.schema';
-import { SubmitionEntity } from 'src/task-collector/domain/entities/Submition.entity';
+import { SubmitionEntity } from 'src/judging/domain/entities/Submition.entity';
+import { TaskMapper } from 'src/competitions/application/mapper/Task.mapper';
+import { MapperTokens } from 'src/common/Tokens';
 
 @Injectable()
 export class SubmitionMapper extends Mapper<SubmitionSchema, SubmitionEntity> {

@@ -1,4 +1,4 @@
-import { SubmitionEntity } from 'src/task-collector/domain/entities/Submition.entity';
+import { SubmitionEntity } from '../../../judging/domain/entities/Submition.entity.ts';
 
 export interface ISubmitionRepository {
   save(data: SubmitionEntity): Promise<void>;

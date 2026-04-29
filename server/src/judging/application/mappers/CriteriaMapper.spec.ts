@@ -1,7 +1,7 @@
-import { CriteriaMapper } from 'src/judging/application/mappers/CriteriaMapper';
-import { CriteriaEntity } from 'src/judging/domain/entities/Criteria.entity';
 import { CriteriaSchema } from 'src/schemas/Criteria.schema';
+import { CriteriaMapper } from './CriteriaMapper';
 import { Icons } from 'src/types/Icons';
+import { CriteriaEntity } from 'src/task-collector/domain/entities/Criteria.entity';
 
 describe('CriteriaMapper', () => {
   let mapper: CriteriaMapper;

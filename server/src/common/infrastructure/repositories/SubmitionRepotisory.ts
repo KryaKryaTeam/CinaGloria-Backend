@@ -1,11 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { BaseRepository } from './BaseRepository';
 import { SubmitionSchema } from 'src/schemas/Submition.schema';
-import { ISubmitionRepository } from 'src/task-collector/application/bounds/ISubmitionRepository';
+import { ISubmitionRepository } from 'src/judging/application/bounds/ISubmitionRepository';
 import { MapperTokens } from 'src/common/Tokens';
-import { SubmitionEntity } from 'src/task-collector/domain/entities/Submition.entity';
+import { SubmitionEntity } from 'src/judging/domain/entities/Submition.entity';
 import { ApiError, SubmitionErrors } from 'src/error/ApiError';
-import { SubmitionMapper } from 'src/task-collector/application/mappers/SubmitionMapper';
+import { SubmitionMapper } from 'src/judging/application/mappers/SubmitionMapper';
 
 @Injectable()
 export class SubmitionRepository

@@ -1,6 +1,6 @@
 import { SubmitionMapper } from './SubmitionMapper';
 import { TaskMapper } from 'src/competitions/application/mapper/Task.mapper';
-import { SubmitionEntity } from 'src/task-collectorjudging/domain/entities/Submition.entity';
+import { SubmitionEntity } from 'src/task-collector/domain/entities/Submition.entity';
 
 describe('SubmitionMapper', () => {
   let mapper: SubmitionMapper;

@@ -1,10 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { BaseRepository } from './BaseRepository';
-import { ICriteriaRepotisory } from 'src/task-collector/application/bounds/ICriteriaRepository';
-import { CriteriaEntity } from 'src/task-collector/domain/entities/Criteria.entity';
+import { ICriteriaRepotisory } from 'src/judging/application/bounds/ICriteriaRepository';
+import { CriteriaEntity } from 'src/judging/domain/entities/Criteria.entity';
 import { CriteriaSchema } from 'src/schemas/Criteria.schema';
 import { MapperTokens } from 'src/common/Tokens';
-import { CriteriaMapper } from 'src/task-collector/application/mappers/CriteriaMapper';
+import { CriteriaMapper } from 'src/judging/application/mappers/CriteriaMapper';
 import { ApiError, CriteriaErrors } from 'src/error/ApiError';
 
 @Injectable()

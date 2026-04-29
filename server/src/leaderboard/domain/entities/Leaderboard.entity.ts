@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import { Entity } from 'src/common/domain/Entity';
 import { TaskEntity } from 'src/competitions/domain/entities/Task.entity';
-import { CriteriaEntity } from 'src/task-collector/domain/entities/Criteria.entity';
+import { CriteriaEntity } from 'src/judging/domain/entities/Criteria.entity';
 
 export interface ICreateLeaderboard {
   value: number;

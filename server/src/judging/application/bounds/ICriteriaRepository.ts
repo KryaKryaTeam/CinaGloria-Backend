@@ -1,4 +1,4 @@
-import { CriteriaEntity } from 'src/task-collectorjudging/domain/entities/Criteria.entity';
+import { CriteriaEntity } from 'src/task-collector/domain/entities/Criteria.entity';
 
 export interface ICriteriaRepotisory {
   save(criteria: CriteriaEntity): Promise<void>;

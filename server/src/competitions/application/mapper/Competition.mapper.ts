@@ -8,7 +8,7 @@ import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionSchema } from 'src/schemas/Competition.schema';
 import { RelationSlots } from 'src/types/RelationSlots';
 import { RoundMapper } from './Round.mapper';
-import { TeamMapper } from 'src/teams/application/team.mapper';
+import { TeamMapper } from 'src/teams/application/mappers/team.mapper';
 
 @Injectable()
 export class CompetitionMapper extends Mapper<

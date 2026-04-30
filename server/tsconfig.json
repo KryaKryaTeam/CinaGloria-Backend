@@ -25,5 +25,7 @@
     "noFallthroughCasesInSwitch": false,
     "strictPropertyInitialization": false
   },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"],
   "references": [{ "path": "./tsconfig.spec.json" }]
 }

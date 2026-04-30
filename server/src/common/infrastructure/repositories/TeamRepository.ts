@@ -1,6 +1,6 @@
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
-import { ITeamRepository } from 'src/teams/bounds/TeamRepository';
+import { ITeamRepository } from 'src/teams/application/bounds/TeamRepository';
 import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
 import { BaseRepository } from './BaseRepository';
 import { TeamSchema } from 'src/schemas/Team.schema';

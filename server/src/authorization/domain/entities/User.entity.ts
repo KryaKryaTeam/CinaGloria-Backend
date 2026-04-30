@@ -171,6 +171,28 @@ export class UserEntity extends Entity {
     return ent;
   }
 
+  static createFake(): UserEntity {
+    const fakeData: IUserEntityJSON = {
+      id: randomUUID(),
+      email: 'fakeuser@example.com',
+      username: 'fakeUsername',
+      avatarURL: 'fake-avatar-url',
+      contact: {
+        telegram: '@fakeTelegram',
+        discord: 'fakeDiscord#1234',
+      },
+      firstName: 'John',
+      lastName: 'Doe',
+      surName: 'Smith',
+      birthDay: new Date('1990-01-01').toISOString(),
+      role: RoleEnum.USER,
+      authorizationProvider: [],
+      events: [],
+    };
+
+    return UserEntity.load(fakeData);
+  }
+
   toJSON(): IUserEntityJSON {
     return {
       id: this.id,

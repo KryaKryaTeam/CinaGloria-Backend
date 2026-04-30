@@ -85,6 +85,23 @@ export class RoundEntity extends Entity {
     return new RoundEntity(data);
   }
 
+  public static createFake(): RoundEntity {
+    const fakeData: IRoundPlain = {
+      id: randomUUID(),
+      name: 'Fake Round',
+      hidden: false,
+      description: 'This is a fake round for testing purposes.',
+      icon: Icons.BOOK,
+      startOfRound: new Date(Date.now() + 1000000),
+      endOfRound: new Date(Date.now() + 2000000),
+      taskTimeout: new Date(Date.now() + 1500000),
+      relatedTasks: [],
+      status: RoundStatus.CREATED,
+    };
+
+    return RoundEntity.load(fakeData);
+  }
+
   private canChangeStatusTo(status: RoundStatus): boolean {
     const allowedTransitions: Record<RoundStatus, RoundStatus[]> = {
       [RoundStatus.CREATED]: [RoundStatus.IN_PROGRESS],

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Post, Version } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Version } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { Secure } from 'src/authorization/infrastructure/guards/auth/auth.guard';
 import { AllowRoles } from 'src/authorization/infrastructure/guards/role/role.guard';
@@ -12,8 +12,6 @@ import { CreateRoundDto } from '../dto/CreateRound.dto';
 import { DeleteRoundDto } from '../dto/DeleteRound.dto';
 import { PatchRoundDto } from '../dto/PatchRound.dto';
 import { PatchRoundCommand } from 'src/competitions/application/commands/PatchRound.command';
-import { ReadRoundDto } from '../dto/ReadRound.dto';
-import { ReadRoundCommand } from 'src/competitions/application/commands/ReadRound.command';
 
 @Controller('round')
 export class RoundController {
@@ -25,9 +23,6 @@ export class RoundController {
 
   @Inject(CommandTokens.PatchRoundCommand)
   private readonly patchRoundCommand: PatchRoundCommand;
-
-  @Inject(CommandTokens.ReadRoundCommand)
-  private readonly readRoundCommand: ReadRoundCommand;
 
   @Post('create')
   @Version('1')
@@ -58,13 +53,5 @@ export class RoundController {
   @ApiResponse({ status: 200, type: PatchRoundDto })
   async patchRound(@Body() dto: PatchRoundDto, @UserId() user: UserEntity) {
     return await this.patchRoundCommand.execute({ ...dto, user });
-  }
-
-  @Get('read')
-  @Version('1')
-  @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
-  @ApiResponse({ status: 200, type: ReadRoundDto })
-  async readRound(@Body() dto: ReadRoundDto) {
-    return await this.readRoundCommand.execute(dto);
   }
 }

@@ -12,6 +12,7 @@ import { CompetitionStarted } from '../events/CompetitionStarted.event';
 import { CompetitionFinished } from '../events/CompetitionFinished.event';
 import { CompetitionRegistrationEnded } from '../events/CompetitionRegistrationEnded';
 import { ITeamPlain, TeamEntity } from 'src/teams/domain/entities/Team.entity';
+import { Icons } from 'src/types/Icons';
 
 export interface ICompetitionInList {
   id: string;
@@ -203,6 +204,47 @@ export class CompetitionEntity extends Entity {
 
   private get isDraft(): boolean {
     return this._status == CompetitionStatus.DRAFT;
+  }
+
+  public static createFake(): CompetitionEntity {
+    const now = Date.now();
+    const fakeData: ICompetitionPlain = {
+      id: randomUUID(),
+      name: 'Fake Competition',
+      description: 'This is a fake competition for testing purposes.',
+      ultraWideBanner: InternalFile.define<'competition:ultraWideBanner'>(
+        'banner.png',
+        'competition:ultraWideBanner',
+        'competition:ultraWideBanner',
+      ),
+      banner: InternalFile.define<'competition:banner'>(
+        'avatar.png',
+        'competition:banner',
+        'competition:banner',
+      ),
+      avatar: InternalFile.define<'competition:avatar'>(
+        'avatar.png',
+        'competition:avatar',
+        'competition:avatar',
+      ),
+      socialMedia: InternalFile.define<'competition:socialMedia'>(
+        'social_media.png',
+        'competition:socialMedia',
+        'competition:socialMedia',
+      ),
+      dateOfStartRegistration: new Date(now + 1000000),
+      dateOfEndRegistration: new Date(now + 2000000),
+      dateOfStart: new Date(now + 3000000),
+      dateOfEnd: new Date(now + 4000000),
+      publishAt: undefined,
+      status: CompetitionStatus.DRAFT,
+      rules: [CompetitionRule.define('test', 'test', Icons.BOOK)],
+      settings: CompetitionSettings.createDefaults(),
+      rounds: [],
+      teams: [],
+    };
+
+    return CompetitionEntity.load(fakeData);
   }
 
   private get canBeChanged(): boolean {

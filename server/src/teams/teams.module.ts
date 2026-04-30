@@ -1,6 +1,6 @@
 import { Module, Provider } from '@nestjs/common';
 import { MapperTokens } from 'src/common/Tokens';
-import { TeamMapper } from './application/team.mapper';
+import { TeamMapper } from 'src/teams/application/mappers/team.mapper';
 
 const providers: Provider[] = [
   {

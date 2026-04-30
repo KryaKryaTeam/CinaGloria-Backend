@@ -36,7 +36,7 @@ export interface ITeamPlain {
   }[];
 }
 
-interface ITeamCreate {
+export interface ITeamCreate {
   captain: string;
   name: string;
   avatar: InternalFile<'team:avatar'>;

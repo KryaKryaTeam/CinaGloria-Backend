@@ -20,7 +20,6 @@ import { UpdateSettingsOfCompetitionCommand } from './application/commands/Updat
 import { CreateRoundCommand } from './application/commands/CreateRound.command';
 import { DeleteRoundCommand } from './application/commands/DeleteRound.command';
 import { PatchRoundCommand } from './application/commands/PatchRound.command';
-import { ReadRoundCommand } from './application/commands/ReadRound.command';
 import { CreateTaskCommand } from './application/commands/CreateTask.command';
 import { TeamsModule } from 'src/teams/teams.module';
 
@@ -80,7 +79,6 @@ const providers: Provider[] = [
   { provide: CommandTokens.CreateRoundCommand, useClass: CreateRoundCommand },
   { provide: CommandTokens.DeleteRoundCommand, useClass: DeleteRoundCommand },
   { provide: CommandTokens.PatchRoundCommand, useClass: PatchRoundCommand },
-  { provide: CommandTokens.ReadRoundCommand, useClass: ReadRoundCommand },
   { provide: CommandTokens.CreateTaskCommand, useClass: CreateTaskCommand },
 ];
 

@@ -17,6 +17,7 @@ export enum MapperTokens {
   TeamMapper = 'TEAM_MAPPER',
   CriteriaMapper = 'CRITERIA_MAPPER',
   SubmitionMapper = 'SUBMITION_MAPPER',
+  LeaderboardMapper = 'LEADERBOARD_MAPPER',
 }
 
 export enum ReposTokens {
@@ -32,6 +33,7 @@ export enum ReposTokens {
   ScoreRepository = 'SCORE_REPOSITORY',
   CriteriaRepository = 'CRITERIA_REPOSTORY',
   SubmitionRepository = 'SUBMITION_REPOSITORY',
+  LeaderboardRepository = 'LEADERBOARD_REPOSITORY',
 }
 
 export enum CommandTokens {

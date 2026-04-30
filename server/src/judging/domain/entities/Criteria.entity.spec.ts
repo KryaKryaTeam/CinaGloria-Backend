@@ -8,6 +8,7 @@ describe('CriteriaEntity', () => {
     description: 'Valid description',
     icon: Icons.BOOK,
     visibility: true,
+    score: 1,
   };
 
   describe('load', () => {
@@ -56,6 +57,7 @@ describe('CriteriaEntity', () => {
         description: validData.description,
         icon: validData.icon,
         visibility: validData.visibility,
+        score: validData.score,
       });
 
       expect(entity.id).toBeDefined();
@@ -70,6 +72,7 @@ describe('CriteriaEntity', () => {
           description: validData.description,
           icon: validData.icon,
           visibility: validData.visibility,
+          score: validData.score,
         }),
       ).toThrow();
     });

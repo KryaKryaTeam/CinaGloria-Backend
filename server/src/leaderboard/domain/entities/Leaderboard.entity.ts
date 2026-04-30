@@ -1,40 +1,35 @@
-import { randomUUID } from 'crypto';
 import { Entity } from 'src/common/domain/Entity';
-import { TaskEntity } from 'src/competitions/domain/entities/Task.entity';
-import { CriteriaEntity } from 'src/judging/domain/entities/Criteria.entity';
+import { ILeaderboardNodeValue } from '../objects/LeaderboardNode.object';
+import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
+import { randomUUID } from 'crypto';
 
 export interface ICreateLeaderboard {
-  value: number;
-  criteria: CriteriaEntity;
-  task: TaskEntity;
+  nodes: ILeaderboardNodeValue[];
+  round: RoundEntity;
 }
 
 export interface ILeaderboardPlain {
   id: string;
-  value: number;
-  criteria: CriteriaEntity;
-  task: TaskEntity;
+  nodes: ILeaderboardNodeValue[];
+  round: RoundEntity;
 }
 
 export interface ILeaderboardEntityJSON {
   id: string;
-  value: number;
-  criteria: CriteriaEntity;
-  task: TaskEntity;
+  nodes: ILeaderboardNodeValue[];
+  round: RoundEntity;
 }
 
 export class LeaderboardEntity extends Entity {
   public readonly _id: string;
-  private _value: number;
-  private _criteria: CriteriaEntity;
-  private _task: TaskEntity;
+  public _nodes: ILeaderboardNodeValue[];
+  public _round: RoundEntity;
 
   private constructor(data: ILeaderboardPlain) {
     super();
     this._id = data.id;
-    this._value = data.value;
-    this._criteria = data.criteria;
-    this._task = data.task;
+    this._nodes = data.nodes;
+    this._round = data.round;
   }
 
   static load(data: ILeaderboardPlain) {
@@ -48,43 +43,31 @@ export class LeaderboardEntity extends Entity {
     });
   }
 
-  get id(): string {
+  get id() {
     return this._id;
   }
 
-  get value(): number {
-    return this._value;
+  get nodes() {
+    return this._nodes;
   }
 
-  get criteria(): CriteriaEntity {
-    return this._criteria;
+  get round() {
+    return this._round;
   }
 
-  get task(): TaskEntity {
-    return this._task;
+  set nodes(value: ILeaderboardNodeValue[]) {
+    this._nodes = value;
   }
 
-  set value(newValue: number) {
-    if (newValue < 0) {
-      throw new Error('Leaderboard value cannot be negative');
-    }
-    this._value = newValue;
-  }
-
-  set criteria(criteria: CriteriaEntity) {
-    this._criteria = criteria;
-  }
-
-  set task(task: TaskEntity) {
-    this._task = task;
+  set round(value: RoundEntity) {
+    this._round = value;
   }
 
   toJSON(): ILeaderboardEntityJSON {
     return {
       id: this._id,
-      value: this._value,
-      criteria: this._criteria,
-      task: this._task,
+      round: this.round,
+      nodes: this._nodes,
     };
   }
 }

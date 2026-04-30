@@ -10,6 +10,7 @@ export interface ICriteriaPlain {
   name: string;
   description: string;
   icon: Icons;
+  score: number;
 }
 
 export interface ICreateCriteria {
@@ -17,6 +18,7 @@ export interface ICreateCriteria {
   name: string;
   description: string;
   icon: Icons;
+  score: number;
 }
 
 export interface ICriteriaEntityJSON {
@@ -25,6 +27,7 @@ export interface ICriteriaEntityJSON {
   name: string;
   description: string;
   icon: Icons;
+  score: number;
 }
 
 export class CriteriaEntity extends Entity {
@@ -34,6 +37,7 @@ export class CriteriaEntity extends Entity {
   public _description: string;
   public _icon: Icons;
   public _team: TeamEntity;
+  public _score: number;
 
   private constructor(data: ICriteriaPlain) {
     super();
@@ -82,6 +86,10 @@ export class CriteriaEntity extends Entity {
     this._icon = value;
   }
 
+  set score(value: number) {
+    this._score = value;
+  }
+
   get id() {
     return this._id;
   }
@@ -102,6 +110,10 @@ export class CriteriaEntity extends Entity {
     return this._icon;
   }
 
+  get score() {
+    return this._score;
+  }
+
   toJSON(): ICriteriaEntityJSON {
     return {
       id: this._id,
@@ -109,6 +121,7 @@ export class CriteriaEntity extends Entity {
       icon: this._icon,
       visibility: this._visibility,
       name: this._name,
+      score: this._score,
     };
   }
 }

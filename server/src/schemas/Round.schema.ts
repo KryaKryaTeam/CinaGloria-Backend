@@ -6,10 +6,12 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { CompetitionSchema } from './Competition.schema';
 import { TaskSchema } from './Task.schema';
+import { LeaderboardSchema } from './Leaderboard.schema';
 
 @Entity({ name: 'round' })
 export class RoundSchema {
@@ -44,4 +46,7 @@ export class RoundSchema {
   @ManyToOne(() => CompetitionSchema)
   @JoinColumn({ name: 'competition_id' })
   competition: CompetitionSchema;
+
+  @OneToOne(() => LeaderboardSchema, (leaderboard) => leaderboard.round)
+  leaderboard: LeaderboardSchema;
 }

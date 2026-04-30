@@ -17,4 +17,7 @@ export class CriteriaSchema {
 
   @Column({ enum: Icons })
   icon: Icons;
+
+  @Column()
+  score: number;
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Mapper } from 'src/common/infrastructure/Mapper';
+import { CriteriaEntity } from 'src/judging/domain/entities/Criteria.entity';
 import { CriteriaSchema } from 'src/schemas/Criteria.schema';
-import { CriteriaEntity } from 'src/task-collector/domain/entities/Criteria.entity';
 
 @Injectable()
 export class CriteriaMapper extends Mapper<CriteriaSchema, CriteriaEntity> {
@@ -15,6 +15,7 @@ export class CriteriaMapper extends Mapper<CriteriaSchema, CriteriaEntity> {
       description: entity.description,
       icon: entity.icon,
       visibility: entity.visibility,
+      score: entity.score,
     };
   }
 }

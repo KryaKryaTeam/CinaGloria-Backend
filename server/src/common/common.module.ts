@@ -36,6 +36,7 @@ import { SubmitionSchema } from 'src/schemas/Submition.schema';
 import { CriteriaSchema } from 'src/schemas/Criteria.schema';
 import { ScoreSchema } from 'src/schemas/Score.schema';
 import { JudgingModule } from 'src/judging/judging.module';
+import { LeaderboardRepository } from './infrastructure/repositories/LeaderboardRepotisory';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -68,6 +69,10 @@ const providers: Provider[] = [
   { provide: ReposTokens.TaskRepository, useClass: TaskRepository },
   { provide: ReposTokens.CriteriaRepository, useClass: CriteriaRepository },
   { provide: ReposTokens.SubmitionRepository, useClass: SubmitionRepository },
+  {
+    provide: ReposTokens.LeaderboardRepository,
+    useClass: LeaderboardRepository,
+  },
 ];
 
 @Global()

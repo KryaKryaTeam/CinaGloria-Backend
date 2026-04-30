@@ -441,6 +441,14 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'Did not provide any related tasks',
     status: 400,
   },
+  LEADERBOARD_001: {
+    message: 'The place value is not valid. Must be 1 or bigger',
+    status: 400,
+  },
+  LEADERBOARD_002: {
+    message: 'This leaderboard was not found',
+    status: 404,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -593,6 +601,11 @@ export const SubmitionErrors = {
   NO_YOUTUBE_URL: 'SUBMITION_003',
   NO_JURY: 'SUBMITION_004',
   NO_RELATED_TASKS: 'SUBMITION_005',
+};
+
+export const LeaderboardErrors = {
+  INVALID_PLACE_VALUE: 'LEADERBOARD_001',
+  LEADERBOARD_NOT_FOUND: 'LEADERBOARD_002',
 };
 
 export type ApiErrorCode = keyof typeof ApiErrorsCodeVal;

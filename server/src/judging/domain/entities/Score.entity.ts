@@ -43,7 +43,7 @@ export class ScoreEntity extends Entity {
   }
 
   static create(data: ICreateScore) {
-    return { id: randomUUID(), ...data };
+    return new ScoreEntity({ id: randomUUID(), ...data });
   }
 
   set score(value: number) {

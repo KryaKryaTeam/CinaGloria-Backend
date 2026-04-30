@@ -1,5 +1,7 @@
 import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
+import { Icons } from 'src/types/Icons';
 import { RoundStatus } from 'src/types/RoundStatus';
+import { TaskEntity } from './Task.entity';
 
 describe('RoundEntity', () => {
   const baseDate = new Date(Date.now() + 100000);
@@ -7,8 +9,9 @@ describe('RoundEntity', () => {
   const validData = {
     name: 'Round 1',
     description: 'Some description',
-    icon: 'ICON' as any,
+    icon: 'ICON' as unknown as Icons,
     startOfRound: baseDate,
+    taskTimeout: new Date(baseDate.getTime() + 50000),
     endOfRound: new Date(baseDate.getTime() + 100000),
     relatedTasks: [],
     hidden: false,
@@ -54,7 +57,7 @@ describe('RoundEntity', () => {
   describe('task management', () => {
     it('should add task', () => {
       const round = RoundEntity.create(validData);
-      const task = { id: 't1' } as any;
+      const task = { id: 't1' } as unknown as TaskEntity;
 
       round.addTask(task);
 
@@ -62,7 +65,7 @@ describe('RoundEntity', () => {
     });
 
     it('should remove task', () => {
-      const task = { id: 't1' } as any;
+      const task = { id: 't1' } as unknown as TaskEntity;
 
       const round = RoundEntity.create({
         ...validData,

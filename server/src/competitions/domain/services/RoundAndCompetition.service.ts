@@ -1,4 +1,4 @@
-import { ApiError, RoundErrors, UserErrors } from 'src/error/ApiError';
+import { ApiError, UserErrors } from 'src/error/ApiError';
 import {
   CompetitionEntity,
   ICreateCompetition,
@@ -17,14 +17,7 @@ export class RoundAndCompetitionService {
     if (!(user.hasRole(RoleEnum.ADMIN) || user.hasRole(RoleEnum.ORGANIZER)))
       ApiError.throw(UserErrors.NOT_ENOUGH_RIGHTS);
 
-    const valid = competition.rounds.every(
-      (a) =>
-        a.startOfRound > round.endOfRound || a.endOfRound < round.startOfRound,
-    );
-
-    if (!valid) ApiError.throw(RoundErrors.SPAN_IS_INVALID);
-
-    const entity = RoundEntity.create(round);
+    const entity = RoundEntity.create(round); // validates here!
     competition.addRound(entity);
     return entity;
   }

@@ -1,18 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsDate,
-  IsEnum,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { IsDate, IsEnum, IsOptional, IsString, IsUUID } from 'class-validator';
 import { Icons } from 'src/types/Icons';
 
 export class PatchRoundDto {
   @ApiProperty({ example: '0e246897-5f08-488b-a3e4-fe329359d3af' })
   @IsUUID()
-  id: string;
+  roundId: string;
 
   @ApiProperty({ example: 'Round 1' })
   @IsOptional()
@@ -24,11 +17,6 @@ export class PatchRoundDto {
   @IsString()
   description?: string;
 
-  @ApiProperty({ example: false })
-  @IsOptional()
-  @IsBoolean()
-  hidden?: boolean;
-
   @ApiProperty({ example: '3000-04-08T12:00:00.000Z' })
   @IsOptional()
   @IsDate()
@@ -38,6 +26,11 @@ export class PatchRoundDto {
   @IsOptional()
   @IsDate()
   endOfRound?: Date;
+
+  @ApiProperty({ example: '3010-05-08T12:00:00.000Z' })
+  @IsOptional()
+  @IsDate()
+  taskTimeout?: Date;
 
   @ApiProperty({ example: Icons.STAR, enum: Icons })
   @IsOptional()

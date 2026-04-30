@@ -3,7 +3,7 @@ import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionStatus } from 'src/types/CompetitionStatus';
 import { CompetitionRule } from '../objects/CompetitionRule.object';
 import { randomUUID } from 'crypto';
-import { RoundEntity } from './Round.entity';
+import { IRoundPlain, RoundEntity } from './Round.entity';
 import { ApiError, CompetitionErrors, DomainErrors } from 'src/error/ApiError';
 import { CompetitionSettings } from '../objects/CompetitionSettings';
 import { RoundStatus } from 'src/types/RoundStatus';
@@ -11,6 +11,8 @@ import { CompetitionRegistrationStarted } from '../events/CompetititonRegistrati
 import { CompetitionStarted } from '../events/CompetitionStarted.event';
 import { CompetitionFinished } from '../events/CompetitionFinished.event';
 import { CompetitionRegistrationEnded } from '../events/CompetitionRegistrationEnded';
+import { ITeamPlain, TeamEntity } from 'src/teams/domain/entities/Team.entity';
+import { Icons } from 'src/types/Icons';
 
 export interface ICompetitionInList {
   id: string;
@@ -55,6 +57,8 @@ export interface ICompetitionPlain {
   status: CompetitionStatus;
   rules: CompetitionRule[];
   settings: CompetitionSettings;
+  rounds: IRoundPlain[];
+  teams: ITeamPlain[];
 }
 
 export interface ICreateCompetition {
@@ -106,6 +110,7 @@ export class CompetitionEntity extends Entity {
   private _status: CompetitionStatus;
   private _rules: CompetitionRule[];
   private _rounds: RoundEntity[];
+  private _teams: TeamEntity[];
 
   private _settings: CompetitionSettings;
 
@@ -130,7 +135,8 @@ export class CompetitionEntity extends Entity {
     this._status = plain.status;
     this._rules = plain.rules || [];
     this._settings = plain.settings;
-    this._rounds = [];
+    this._rounds = plain.rounds.map((pl) => RoundEntity.load(pl));
+    this._teams = plain.teams.map((pl) => TeamEntity.load(pl));
   }
 
   private static validate(plain: ICompetitionPlain | ICreateCompetition) {
@@ -191,11 +197,54 @@ export class CompetitionEntity extends Entity {
       rules: plain.rules || [],
       status: CompetitionStatus.DRAFT,
       settings: CompetitionSettings.createDefaults(),
+      rounds: [],
+      teams: [],
     });
   }
 
   private get isDraft(): boolean {
     return this._status == CompetitionStatus.DRAFT;
+  }
+
+  public static createFake(): CompetitionEntity {
+    const now = Date.now();
+    const fakeData: ICompetitionPlain = {
+      id: randomUUID(),
+      name: 'Fake Competition',
+      description: 'This is a fake competition for testing purposes.',
+      ultraWideBanner: InternalFile.define<'competition:ultraWideBanner'>(
+        'banner.png',
+        'competition:ultraWideBanner',
+        'competition:ultraWideBanner',
+      ),
+      banner: InternalFile.define<'competition:banner'>(
+        'avatar.png',
+        'competition:banner',
+        'competition:banner',
+      ),
+      avatar: InternalFile.define<'competition:avatar'>(
+        'avatar.png',
+        'competition:avatar',
+        'competition:avatar',
+      ),
+      socialMedia: InternalFile.define<'competition:socialMedia'>(
+        'social_media.png',
+        'competition:socialMedia',
+        'competition:socialMedia',
+      ),
+      dateOfStartRegistration: new Date(now + 1000000),
+      dateOfEndRegistration: new Date(now + 2000000),
+      dateOfStart: new Date(now + 3000000),
+      dateOfEnd: new Date(now + 4000000),
+      publishAt: undefined,
+      status: CompetitionStatus.DRAFT,
+      rules: [CompetitionRule.define('test', 'test', Icons.BOOK)],
+      settings: CompetitionSettings.createDefaults(),
+      rounds: [],
+      teams: [],
+    };
+
+    return CompetitionEntity.load(fakeData);
   }
 
   private get canBeChanged(): boolean {
@@ -248,12 +297,7 @@ export class CompetitionEntity extends Entity {
       ],
       [CompetitionStatus.STARTED]: [
         CompetitionStatus.CANCELED,
-        CompetitionStatus.SCORING,
-      ],
-      [CompetitionStatus.SCORING]: [
         CompetitionStatus.ARCHIVED,
-        CompetitionStatus.CANCELED,
-        CompetitionStatus.STARTED, // якщо у змагання наприклад два раунди
       ],
       [CompetitionStatus.ARCHIVED]: [],
       [CompetitionStatus.CANCELED]: [],
@@ -545,6 +589,27 @@ export class CompetitionEntity extends Entity {
     this._rounds.splice(i, 1);
   }
 
+  public canAddTeam(team: TeamEntity) {
+    const maxTeamSize = this.settings.get('maxTeamMembers');
+    const minTeamSize = this.settings.get('minTeamMembers');
+
+    if (team.members.length > maxTeamSize || team.members.length < minTeamSize)
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    const maxTeams = this.settings.get('maxTeams');
+    if (maxTeams < this.teams.length + 1)
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+
+    if (this.status != CompetitionStatus.REGISTRATION)
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+  }
+
+  public addTeam(team: TeamEntity) {
+    this.canAddTeam(team);
+
+    this._teams.push(team);
+  }
+
   set status(value: CompetitionStatus) {
     if (value == CompetitionStatus.SCHEDULED)
       ApiError.throw(CompetitionErrors.SETTER_SCHEDULED);
@@ -604,11 +669,13 @@ export class CompetitionEntity extends Entity {
   get rounds() {
     return [...this._rounds];
   }
+  get teams() {
+    return [...this._teams];
+  }
 
   get canBeDeleted() {
     return this.canBeChanged;
   }
-
   get publicInList(): ICompetitionInList | void {
     if (!this.isDraft)
       return {
@@ -658,6 +725,8 @@ export class CompetitionEntity extends Entity {
       rules: this.rules,
       status: this._status,
       settings: this._settings,
+      rounds: this.rounds,
+      teams: this.teams.map((ent) => ent.toJSON()),
     };
   }
 }

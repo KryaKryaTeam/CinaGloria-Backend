@@ -1,6 +1,6 @@
 import { Mapper } from 'src/common/infrastructure/Mapper';
 import { TeamSchema } from 'src/schemas/Team.schema';
-import { TeamEntity } from '../domain/entities/Team.entity';
+import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionSchema } from 'src/schemas/Competition.schema';
 import { UserSchema } from 'src/schemas/User.schema';

@@ -1,11 +1,14 @@
 import { UserAndCompetitionService } from 'src/competitions/domain/services/UserAndCompetitionService';
 import { RoleEnum } from 'src/types/RoleEnum';
 import { CompetitionStatus } from 'src/types/CompetitionStatus';
+import { UserEntity } from 'src/authorization/domain/entities/User.entity';
+import { CompetitionEntity } from '../entities/Competition.entity';
+import { CompetitionSettings } from '../objects/CompetitionSettings';
 
 describe('UserAndCompetitionService', () => {
-  const admin = { role: RoleEnum.ADMIN } as any;
-  const organizer = { role: RoleEnum.ORGANIZER } as any;
-  const player = { role: RoleEnum.USER } as any;
+  const admin = { role: RoleEnum.ADMIN } as unknown as UserEntity;
+  const organizer = { role: RoleEnum.ORGANIZER } as unknown as UserEntity;
+  const player = { role: RoleEnum.USER } as unknown as UserEntity;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -42,7 +45,7 @@ describe('UserAndCompetitionService', () => {
       const competition = {
         name: 'old',
         description: 'old',
-      } as any;
+      } as unknown as CompetitionEntity;
 
       UserAndCompetitionService.editCompetition(
         competition,
@@ -59,7 +62,7 @@ describe('UserAndCompetitionService', () => {
     it('should schedule competition', () => {
       const competition = {
         schedule: jest.fn(),
-      } as any;
+      } as unknown as CompetitionEntity;
 
       const date = new Date();
 
@@ -73,7 +76,7 @@ describe('UserAndCompetitionService', () => {
     it('should decline scheduled publish', () => {
       const competition = {
         declineScheduledPublish: jest.fn(),
-      } as any;
+      } as unknown as CompetitionEntity;
 
       UserAndCompetitionService.declineSchedulePublishing(competition, admin);
 
@@ -85,11 +88,15 @@ describe('UserAndCompetitionService', () => {
     it('should set competition status to published', () => {
       const competition = {
         status: null,
-      } as any;
+        publish: jest.fn(
+          () => (competition.status = CompetitionStatus.PUBLISHED),
+        ),
+      } as unknown as CompetitionEntity;
 
       UserAndCompetitionService.publishCompetiton(competition, admin);
 
       expect(competition.status).toBe(CompetitionStatus.PUBLISHED);
+      expect(competition.publish as unknown as jest.Func).toHaveBeenCalled();
     });
   });
 
@@ -97,7 +104,7 @@ describe('UserAndCompetitionService', () => {
     it('should throw if competition cannot be deleted', () => {
       const competition = {
         canBeDeleted: false,
-      } as any;
+      } as unknown as CompetitionEntity;
 
       expect(() =>
         UserAndCompetitionService.deleteCompetition(competition, admin),
@@ -107,7 +114,7 @@ describe('UserAndCompetitionService', () => {
     it('should allow deletion check if allowed', () => {
       const competition = {
         canBeDeleted: true,
-      } as any;
+      } as unknown as CompetitionEntity;
 
       const result = UserAndCompetitionService.deleteCompetition(
         competition,
@@ -137,9 +144,9 @@ describe('UserAndCompetitionService', () => {
     it('should update competition settings', () => {
       const competition = {
         settings: null,
-      } as any;
+      } as unknown as CompetitionEntity;
 
-      const settings = { maxPlayers: 10 } as any;
+      const settings = { maxPlayers: 10 } as unknown as CompetitionSettings;
 
       UserAndCompetitionService.chanegeSettingsOfCompetition(
         competition,

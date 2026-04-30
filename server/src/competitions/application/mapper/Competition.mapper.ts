@@ -1,20 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Mapper } from 'src/common/infrastructure/Mapper';
+import { MapperTokens } from 'src/common/Tokens';
 import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
 import { CompetitionRule } from 'src/competitions/domain/objects/CompetitionRule.object';
 import { CompetitionSettings } from 'src/competitions/domain/objects/CompetitionSettings';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionSchema } from 'src/schemas/Competition.schema';
 import { RelationSlots } from 'src/types/RelationSlots';
+import { RoundMapper } from './Round.mapper';
+import { TeamMapper } from 'src/teams/application/mappers/team.mapper';
 
 @Injectable()
 export class CompetitionMapper extends Mapper<
   CompetitionSchema,
   CompetitionEntity
 > {
+  @Inject(MapperTokens.RoundMapper) private readonly roundMapper: RoundMapper;
+  @Inject(MapperTokens.TeamMapper) private readonly teamMapper: TeamMapper;
   public toEntity(schema: CompetitionSchema): CompetitionEntity {
     return CompetitionEntity.load({
       id: schema.id,
+      rounds: schema.rounds
+        ? schema.rounds.map((sch) => this.roundMapper.toEntity(sch))
+        : [],
+      teams: schema.teams
+        ? schema.teams.map((sch) => this.teamMapper.toEntity(sch).toJSON())
+        : [],
       avatar: schema.avatar
         ? InternalFile.define<typeof RelationSlots.competition.avatar>(
             schema.avatar,
@@ -38,9 +49,11 @@ export class CompetitionMapper extends Mapper<
       dateOfStartRegistration: schema.dateOfStartRegistration,
       description: schema.description,
       name: schema.name,
-      rules: schema.rules.map((el) =>
-        CompetitionRule.define(el.name, el.description, el.icon),
-      ),
+      rules: schema.rules
+        ? schema.rules.map((el) =>
+            CompetitionRule.define(el.name, el.description, el.icon),
+          )
+        : [],
       socialMedia: schema.socialMedia
         ? InternalFile.define<typeof RelationSlots.competition.socialMedia>(
             schema.socialMedia,
@@ -89,7 +102,12 @@ export class CompetitionMapper extends Mapper<
     schema.publishedAt = entity.publishAt;
     schema.rules = entity.rules.map((el) => el.toJSON());
     schema.settings = entity.settings.toJSON();
-
+    schema.rounds = entity.rounds
+      ? entity.rounds.map((ent) => this.roundMapper.toSchema(ent))
+      : [];
+    schema.teams = entity.teams
+      ? entity.teams.map((ent) => this.teamMapper.toSchema(ent))
+      : [];
     return schema;
   }
 }

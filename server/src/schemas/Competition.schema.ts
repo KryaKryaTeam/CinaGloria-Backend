@@ -56,11 +56,15 @@ export class CompetitionSchema {
   @Column({ type: 'jsonb', default: [] })
   rules: ICompetitionRule[];
 
-  @OneToMany(() => TeamSchema, (team) => team.activeCompetition)
+  @OneToMany(() => TeamSchema, (team) => team.activeCompetition, {
+    cascade: true,
+    onDelete: 'SET NULL',
+  })
   teams: TeamSchema[];
 
   @OneToMany(() => RoundSchema, (round) => round.competition, {
     onDelete: 'CASCADE',
+    cascade: true,
   })
   rounds: RoundSchema[];
 

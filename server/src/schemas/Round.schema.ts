@@ -28,11 +28,14 @@ export class RoundSchema {
   @Column({ type: 'enum', enum: Icons, default: Icons.CPU })
   icon: Icons;
 
-  @Column({ type: 'timestamp with time zone', nullable: true })
-  startOfRound: Date | null;
+  @Column({ type: 'timestamp with time zone' })
+  startOfRound: Date;
 
-  @Column({ type: 'timestamp with time zone', nullable: true })
-  endOfRound: Date | null;
+  @Column({ type: 'timestamp with time zone' })
+  taskTimeout: Date;
+
+  @Column({ type: 'timestamp with time zone' })
+  endOfRound: Date;
 
   @OneToMany(() => TaskSchema, (task) => task.round, { onDelete: 'CASCADE' })
   relatedTasks: TaskSchema[];

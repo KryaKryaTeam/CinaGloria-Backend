@@ -4,7 +4,6 @@ import { Command } from 'src/common/application/Command';
 import { ReposTokens, ServiceTokens } from 'src/common/Tokens';
 import {
   CompetitionEntity,
-  ICompetitionPlain,
   ICreateCompetitionRAW,
 } from 'src/competitions/domain/entities/Competition.entity';
 import type { IFileRepository } from 'src/files/application/bounds/IFileRepository';
@@ -24,7 +23,7 @@ interface CommandInput {
 
 export class CreateCompetitionCommand extends Command<
   CommandInput,
-  ICompetitionPlain
+  CompetitionEntity
 > {
   @Inject(ReposTokens.FileRepository)
   private readonly fileRepository: IFileRepository;
@@ -33,7 +32,7 @@ export class CreateCompetitionCommand extends Command<
   @Inject(ServiceTokens.FileLinkerService)
   private readonly linkerService: LinkerApplicationService;
 
-  async implementation(data: CommandInput): Promise<ICompetitionPlain> {
+  async implementation(data: CommandInput): Promise<CompetitionEntity> {
     const comp = UserAndCompetitionService.createCompetition(
       {
         ...data.competition,

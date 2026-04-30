@@ -1,4 +1,5 @@
 import { FileRelationMapper } from 'src/files/application/mappers/FileRelationMapper';
+import { FileRelationEntity } from 'src/files/domain/entities/FileRelation.entity';
 import { FileRelation } from 'src/schemas/FileRelation.schema';
 
 describe('FileRelationMapper', () => {
@@ -57,7 +58,7 @@ describe('FileRelationMapper', () => {
       const schema = {
         id: 'rel1',
         file: { raw: 'file' },
-      } as any;
+      } as unknown as FileRelation;
 
       const entity = mapper.toEntity(schema);
 
@@ -72,7 +73,7 @@ describe('FileRelationMapper', () => {
       const entity = {
         id: 'rel1',
         filed: false, // triggers error
-      } as any;
+      } as unknown as FileRelationEntity;
 
       expect(() => mapper.toSchema(entity)).toThrow();
     });
@@ -89,7 +90,7 @@ describe('FileRelationMapper', () => {
         user: { id: 'user1' },
         competition: { id: 'comp1' },
         slot: 'file:avatar',
-      } as any;
+      } as unknown as FileRelationEntity;
 
       const result = mapper.toSchema(entity);
 
@@ -110,7 +111,7 @@ describe('FileRelationMapper', () => {
         user: { id: 'user1' },
         competition: { id: 'comp1' },
         slot: null,
-      } as any;
+      } as unknown as FileRelationEntity;
 
       const result = mapper.toSchema(entity);
 

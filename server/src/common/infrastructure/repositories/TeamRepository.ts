@@ -6,9 +6,9 @@ import { BaseRepository } from './BaseRepository';
 import { TeamSchema } from 'src/schemas/Team.schema';
 import { Inject } from '@nestjs/common';
 import { MapperTokens } from 'src/common/Tokens';
-import { TeamMapper } from 'src/teams/application/team.mapper';
 import { CompetitionMapper } from 'src/competitions/application/mapper/Competition.mapper';
 import { UserMapper } from 'src/authorization/application/mappers/UserMapper';
+import { TeamMapper } from 'src/teams/application/mappers/team.mapper';
 
 export class TeamRepository
   extends BaseRepository<TeamSchema>

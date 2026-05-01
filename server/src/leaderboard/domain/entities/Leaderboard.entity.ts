@@ -48,7 +48,8 @@ export class LeaderboardEntity extends Entity {
   }
 
   get nodes() {
-    return this._nodes;
+    // return structuredClone(this._nodes);
+    return [...this._nodes];
   }
 
   get round() {

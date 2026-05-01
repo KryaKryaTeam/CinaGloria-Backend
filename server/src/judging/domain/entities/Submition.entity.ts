@@ -124,7 +124,7 @@ export class SubmitionEntity extends Entity {
   }
 
   get relatedTasks(): TaskEntity[] {
-    return this._relatedTasks;
+    return [...this._relatedTasks];
   }
 
   set relatedTasks(value: TaskEntity[]) {

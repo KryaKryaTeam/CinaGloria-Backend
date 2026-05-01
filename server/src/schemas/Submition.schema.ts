@@ -1,4 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { TaskSchema } from './Task.schema';
 
 @Entity()
@@ -16,6 +22,7 @@ export class SubmitionSchema {
   youtubeURL: string;
 
   @Column({ type: 'uuid' })
+  @JoinColumn()
   assignedToJury: string;
 
   @OneToMany(() => TaskSchema, (task) => task.submition)

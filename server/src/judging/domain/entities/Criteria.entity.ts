@@ -47,27 +47,29 @@ export class CriteriaEntity extends Entity {
     this._visibility = data.visibility;
     this._description = data.description;
     this._icon = data.icon;
+    this._score = data.score;
   }
 
   static load(data: ICriteriaPlain) {
-    this.validate(data.name, data.description);
+    this.validate(data.name, data.description, data.score);
     return new CriteriaEntity(data);
   }
 
   static create(data: ICreateCriteria) {
-    this.validate(data.name, data.description);
+    this.validate(data.name, data.description, data.score);
     return new CriteriaEntity({
       id: randomUUID(),
       ...data,
     });
   }
 
-  static validate(name: string, description: string) {
+  static validate(name: string, description: string, score: number) {
     if (name.trim().length == 0) ApiError.throw(CriteriaErrors.NO_NAME);
     if (name.trim().length > 255)
       ApiError.throw(CriteriaErrors.NAME_IS_TOO_BIG);
     if (description.trim().length > 1000)
       ApiError.throw(CriteriaErrors.DESCRIPTION_TOO_BIG);
+    if (score <= 0) ApiError.throw(CriteriaErrors.NEGATIVE_OR_ZERO_SCORE);
   }
 
   set visibility(value: boolean) {

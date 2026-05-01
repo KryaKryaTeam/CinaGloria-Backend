@@ -7,7 +7,7 @@ export class LeaderboardSchema {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'jsonb', default: "'[]'" })
+  @Column({ type: 'jsonb', default: '[]' })
   nodes: ILeaderboardNodeValue[];
 
   @OneToOne(() => RoundSchema, (round) => round.leaderboard)

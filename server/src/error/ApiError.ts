@@ -449,6 +449,10 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'This leaderboard was not found',
     status: 404,
   },
+  SCORE_005: {
+    message: 'The criteria value cannot be less than or uqual to zero',
+    status: 400,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -593,6 +597,7 @@ export const CriteriaErrors = {
   NAME_IS_TOO_BIG: 'CRITERIA_002',
   DESCRIPTION_TOO_BIG: 'CRITERIA_003',
   NO_NAME: 'CRITERIA_004',
+  NEGATIVE_OR_ZERO_SCORE: 'CRITERIA_005',
 };
 
 export const SubmitionErrors = {

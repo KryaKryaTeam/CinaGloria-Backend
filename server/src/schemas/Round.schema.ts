@@ -47,6 +47,9 @@ export class RoundSchema {
   @JoinColumn({ name: 'competition_id' })
   competition: CompetitionSchema;
 
-  @OneToOne(() => LeaderboardSchema, (leaderboard) => leaderboard.round)
+  @OneToOne(() => LeaderboardSchema, (leaderboard) => leaderboard.round, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
   leaderboard: LeaderboardSchema;
 }

@@ -401,6 +401,58 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: "The user doesn't have enough rights to access this feature",
     status: 403,
   },
+  SCORE_001: {
+    message: 'This score was not found',
+    status: 404,
+  },
+  CRITERIA_001: {
+    message: 'The criteria was not found',
+    status: 404,
+  },
+  CRITERIA_002: {
+    message: 'The name of this criteria is too big',
+    status: 400,
+  },
+  CRITERIA_003: {
+    message: 'The description of this criteria is too big',
+    status: 400,
+  },
+  CRITERIA_004: {
+    message: 'Did not fill in the name of the criteria',
+    status: 400,
+  },
+  SUBMITION_001: {
+    message: 'The submition was not found',
+    status: 404,
+  },
+  SUBMITION_002: {
+    message: 'Did not provide github url',
+    status: 400,
+  },
+  SUBMITION_003: {
+    message: 'Did not provide youtube url',
+    status: 400,
+  },
+  SUBMITION_004: {
+    message: 'Did not assign to jury',
+    status: 400,
+  },
+  SUBMITION_005: {
+    message: 'Did not provide any related tasks',
+    status: 400,
+  },
+  LEADERBOARD_001: {
+    message: 'The place value is not valid. Must be 1 or bigger',
+    status: 400,
+  },
+  LEADERBOARD_002: {
+    message: 'This leaderboard was not found',
+    status: 404,
+  },
+  SCORE_005: {
+    message: 'The criteria value cannot be less than or uqual to zero',
+    status: 400,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -534,6 +586,31 @@ export const TestErrors = {
 
 export const CommandErrors = {
   COMMAND_PARAMS_WRONG: 'COMMAND_001',
+};
+
+export const ScoreErrors = {
+  SCORE_NOT_FOUND: 'SCORE_001',
+};
+
+export const CriteriaErrors = {
+  CRITERIA_NOT_FOUND: 'CRITERIA_001',
+  NAME_IS_TOO_BIG: 'CRITERIA_002',
+  DESCRIPTION_TOO_BIG: 'CRITERIA_003',
+  NO_NAME: 'CRITERIA_004',
+  NEGATIVE_OR_ZERO_SCORE: 'CRITERIA_005',
+};
+
+export const SubmitionErrors = {
+  SUBMITION_NOT_FOUND: 'SUBMITION_001',
+  NO_GITHUB_URL: 'SUBMITION_002',
+  NO_YOUTUBE_URL: 'SUBMITION_003',
+  NO_JURY: 'SUBMITION_004',
+  NO_RELATED_TASKS: 'SUBMITION_005',
+};
+
+export const LeaderboardErrors = {
+  INVALID_PLACE_VALUE: 'LEADERBOARD_001',
+  LEADERBOARD_NOT_FOUND: 'LEADERBOARD_002',
 };
 
 export type ApiErrorCode = keyof typeof ApiErrorsCodeVal;

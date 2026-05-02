@@ -13,7 +13,11 @@ export enum MapperTokens {
   CompetitionMapper = 'COMPETITION_MAPPER',
   RoundMapper = 'ROUND_MAPPER',
   TaskMapper = 'TASK_MAPPER',
+  ScoreMapper = 'SCORE_MAPPER',
   TeamMapper = 'TEAM_MAPPER',
+  CriteriaMapper = 'CRITERIA_MAPPER',
+  SubmitionMapper = 'SUBMITION_MAPPER',
+  LeaderboardMapper = 'LEADERBOARD_MAPPER',
 }
 
 export enum ReposTokens {
@@ -26,6 +30,10 @@ export enum ReposTokens {
   RoundRepository = 'ROUND_REPOSITORY',
   TeamRepository = 'TEAM_REPOSITORY',
   TaskRepository = 'TASK_REPOSITORY',
+  ScoreRepository = 'SCORE_REPOSITORY',
+  CriteriaRepository = 'CRITERIA_REPOSTORY',
+  SubmitionRepository = 'SUBMITION_REPOSITORY',
+  LeaderboardRepository = 'LEADERBOARD_REPOSITORY',
 }
 
 export enum CommandTokens {

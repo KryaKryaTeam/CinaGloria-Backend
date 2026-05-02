@@ -1,7 +1,7 @@
 // src/teams/domain/entities/Team.entity.spec.ts
 
 import { randomUUID } from 'crypto';
-import { ITeamCreate, TeamEntity } from './Team.entity';
+import { ICreateTeam, TeamEntity } from './Team.entity';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { TeamStatus } from 'src/types/TeamStatus';
 import { ApiError, DomainErrors } from 'src/error/ApiError';
@@ -10,7 +10,7 @@ describe('TeamEntity', () => {
   let team: TeamEntity;
 
   beforeEach(() => {
-    const createData: ITeamCreate = {
+    const createData: ICreateTeam = {
       captain: randomUUID(),
       name: 'Test Team',
       avatar: InternalFile.define<'team:avatar'>(

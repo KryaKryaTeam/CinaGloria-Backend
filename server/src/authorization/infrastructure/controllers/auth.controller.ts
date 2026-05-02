@@ -42,7 +42,7 @@ export class AuthController {
   @Inject(CommandTokens.LoginCommand)
   private readonly loginCommand: LoginCommand;
 
-  @Inject(CommandTokens.RegistarationCommand)
+  @Inject(CommandTokens.RegistrationCommand)
   private readonly registrationCommand: RegistrationCommand;
 
   @Inject(CommandTokens.RefreshCommand)

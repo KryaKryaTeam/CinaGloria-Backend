@@ -39,8 +39,6 @@ export class NotificationRepository
     });
     if (result == null) return null;
 
-    console.log(result);
-
     return this.notificationMapper.toEntity(result);
   }
 
@@ -53,6 +51,14 @@ export class NotificationRepository
       skip: page * 20,
       take: 20,
       loadRelationIds: true,
+      order: {
+        status: {
+          direction: 'DESC',
+        },
+        createdAt: {
+          direction: 'DESC',
+        },
+      },
     });
 
     if (!result || !result[0]) return null;

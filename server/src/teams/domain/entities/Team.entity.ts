@@ -36,7 +36,7 @@ export interface ITeamPlain {
   }[];
 }
 
-export interface ITeamCreate {
+export interface ICreateTeam {
   captain: string;
   name: string;
   avatar: InternalFile<'team:avatar'>;
@@ -81,7 +81,7 @@ export class TeamEntity extends Entity {
     this._registrationTimeout = plain.registrationTimeout;
   }
 
-  static create(createData: ITeamCreate) {
+  static create(createData: ICreateTeam) {
     return new TeamEntity({
       id: randomUUID(),
       captain: createData.captain,
@@ -338,6 +338,20 @@ export class TeamEntity extends Entity {
     this._history.push(historyNode);
   } // I will make V_OBJ for this in future. SO DON'T TOUCH THIS!
   //generateCert() {} <--- futured functionality
+
+  set name(new_: string) {
+    if (new_.trim().length == 0 || new_.trim().length < 255)
+      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+    this._name = new_.trim();
+  }
+
+  set avatar(new_: InternalFile<'team:avatar'>) {
+    this._avatar = new_;
+  }
+
+  set banner(new_: InternalFile<'team:banner'>) {
+    this._banner = new_;
+  }
 
   toJSON(): ITeamPlain {
     return {

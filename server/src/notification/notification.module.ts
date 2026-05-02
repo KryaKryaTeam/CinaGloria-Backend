@@ -41,7 +41,7 @@ const providers: Provider[] = [
     useClass: GetNotificationsQuery,
   },
   {
-    provide: CommandTokens.MakeNotificationReaded,
+    provide: CommandTokens.MakeNotificationReadCommand,
     useClass: MakeNotificationReaded,
   },
   {

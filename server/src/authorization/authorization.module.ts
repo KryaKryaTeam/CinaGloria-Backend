@@ -51,7 +51,7 @@ const providers: Provider[] = [
     useClass: LoginCommand,
   },
   {
-    provide: CommandTokens.RegistarationCommand,
+    provide: CommandTokens.RegistrationCommand,
     useClass: RegistrationCommand,
   },
   {

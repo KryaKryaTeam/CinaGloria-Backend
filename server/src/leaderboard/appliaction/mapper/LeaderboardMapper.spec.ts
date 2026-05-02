@@ -38,7 +38,7 @@ describe('LeaderboardMapper', () => {
       expect(result).toBeInstanceOf(LeaderboardEntity);
       expect(result.id).toBe(schema.id);
       expect(result.round).toBe(roundEntityMock);
-      expect(result.nodes).toBe(schema.nodes);
+      expect(result.nodes).toStrictEqual(schema.nodes);
     });
   });
 

@@ -22,10 +22,12 @@ export class LeaderboardMapper extends Mapper<
   }
 
   public toSchema(entity: LeaderboardEntity): LeaderboardSchema {
-    return {
-      id: entity.id,
-      round: this.roundMapper.toSchema(entity.round),
-      nodes: entity.nodes,
-    };
+    const sch = new LeaderboardSchema();
+
+    sch.id = entity.id;
+    sch.round = this.roundMapper.toSchema(entity.round);
+    sch.nodes = entity.nodes;
+
+    return sch;
   }
 }

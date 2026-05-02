@@ -20,11 +20,13 @@ export class ScoreMapper extends Mapper<ScoreSchema, ScoreEntity> {
   }
 
   public toSchema(entity: ScoreEntity): ScoreSchema {
-    return {
-      id: entity.id,
-      score: entity._score,
-      team: entity.team,
-      task: this.taskMapper.toSchema(entity.task),
-    };
+    const sch = new ScoreSchema();
+
+    sch.id = entity.id;
+    sch.score = entity._score;
+    sch.team = entity.team;
+    sch.task = this.taskMapper.toSchema(entity.task);
+
+    return sch;
   }
 }

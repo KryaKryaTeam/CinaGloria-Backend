@@ -28,13 +28,15 @@ export class SubmitionMapper extends Mapper<SubmitionSchema, SubmitionEntity> {
     const tasks = entity.relatedTasks.map((task) =>
       this.taskMapper.toSchema(task),
     );
-    return {
-      id: entity.id,
-      assignedToJury: entity.assignedToJury,
-      githubURL: entity.githubURL,
-      youtubeURL: entity.youtubeURL,
-      relatedTasks: tasks,
-      createdAt: entity.createdAt,
-    };
+    const sch = new SubmitionSchema();
+
+    sch.id = entity.id;
+    sch.assignedToJury = entity.assignedToJury;
+    sch.githubURL = entity.githubURL;
+    sch.youtubeURL = entity.youtubeURL;
+    sch.relatedTasks = tasks;
+    sch.createdAt = entity.createdAt;
+
+    return sch;
   }
 }

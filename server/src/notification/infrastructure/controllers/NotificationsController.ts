@@ -19,7 +19,7 @@ export class NotificationsController {
   @Inject(CommandTokens.GetNotificationsQuery)
   private readonly getNotificationQuery: GetNotificationsQuery;
 
-  @Inject(CommandTokens.MakeNotificationReaded)
+  @Inject(CommandTokens.MakeNotificationReadCommand)
   private readonly makeNotificationReaded: MakeNotificationReaded;
 
   @Inject(CommandTokens.MarkAllNotificationsReadCommand)

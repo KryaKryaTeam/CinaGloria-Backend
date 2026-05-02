@@ -53,4 +53,20 @@ export class TeamRepository
     const members = team.members.map((sch) => this.userMapper.toEntity(sch));
     return members;
   }
+  async findByMemberPage(userId: string, page: number): Promise<TeamEntity[]> {
+    const teams = await this.repository.find({
+      where: {
+        members: {
+          id: userId,
+        },
+      },
+      take: 20,
+      skip: page * 20,
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+
+    return teams.map((sch) => this.mapper.toEntity(sch));
+  }
 }

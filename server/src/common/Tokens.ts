@@ -29,22 +29,44 @@ export enum ReposTokens {
 }
 
 export enum CommandTokens {
+  // --- AUTH & USER ---
   LoginCommand = 'LOGIN_COMMAND',
-  RegistarationCommand = 'REGISTRATION_COMMAND',
+  RegistrationCommand = 'REGISTRATION_COMMAND',
   ValidateRegistrationCommand = 'VALIDATE_REGISTRATION_COMMAND',
   CheckCommand = 'CHECK_COMMAND',
   GenerateTicketCommand = 'GENERATE_TICKET_COMMAND',
   RefreshCommand = 'REFRESH_COMMAND',
   GetPublicProfileQuery = 'GET_PUBLIC_PROFILE_QUERY',
-  GetPrivateProfileQuery = 'GET_PUBLIC_PRIVATE_QUERY',
+  GetPrivateProfileQuery = 'GET_PRIVATE_PROFILE_QUERY',
   UpdateUserAdditionalDataCommand = 'UPDATE_USER_ADDITIONAL_DATA_COMMAND',
   UpdateUsernameCommand = 'UPDATE_USERNAME_COMMAND',
   UpdateAvatarCommand = 'UPDATE_AVATAR_COMMAND',
   GetCSRFToken = 'GET_CSRF_TOKEN_QUERY',
+
+  // --- NOTIFICATIONS ---
   GetNotificationsQuery = 'GET_NOTIFICATION_QUERY',
-  MakeNotificationReaded = 'MAKE_NOTIFICATION_READED_COMMAND',
+  MakeNotificationReadCommand = 'MAKE_NOTIFICATION_READ_COMMAND',
+  MarkAllNotificationsReadCommand = 'MARK_ALL_NOTIFICATIONS_READ_COMMAND',
+  SendTestNotificationCommand = 'SEND_TEST_NOTIFICATION_COMMAND',
+
+  // --- FILE & INFRA ---
   UploadFileCommand = 'UPLOAD_FILE_COMMAND',
   GetLinkQuery = 'GET_LINK_QUERY',
+  DeleteGarbageCommand = 'DELETE_GARBAGE_COMMAND',
+
+  // --- TEAMS ---
+  CreateTeamCommand = 'CREATE_TEAM_COMMAND',
+  PatchTeamCommand = 'PATCH_TEAM_COMMAND',
+  RegisterTeamCommand = 'REGISTER_TEAM_COMMAND',
+  CancelRegistrationOfTeamsCommand = 'CANCEL_REGISTRATION_OF_TEAMS_COMMAND',
+  GetMyTeamsPageQuery = 'GET_MY_TEAMS_PAGE_QUERY',
+
+  // --- TEAM MEMBERS ---
+  InviteMemberCommand = 'INVITE_MEMBER_COMMAND',
+  AcceptMemberInviteCommand = 'ACCEPT_MEMBER_INVITE_COMMAND',
+  DeleteMemberCommand = 'DELETE_MEMBER_COMMAND',
+
+  // --- COMPETITION MANAGEMENT ---
   CreateCompetitionCommand = 'CREATE_COMPETITION_COMMAND',
   UpdateCompetitionCommand = 'UPDATE_COMPETITION_COMMAND',
   DeleteCompetitionCommand = 'DELETE_COMPETITION_COMMAND',
@@ -54,21 +76,24 @@ export enum CommandTokens {
   GetPublicCompetitionQuery = 'GET_PUBLIC_COMPETITION_QUERY',
   GetCompetitionPageQuery = 'GET_COMPETITION_PAGE_QUERY',
   GetPublicCompetitionsPageQuery = 'GET_PUBLIC_COMPETITIONS_PAGE_QUERY',
-  SendTestNotificationCommand = 'SEND_TEST_NOTIFICATION_COMMAND',
-  CreateSuperUserCommand = 'CREATE_SUPER_USER_COMMAND',
-  SetRoleToAUserCommand = 'SET_ROLE_TO_A_USER_COMMAND',
-  DeleteGarbageCommand = 'DELETE_GARBAGE_COMMAND',
-  GetUsersByEmailQuery = 'GET_USERS_BY_EMAIL_QUERY',
-  MarkAllNotificationsReadCommand = 'MARK_ALL_NOTIFICATIONS_READ_COMMAND',
+  UpdateSettingsOfCompetitionCommand = 'UPDATE_SETTINGS_OF_COMPETITION_COMMAND',
+
+  // --- ROUNDS & TASKS ---
   CreateRoundCommand = 'CREATE_ROUND_COMMAND',
   DeleteRoundCommand = 'DELETE_ROUND_COMMAND',
   PatchRoundCommand = 'PATCH_ROUND_COMMAND',
   ReadRoundCommand = 'READ_ROUND_COMMAND',
-  CreateTaskCommand = 'CREAT_TASK_COMMAND',
-  UpdateSettingsOfCompetitionCommand = 'UPDATE_SETTINGS_OF_COMPETITION_COMMAND',
+  CreateTaskCommand = 'CREATE_TASK_COMMAND',
+
+  // --- AUTOMATION & EVENTS ---
   RunEndEventOnAllEndedRoundsCommand = 'RUN_END_EVENT_ON_ALL_ENDED_ROUNDS_COMMAND',
   RunStartedEventOnAllStartedRoundsCommand = 'RUN_STARTED_EVENT_ON_ALL_STARTED_ROUNDS_COMMAND',
   HandleCompetitionScheduledEventsCommand = 'HANDLE_COMPETITION_SCHEDULED_EVENTS_COMMAND',
+
+  // --- ADMIN ---
+  CreateSuperUserCommand = 'CREATE_SUPER_USER_COMMAND',
+  SetRoleToAUserCommand = 'SET_ROLE_TO_A_USER_COMMAND',
+  GetUsersByEmailQuery = 'GET_USERS_BY_EMAIL_QUERY',
 }
 
 export enum ServiceTokens {

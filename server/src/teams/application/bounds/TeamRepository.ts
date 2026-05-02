@@ -7,4 +7,5 @@ export interface ITeamRepository {
   findById(id: string): Promise<TeamEntity | undefined>;
   getAllSerializedMembers(id: string): Promise<UserEntity[]>;
   getActiveCompetition(id: string): Promise<CompetitionEntity | undefined>;
+  findByMemberPage(userId: string, page: number): Promise<TeamEntity[]>;
 }

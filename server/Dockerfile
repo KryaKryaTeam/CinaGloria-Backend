@@ -15,4 +15,4 @@ COPY --from=builder /app/package*.json ./
 # Install ONLY production dependencies (no compilers)
 RUN npm install --omit=dev
 
-CMD ["node", "dist/src/main.js"]
+CMD ["node", "dist/main.js"]

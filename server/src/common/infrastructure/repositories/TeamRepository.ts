@@ -69,4 +69,8 @@ export class TeamRepository
 
     return teams.map((sch) => this.mapper.toEntity(sch));
   }
+
+  async delete(team: TeamEntity): Promise<void> {
+    await this.repository.delete({ id: team.id });
+  }
 }

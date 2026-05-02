@@ -8,4 +8,5 @@ export interface ITeamRepository {
   getAllSerializedMembers(id: string): Promise<UserEntity[]>;
   getActiveCompetition(id: string): Promise<CompetitionEntity | undefined>;
   findByMemberPage(userId: string, page: number): Promise<TeamEntity[]>;
+  delete(team: TeamEntity): Promise<void>;
 }

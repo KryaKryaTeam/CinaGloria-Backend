@@ -60,11 +60,13 @@ export enum CommandTokens {
   RegisterTeamCommand = 'REGISTER_TEAM_COMMAND',
   CancelRegistrationOfTeamsCommand = 'CANCEL_REGISTRATION_OF_TEAMS_COMMAND',
   GetMyTeamsPageQuery = 'GET_MY_TEAMS_PAGE_QUERY',
+  DeleteTeamCommand = 'DELETE_TEAM_COMMAND',
 
   // --- TEAM MEMBERS ---
   InviteMemberCommand = 'INVITE_MEMBER_COMMAND',
   AcceptMemberInviteCommand = 'ACCEPT_MEMBER_INVITE_COMMAND',
   DeleteMemberCommand = 'DELETE_MEMBER_COMMAND',
+  ChangeCaptainCommand = 'CHANGE_CAPTAIN_COMMAND',
 
   // --- COMPETITION MANAGEMENT ---
   CreateCompetitionCommand = 'CREATE_COMPETITION_COMMAND',

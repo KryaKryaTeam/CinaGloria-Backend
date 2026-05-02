@@ -5,19 +5,24 @@ import { ReposTokens } from 'src/common/Tokens';
 import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
 import type { ITeamRepository } from '../bounds/TeamRepository';
 
-interface Input {
+export interface GetMyTeamsPageInput {
   page: number;
   actor: UserEntity;
 }
 
-interface Output {
+export interface GetMyTeamsPageOutput {
   teams: TeamEntity[];
 }
 
-export class GetMyTeamsPage extends Query<Input, Output> {
+export class GetMyTeamsPage extends Query<
+  GetMyTeamsPageInput,
+  GetMyTeamsPageOutput
+> {
   @Inject(ReposTokens.TeamRepository)
   private readonly teamRepo: ITeamRepository;
-  async implementation(data: Input): Promise<Output> {
+  async implementation(
+    data: GetMyTeamsPageInput,
+  ): Promise<GetMyTeamsPageOutput> {
     const teams = await this.teamRepo.findByMemberPage(
       data.actor.id,
       data.page,

@@ -9,6 +9,9 @@ import { GetMyTeamsPage } from './application/commands/GetMyTeamsPage.query';
 import { InviteMemberCommand } from './application/commands/InviteMember.command';
 import { PatchTeamCommand } from './application/commands/PatchTeam.command';
 import { RegisterTeamCommand } from './application/commands/RegisterTeam.command';
+import { TeamController } from './infrastructure/controllers/team.controller';
+import { DeleteTeamCommand } from './application/commands/DeleteTeam.command';
+import { ChangeCaptainCommand } from './application/commands/ChangeCaptain.command';
 
 const providers: Provider[] = [
   {
@@ -38,10 +41,16 @@ const providers: Provider[] = [
   { provide: CommandTokens.InviteMemberCommand, useClass: InviteMemberCommand },
   { provide: CommandTokens.PatchTeamCommand, useClass: PatchTeamCommand },
   { provide: CommandTokens.RegisterTeamCommand, useClass: RegisterTeamCommand },
+  { provide: CommandTokens.DeleteTeamCommand, useClass: DeleteTeamCommand },
+  {
+    provide: CommandTokens.ChangeCaptainCommand,
+    useClass: ChangeCaptainCommand,
+  },
 ];
 
 @Module({
   providers,
   exports: [...providers],
+  controllers: [TeamController],
 })
 export class TeamsModule {}

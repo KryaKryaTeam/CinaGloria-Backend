@@ -14,7 +14,7 @@ interface CreateTeamCommandInput {
     name: string;
   };
 }
-interface CreateTeamCommandOutput {
+export interface CreateTeamCommandOutput {
   team: TeamEntity;
 }
 

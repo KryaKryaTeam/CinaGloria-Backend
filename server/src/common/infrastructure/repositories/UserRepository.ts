@@ -5,6 +5,7 @@ import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { UserMapper } from 'src/authorization/application/mappers/UserMapper';
 import { Inject } from '@nestjs/common';
 import { MapperTokens } from 'src/common/Tokens';
+import { RoleEnum } from 'src/types/RoleEnum';
 
 export class UserRepository
   extends BaseRepository<UserSchema>
@@ -61,6 +62,17 @@ export class UserRepository
       .skip(page * 20)
       .take(20)
       .getMany();
+    if (!result || result.length == 0) return [];
+
+    return result.map((el) => this.userMapper.toEntity(el));
+  }
+
+  async findAllJuries(): Promise<UserEntity[] | []> {
+    const result = await this.repository
+      .createQueryBuilder('user')
+      .where('user.role = :role', { role: RoleEnum })
+      .getMany();
+
     if (!result || result.length == 0) return [];
 
     return result.map((el) => this.userMapper.toEntity(el));

@@ -11,4 +11,5 @@ export interface IUserRepository {
     page: number,
     email: string,
   ): Promise<UserEntity[]>;
+  findAllJuries(): Promise<UserEntity[] | []>;
 }

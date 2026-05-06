@@ -12,6 +12,7 @@ import {
 import { CompetitionSchema } from './Competition.schema';
 import { TaskSchema } from './Task.schema';
 import { LeaderboardSchema } from './Leaderboard.schema';
+import { SubmitionSchema } from './Submition.schema';
 
 @Entity({ name: 'round' })
 export class RoundSchema {
@@ -55,4 +56,7 @@ export class RoundSchema {
     cascade: true,
   })
   leaderboard: LeaderboardSchema;
+
+  @OneToMany(() => SubmitionSchema, (submission) => submission.relatedRound)
+  submission: RoundSchema;
 }

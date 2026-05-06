@@ -1,13 +1,13 @@
 import { Entity } from 'src/common/domain/Entity';
-import { TaskEntity } from 'src/competitions/domain/entities/Task.entity';
 import { randomUUID } from 'crypto';
 import { ApiError, SubmitionErrors } from 'src/error/ApiError';
+import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
 
 export interface ICreateSubmition {
   githubURL: string;
   youtubeURL: string;
-  assignedToJury: string;
-  relatedTasks: TaskEntity[];
+  assignedToJury: string | undefined;
+  relatedRound: RoundEntity;
 }
 
 export interface ISubmitionPlain {
@@ -15,8 +15,8 @@ export interface ISubmitionPlain {
   createdAt: Date;
   githubURL: string;
   youtubeURL: string;
-  assignedToJury: string;
-  relatedTasks: TaskEntity[];
+  assignedToJury: string | undefined;
+  relatedRound: RoundEntity;
 }
 
 export interface ISubmitionEntityJSON {
@@ -24,8 +24,8 @@ export interface ISubmitionEntityJSON {
   createdAt: Date;
   githubURL: string;
   youtubeURL: string;
-  assignedToJury: string;
-  relatedTasks: TaskEntity[];
+  assignedToJury: string | undefined;
+  relatedRound: RoundEntity;
 }
 
 export class SubmitionEntity extends Entity {
@@ -33,8 +33,8 @@ export class SubmitionEntity extends Entity {
   public _createdAt: Date;
   public _githubURL: string;
   public _youtubeURL: string;
-  public _assignedToJury: string;
-  public _relatedTasks: TaskEntity[];
+  public _assignedToJury: string | undefined;
+  public _relatedRound: RoundEntity;
 
   private constructor(data: ISubmitionPlain) {
     super();
@@ -44,42 +44,28 @@ export class SubmitionEntity extends Entity {
     this._githubURL = data.githubURL;
     this._youtubeURL = data.youtubeURL;
     this._assignedToJury = data.assignedToJury;
-    this._relatedTasks = data.relatedTasks;
+    this._relatedRound = data.relatedRound;
   }
 
   static validate(
     githubURL: string,
     youtubeURL: string,
-    assignedToJury: string,
-    relatedTasks: TaskEntity[],
+    relatedRound: RoundEntity,
   ) {
     if (githubURL.trim().length == 0)
       ApiError.throw(SubmitionErrors.NO_GITHUB_URL);
     if (youtubeURL.trim().length == 0)
       ApiError.throw(SubmitionErrors.NO_YOUTUBE_URL);
-    if (assignedToJury.trim().length == 0)
-      ApiError.throw(SubmitionErrors.NO_JURY);
-    if (relatedTasks.length == 0)
-      ApiError.throw(SubmitionErrors.NO_RELATED_TASKS);
+    if (!relatedRound) ApiError.throw(SubmitionErrors.NO_RELATED_ROUND);
   }
 
   static load(data: ISubmitionPlain) {
-    this.validate(
-      data.githubURL,
-      data.youtubeURL,
-      data.assignedToJury,
-      data.relatedTasks,
-    );
+    this.validate(data.githubURL, data.youtubeURL, data.relatedRound);
     return new SubmitionEntity(data);
   }
 
   static create(data: ICreateSubmition) {
-    this.validate(
-      data.githubURL,
-      data.youtubeURL,
-      data.assignedToJury,
-      data.relatedTasks,
-    );
+    this.validate(data.githubURL, data.youtubeURL, data.relatedRound);
     return new SubmitionEntity({
       id: randomUUID(),
       createdAt: new Date(),
@@ -115,7 +101,7 @@ export class SubmitionEntity extends Entity {
     this._youtubeURL = value;
   }
 
-  get assignedToJury(): string {
+  get assignedToJury(): string | undefined {
     return this._assignedToJury;
   }
 
@@ -123,12 +109,12 @@ export class SubmitionEntity extends Entity {
     this._assignedToJury = value;
   }
 
-  get relatedTasks(): TaskEntity[] {
-    return [...this._relatedTasks];
+  get relatedRound(): RoundEntity {
+    return this._relatedRound;
   }
 
-  set relatedTasks(value: TaskEntity[]) {
-    this._relatedTasks = value;
+  set relatedRound(value: RoundEntity) {
+    this._relatedRound = value;
   }
 
   toJSON(): ISubmitionEntityJSON {
@@ -138,7 +124,7 @@ export class SubmitionEntity extends Entity {
       assignedToJury: this.assignedToJury,
       githubURL: this.githubURL,
       youtubeURL: this.youtubeURL,
-      relatedTasks: this.relatedTasks,
+      relatedRound: this.relatedRound,
     };
   }
 }

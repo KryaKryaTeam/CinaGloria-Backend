@@ -104,6 +104,13 @@ export enum CommandTokens {
   CreateSuperUserCommand = 'CREATE_SUPER_USER_COMMAND',
   SetRoleToAUserCommand = 'SET_ROLE_TO_A_USER_COMMAND',
   GetUsersByEmailQuery = 'GET_USERS_BY_EMAIL_QUERY',
+
+  // --- JUDGING ---
+  RoundOnJudgingCommand = 'ROUND_ON_JUDGING_COMMAND',
+  CreateSubmissionCommand = 'CREATE_SUBMISSION_COMMAND',
+  UpdateSubmissionCommand = 'UPDATE_SUBMISSION_COMMAND',
+  FindSubmissionByIdCommand = 'FIND_SUBMISSION_BY_ID_COMMAND',
+  DeleteSubmissionCommand = 'DELETE_SUBMISSION_COMMAND',
 }
 
 export enum ServiceTokens {

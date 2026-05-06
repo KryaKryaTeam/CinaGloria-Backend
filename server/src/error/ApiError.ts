@@ -434,11 +434,7 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     status: 400,
   },
   SUBMITION_004: {
-    message: 'Did not assign to jury',
-    status: 400,
-  },
-  SUBMITION_005: {
-    message: 'Did not provide any related tasks',
+    message: 'Did not provide any related round',
     status: 400,
   },
   LEADERBOARD_001: {
@@ -451,6 +447,10 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
   },
   SCORE_005: {
     message: 'The criteria value cannot be less than or uqual to zero',
+    status: 400,
+  },
+  SUBMITION_005: {
+    message: 'Round is already due. Cannot create submissions',
     status: 400,
   },
 } as const;
@@ -604,8 +604,8 @@ export const SubmitionErrors = {
   SUBMITION_NOT_FOUND: 'SUBMITION_001',
   NO_GITHUB_URL: 'SUBMITION_002',
   NO_YOUTUBE_URL: 'SUBMITION_003',
-  NO_JURY: 'SUBMITION_004',
-  NO_RELATED_TASKS: 'SUBMITION_005',
+  NO_RELATED_ROUND: 'SUBMITION_004',
+  CANNOT_SUBMIT: 'SUBMITION_005',
 };
 
 export const LeaderboardErrors = {

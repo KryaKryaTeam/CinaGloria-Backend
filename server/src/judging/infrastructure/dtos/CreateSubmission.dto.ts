@@ -20,5 +20,6 @@ export class CreateSubmissionDto {
   @ApiProperty({
     description: 'An array of tasks related to this submission',
   })
-  relatedRound: PlainRoundDto;
+  @IsString()
+  relatedRound: string;
 }

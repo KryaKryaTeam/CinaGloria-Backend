@@ -23,12 +23,20 @@ import { CompetitionRepository } from './infrastructure/repositories/Competition
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { JsonInterceptor } from './infrastructure/interceptors/JsonInterceptor';
 import { RoundRepository } from './infrastructure/repositories/RoundRepository';
+import { ScoreRepository } from './infrastructure/repositories/ScoreRepository';
 import { TeamsModule } from 'src/teams/teams.module';
 import { TeamSchema } from 'src/schemas/Team.schema';
 import { RoundSchema } from 'src/schemas/Round.schema';
 import { TaskSchema } from 'src/schemas/Task.schema';
 import { TeamRepository } from './infrastructure/repositories/TeamRepository';
 import { TaskRepository } from './infrastructure/repositories/TaskRepository';
+import { CriteriaRepository } from './infrastructure/repositories/CriteriaRepotisory';
+import { SubmitionRepository } from './infrastructure/repositories/SubmitionRepotisory';
+import { SubmitionSchema } from 'src/schemas/Submition.schema';
+import { CriteriaSchema } from 'src/schemas/Criteria.schema';
+import { ScoreSchema } from 'src/schemas/Score.schema';
+import { JudgingModule } from 'src/judging/judging.module';
+import { LeaderboardRepository } from './infrastructure/repositories/LeaderboardRepotisory';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -56,8 +64,15 @@ const providers: Provider[] = [
     provide: ReposTokens.RoundRepository,
     useClass: RoundRepository,
   },
+  { provide: ReposTokens.ScoreRepository, useClass: ScoreRepository },
   { provide: ReposTokens.TeamRepository, useClass: TeamRepository },
   { provide: ReposTokens.TaskRepository, useClass: TaskRepository },
+  { provide: ReposTokens.CriteriaRepository, useClass: CriteriaRepository },
+  { provide: ReposTokens.SubmitionRepository, useClass: SubmitionRepository },
+  {
+    provide: ReposTokens.LeaderboardRepository,
+    useClass: LeaderboardRepository,
+  },
 ];
 
 @Global()
@@ -84,13 +99,16 @@ const providers: Provider[] = [
       TeamSchema,
       RoundSchema,
       TaskSchema,
+      SubmitionSchema,
+      CriteriaSchema,
+      ScoreSchema,
     ]),
     forwardRef(() => AuthorizationModule),
     forwardRef(() => NotificationModule),
     forwardRef(() => FilesModule),
     forwardRef(() => CompetitionsModule),
     forwardRef(() => TeamsModule),
-    forwardRef(() => TeamsModule),
+    forwardRef(() => JudgingModule),
   ],
 })
 export class CommonModule {}

@@ -1,7 +1,7 @@
-import { Entity } from 'src/common/domain/Entity';
+import { Entity } from '../../../common/domain/Entity';
 import { Color } from '../objects/Color.object';
 import { randomUUID } from 'crypto';
-import { ApiError, TaskErrors } from 'src/error/ApiError';
+import { ApiError, TaskErrors } from '../../../error/ApiError';
 
 export interface ICreateTask {
   name: string;

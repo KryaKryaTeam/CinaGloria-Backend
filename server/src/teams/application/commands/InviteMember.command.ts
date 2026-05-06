@@ -4,7 +4,7 @@ import { Command } from 'src/common/application/Command';
 import { ReposTokens } from 'src/common/Tokens';
 import type { ITeamRepository } from '../bounds/TeamRepository';
 import type { IUserRepository } from 'src/authorization/application/bounds/IUserRepository';
-import { ApiError, DomainErrors } from 'src/error/ApiError';
+import { ApiError, TeamErrors, UserErrors } from 'src/error/ApiError';
 import { TeamEntityHelperService } from 'src/teams/domain/services/TeamEntityHelper.service';
 
 interface InviteMemberCommandInput {
@@ -21,10 +21,10 @@ export class InviteMemberCommand extends Command<
   @Inject(ReposTokens.UserRepository) userRepo: IUserRepository;
   async implementation(data: InviteMemberCommandInput): Promise<void> {
     const team = await this.teamRepo.findById(data.teamId);
-    if (!team) ApiError.throw(DomainErrors.UNEXPECTED_VALUE);
+    if (!team) ApiError.throw(TeamErrors.TEAM_UNDEFINED);
 
     const target = await this.userRepo.findById(data.target);
-    if (!target) ApiError.throw(DomainErrors.UNEXPECTED_VALUE);
+    if (!target) ApiError.throw(UserErrors.USER_WITH_THIS_ID_UNDEFINED);
 
     TeamEntityHelperService.inviteMember(team, data.actor, target);
 

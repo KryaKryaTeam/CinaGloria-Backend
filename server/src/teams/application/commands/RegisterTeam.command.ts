@@ -4,7 +4,7 @@ import { Command } from 'src/common/application/Command';
 import { ReposTokens } from 'src/common/Tokens';
 import type { ICompetitionRepository } from 'src/competitions/application/bounds/CompetitionRepository';
 import type { ITeamRepository } from '../bounds/TeamRepository';
-import { ApiError, DomainErrors } from 'src/error/ApiError';
+import { ApiError, CompetitionErrors, TeamErrors } from 'src/error/ApiError';
 import { TeamEntityHelperService } from 'src/teams/domain/services/TeamEntityHelper.service';
 
 interface RegisterTeamCommandInput {
@@ -27,8 +27,8 @@ export class RegisterTeamCommand extends Command<
       data.competitionId,
     );
 
-    if (!team) ApiError.throw(DomainErrors.UNEXPECTED_VALUE);
-    if (!competition) ApiError.throw(DomainErrors.UNEXPECTED_VALUE);
+    if (!team) ApiError.throw(TeamErrors.TEAM_UNDEFINED);
+    if (!competition) ApiError.throw(CompetitionErrors.UNDEFINED);
 
     TeamEntityHelperService.registerTeam(team, data.actor, competition);
 

@@ -31,6 +31,7 @@ import { ChangeCaptainCommand } from 'src/teams/application/commands/ChangeCapta
 import { RegistrationDto } from '../dtos/Registration.dto';
 import { RegisterTeamCommand } from 'src/teams/application/commands/RegisterTeam.command';
 import { CancelRegistrationOfTeamsCommand } from 'src/teams/application/commands/CancelRegistrationOfTeams.command';
+import { AcceptMemberInviteCommand } from 'src/teams/application/commands/AcceptMemberInvite.command';
 
 @Controller('teams')
 export class TeamController {
@@ -61,6 +62,9 @@ export class TeamController {
   @Inject(CommandTokens.CancelRegistrationOfTeamsCommand)
   private readonly cancelRegistrationOfTeamsCommand: CancelRegistrationOfTeamsCommand;
 
+  @Inject(CommandTokens.AcceptMemberInviteCommand)
+  private readonly AcceptMemberInviteCommand: AcceptMemberInviteCommand;
+
   @Get('me/:page')
   @Secure()
   @ApiResponse({ status: 200, type: [TeamEntityDto] })
@@ -80,6 +84,7 @@ export class TeamController {
 
   @Patch(':teamId')
   @Secure()
+  @ApiResponse({ status: 200 })
   async updateTeam(
     @Body() dto: UpdateTeamDto,
     @UserId() user: UserEntity,
@@ -94,6 +99,7 @@ export class TeamController {
 
   @Delete(':teamId')
   @Secure()
+  @ApiResponse({ status: 200 })
   async deleteTeam(@UserId() user: UserEntity, @Param() teamId: TeamIdDto) {
     return await this.deleteTeamCommand.execute({
       actor: user,
@@ -103,6 +109,7 @@ export class TeamController {
 
   @Post(':teamId/members')
   @Secure()
+  @ApiResponse({ status: 200 })
   async addMember(
     @UserId() user: UserEntity,
     @Body() dto: AddMemberDto,
@@ -117,6 +124,7 @@ export class TeamController {
 
   @Delete(':teamId/members/:memberId')
   @Secure()
+  @ApiResponse({ status: 200 })
   async removeMember(
     @UserId() user: UserEntity,
     @Param() dto: TeamMemberIdDto,
@@ -130,6 +138,7 @@ export class TeamController {
 
   @Patch(':teamId/captain')
   @Secure()
+  @ApiResponse({ status: 200 })
   async changeCaptain(
     @UserId() user: UserEntity,
     @Param() teamId: TeamIdDto,
@@ -144,6 +153,7 @@ export class TeamController {
 
   @Post(':teamId/registration')
   @Secure()
+  @ApiResponse({ status: 200 })
   async startRegistration(
     @UserId() user: UserEntity,
     @Param() teamId: TeamIdDto,
@@ -158,11 +168,22 @@ export class TeamController {
 
   @Delete(':teamId/registration')
   @Secure()
+  @ApiResponse({ status: 200 })
   async cancelRegistration(
     @UserId() user: UserEntity,
     @Param() teamId: TeamIdDto,
   ) {
     return await this.cancelRegistrationOfTeamsCommand.execute({
+      actor: user,
+      teamId: teamId.teamId,
+    });
+  }
+
+  @Post(':teamId/accept')
+  @Secure()
+  @ApiResponse({ status: 200 })
+  async acceptInvite(@UserId() user: UserEntity, @Param() teamId: TeamIdDto) {
+    return await this.AcceptMemberInviteCommand.execute({
       actor: user,
       teamId: teamId.teamId,
     });

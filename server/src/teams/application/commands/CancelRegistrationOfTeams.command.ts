@@ -3,7 +3,7 @@ import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { Command } from 'src/common/application/Command';
 import { ReposTokens } from 'src/common/Tokens';
 import type { ITeamRepository } from '../bounds/TeamRepository';
-import { ApiError, DomainErrors } from 'src/error/ApiError';
+import { ApiError, TeamErrors } from 'src/error/ApiError';
 import { TeamEntityHelperService } from 'src/teams/domain/services/TeamEntityHelper.service';
 
 interface CancelRegistrationOfTeamsCommandInput {
@@ -21,7 +21,7 @@ export class CancelRegistrationOfTeamsCommand extends Command<
     data: CancelRegistrationOfTeamsCommandInput,
   ): Promise<void> {
     const team = await this.teamRepository.findById(data.teamId);
-    if (!team) ApiError.throw(DomainErrors.UNEXPECTED_VALUE);
+    if (!team) ApiError.throw(TeamErrors.TEAM_UNDEFINED);
 
     TeamEntityHelperService.cancelRegistration(team, data.actor);
 

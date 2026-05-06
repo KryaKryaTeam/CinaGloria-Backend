@@ -4,7 +4,7 @@ import { Command } from 'src/common/application/Command';
 import { ReposTokens } from 'src/common/Tokens';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import type { ITeamRepository } from '../bounds/TeamRepository';
-import { ApiError, DomainErrors } from 'src/error/ApiError';
+import { ApiError, TeamErrors } from 'src/error/ApiError';
 import { TeamEntityHelperService } from 'src/teams/domain/services/TeamEntityHelper.service';
 
 interface PatchTeamCommandInput {
@@ -21,7 +21,7 @@ export class PatchTeamCommand extends Command<PatchTeamCommandInput, void> {
   @Inject(ReposTokens.TeamRepository) teamRepo: ITeamRepository;
   async implementation(data: PatchTeamCommandInput): Promise<void> {
     const team = await this.teamRepo.findById(data.teamId);
-    if (!team) ApiError.throw(DomainErrors.UNEXPECTED_VALUE);
+    if (!team) ApiError.throw(TeamErrors.TEAM_UNDEFINED);
 
     TeamEntityHelperService.patchEntity(team, data.teamData, data.user);
 

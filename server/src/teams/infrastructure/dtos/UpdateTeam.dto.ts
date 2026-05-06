@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsString, IsOptional } from 'class-validator';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
@@ -22,6 +23,7 @@ export class UpdateTeamDto {
   )
   banner?: InternalFile<'team:banner'>;
 
+  @ApiProperty({ description: 'Name of team ( max 255 )', required: false })
   @IsString()
   @IsOptional()
   name?: string;

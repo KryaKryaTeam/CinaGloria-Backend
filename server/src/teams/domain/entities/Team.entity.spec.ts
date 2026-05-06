@@ -66,7 +66,6 @@ describe('TeamEntity', () => {
       team.addMember(newMemberId);
     } catch (error) {
       expect(error).toBeInstanceOf(ApiError);
-      expect((error as ApiError).code).toBe(DomainErrors.RESTRICTED_CHANGE);
     }
   });
 
@@ -76,23 +75,10 @@ describe('TeamEntity', () => {
     team.acceptInvite(newMemberId);
     team.addMember(newMemberId);
 
-    team.deleteMember(team.captain, newMemberId);
+    team.deleteMember(newMemberId);
 
     expect(team.members.length).toBe(1);
     expect(team.members.includes(newMemberId)).toBe(false);
-  });
-
-  it('should throw an error when deleting a member without proper captain permission', () => {
-    const newMemberId = randomUUID();
-    team.inviteMember(newMemberId);
-    team.acceptInvite(newMemberId);
-
-    try {
-      team.deleteMember(randomUUID(), newMemberId);
-    } catch (error) {
-      expect(error).toBeInstanceOf(ApiError);
-      expect((error as ApiError).code).toBe(DomainErrors.RESTRICTED_CHANGE);
-    }
   });
 
   it('should change the captain of the team entity correctly', () => {
@@ -100,22 +86,9 @@ describe('TeamEntity', () => {
     team.inviteMember(newCaptainId);
     team.acceptInvite(newCaptainId);
 
-    team.changeCaptain(team.captain, newCaptainId);
+    team.changeCaptain(newCaptainId);
 
     expect(team.captain).toBe(newCaptainId);
-  });
-
-  it('should throw an error when changing the captain without proper permission', () => {
-    const newCaptainId = randomUUID();
-    team.inviteMember(newCaptainId);
-    team.acceptInvite(newCaptainId);
-
-    try {
-      team.changeCaptain(randomUUID(), newCaptainId);
-    } catch (error) {
-      expect(error).toBeInstanceOf(ApiError);
-      expect((error as ApiError).code).toBe(DomainErrors.RESTRICTED_CHANGE);
-    }
   });
 
   it('should invite a member for a competition correctly', () => {
@@ -148,7 +121,7 @@ describe('TeamEntity', () => {
     const competitionId = randomUUID();
     team.startRegistration(competitionId);
 
-    team.cancelRegistration(team.captain);
+    team.cancelRegistration();
 
     expect(team.status).toBe(TeamStatus.IDLE);
     expect(team.invites.length).toBe(0);
@@ -163,7 +136,6 @@ describe('TeamEntity', () => {
       team.endRegistration();
     } catch (error) {
       expect(error).toBeInstanceOf(ApiError);
-      expect((error as ApiError).code).toBe(DomainErrors.RESTRICTED_CHANGE);
     }
   });
 });

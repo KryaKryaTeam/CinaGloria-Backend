@@ -45,12 +45,12 @@ export class TeamEntityHelperService {
   static cancelRegistration(team: TeamEntity, actor: UserEntity) {
     this.checkRights(team, actor);
 
-    team.cancelRegistration(actor.id);
+    team.cancelRegistration();
   }
   static deleteMember(team: TeamEntity, actor: UserEntity, target: UserEntity) {
     this.checkRights(team, actor);
 
-    team.deleteMember(actor.id, target.id);
+    team.deleteMember(target.id);
   }
 
   static canDelete(team: TeamEntity, actor: UserEntity) {
@@ -67,6 +67,6 @@ export class TeamEntityHelperService {
   ) {
     this.checkRights(team, actor);
 
-    team.changeCaptain(actor.id, target.id);
+    team.changeCaptain(target.id);
   }
 }

@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { Entity } from 'src/common/domain/Entity';
-import { ApiError, DomainErrors } from 'src/error/ApiError';
+import { ApiError, DomainErrors, TeamErrors } from 'src/error/ApiError';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { MemberAddedEvent } from '../events/MemberAdded.event';
 import { MemberInvitedEvent } from '../events/MemberInvited.event';
@@ -96,6 +96,30 @@ export class TeamEntity extends Entity {
     });
   }
 
+  static createFake(captain?: string) {
+    const captain_ = captain ?? randomUUID();
+    return new TeamEntity({
+      id: randomUUID(),
+      captain: captain_,
+      members: [captain_],
+      activeCompetition: undefined,
+      status: TeamStatus.IDLE,
+      avatar: InternalFile.define<'team:avatar'>(
+        randomUUID() + '.webp',
+        'team:avatar',
+        'team:avatar',
+      ),
+      banner: InternalFile.define<'team:banner'>(
+        randomUUID() + '.webp',
+        'team:banner',
+        'team:banner',
+      ),
+      history: [],
+      memberInvites: [],
+      name: 'Team B',
+    });
+  }
+
   static load(plain: ITeamPlain) {
     return new TeamEntity(plain);
   }
@@ -114,7 +138,7 @@ export class TeamEntity extends Entity {
   }
   canMakeMemberChangesCheck() {
     if (this._status != TeamStatus.IDLE)
-      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(TeamErrors.RESTRICTED_CHANGE);
   }
   haveMember(uuid: string) {
     return this.members.includes(uuid);
@@ -170,7 +194,7 @@ export class TeamEntity extends Entity {
     }[this.status];
 
     if (!avalibleTransitions.includes(newStatus))
-      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(TeamErrors.STATUS_FLOW_BREAK);
 
     this._status = newStatus;
   }
@@ -178,7 +202,7 @@ export class TeamEntity extends Entity {
   addMember(uuid: string) {
     this.canMakeMemberChangesCheck();
     if (!(this.userHasMemberInvite(uuid) && this.userIsAcceptInvite(uuid)))
-      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(TeamErrors.MEMBER_MUST_ACCEPT_INVITE);
 
     this._members.push(uuid);
 
@@ -191,8 +215,8 @@ export class TeamEntity extends Entity {
   }
   inviteMember(uuid: string) {
     this.canMakeMemberChangesCheck();
-    if (this.userHasMemberInvite(uuid))
-      ApiError.throw(DomainErrors.DUPLICATION);
+    if (this.userHasMemberInvite(uuid) || this.haveMember(uuid))
+      ApiError.throw(TeamErrors.USER_ALREADY_MEMBER_OR_INVITED);
 
     this._memberInvites.push({
       member: uuid,
@@ -202,29 +226,27 @@ export class TeamEntity extends Entity {
 
     this.addEvent(new MemberInvitedEvent({ userId: uuid, team: this }));
   }
-  deleteMember(actor: string, target: string) {
+  deleteMember(target: string) {
     this.canMakeMemberChangesCheck();
-    if (!this.isCaptain(actor)) ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
 
     const target_idx = this._members.findIndex((a) => a == target);
-    if (target_idx == -1) ApiError.throw(DomainErrors.NO_CHANGE);
+    if (target_idx == -1) ApiError.throw(TeamErrors.MEMBER_UNDEFINED);
 
     this._members.splice(target_idx, 1);
 
     this.addEvent(new MemberDeletedEvent({ memberId: target, team: this }));
   }
-  changeCaptain(actor: string, target: string) {
+  changeCaptain(target: string) {
     this.canMakeMemberChangesCheck();
-    if (!this.isCaptain(actor)) ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
     this._captain = target;
 
     this.addEvent(new CaptainChangedEvent({ captainId: target, team: this }));
   }
 
   inviteMembersForCompetition(competition: string, target: string) {
-    if (!this.haveMember(target)) ApiError.throw(DomainErrors.NO_CHANGE);
+    if (!this.haveMember(target)) ApiError.throw(TeamErrors.MEMBER_UNDEFINED);
     if (this.status != TeamStatus.REGISTRATION)
-      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(TeamErrors.REGISTRATION_REQUIRED_FOR_INVITE);
 
     this._memberInvites.push({
       member: target,
@@ -247,13 +269,13 @@ export class TeamEntity extends Entity {
         !this.userHasMemberInvite(uuid)) ||
       this.userIsAcceptInvite(uuid)
     )
-      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(TeamErrors.NO_INVITES_FOUND);
 
     const invite_idx = this._memberInvites.findIndex(
       (a) => a.member == uuid && !a.accepted,
     );
 
-    if (invite_idx == -1) ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+    if (invite_idx == -1) ApiError.throw(TeamErrors.NO_INVITES_FOUND);
 
     this._memberInvites[invite_idx].accepted = true;
 
@@ -276,9 +298,8 @@ export class TeamEntity extends Entity {
   // registration for competition
 
   startRegistration(competitionId: string) {
-    // must be called in the service to be sure that team is okay for competition settings
     const noInvites = this.invites.length == 0;
-    if (!noInvites) ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+    if (!noInvites) ApiError.throw(TeamErrors.PENDING_INVITES_EXIST);
 
     this.status = TeamStatus.REGISTRATION;
     this._activeCompetition = competitionId;
@@ -288,13 +309,7 @@ export class TeamEntity extends Entity {
       this.inviteMembersForCompetition(competitionId, member);
     });
   }
-  cancelRegistration(actor: string, system?: boolean) {
-    if (
-      (!this.isCaptain(actor) || this.status != TeamStatus.REGISTRATION) &&
-      !system
-    )
-      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
-
+  cancelRegistration() {
     this.status = TeamStatus.IDLE;
     this._memberInvites = [];
     this._registrationTimeout = undefined;
@@ -312,13 +327,13 @@ export class TeamEntity extends Entity {
       this.status != TeamStatus.REGISTRATION ||
       this._registrationTimeout.getTime() < Date.now()
     )
-      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(TeamErrors.CANNOT_END_REGISTRATION);
     if (
       this._registrationTimeout.getTime() >= Date.now() &&
       !this.allIsAccepted()
     ) {
-      this.cancelRegistration('', true);
-      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+      this.cancelRegistration();
+      ApiError.throw(TeamErrors.CANNOT_END_REGISTRATION);
     }
 
     this.status = TeamStatus.ACTIVE;
@@ -336,7 +351,7 @@ export class TeamEntity extends Entity {
   // in competition status
   addHistoryNode(historyNode: TeamHistoryObject) {
     this._history.push(historyNode);
-  } // I will make V_OBJ for this in future. SO DON'T TOUCH THIS!
+  }
   //generateCert() {} <--- futured functionality
 
   set name(new_: string) {

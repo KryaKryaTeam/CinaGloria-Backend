@@ -27,6 +27,9 @@ export class CompetitionRepository
         rounds: {
           relatedTasks: true,
         },
+        teams: {
+          members: true,
+        },
       },
     });
     if (!result) return null;

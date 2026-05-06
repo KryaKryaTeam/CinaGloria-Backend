@@ -160,4 +160,22 @@
     "body": "${1/(.*)/${1:/upcase}/} = '${1/(.*)/${1:/upcase}/}-event',",
     "description": "Create Event Type",
   },
+  "NestJS BaseHandler Implementation": {
+    "prefix": "evhandler",
+    "body": [
+      "import { Injectable } from '@nestjs/common';",
+      "import { EventType } from 'src/common/domain/EventType';",
+      "import { BaseHandler } from 'src/common/infrastructure/BaseHandler';",
+      "",
+      "@Injectable()",
+      "export class ${1:${TM_FILENAME_BASE/(.*)\\..*/${1:/pascalcase}/}}Handler extends BaseHandler {",
+      "  protected eventType: EventType = EventType.${2:EVENT_CONSTANT};",
+      "",
+      "  async implementation(payload: { ${3:type} }): Promise<void> {",
+      "    ${0:// Your logic here}",
+      "  }",
+      "}",
+    ],
+    "description": "Create a new NestJS Event Handler extending BaseHandler",
+  },
 }

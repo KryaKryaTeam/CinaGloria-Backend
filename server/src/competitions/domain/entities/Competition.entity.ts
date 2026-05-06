@@ -4,7 +4,12 @@ import { CompetitionStatus } from 'src/types/CompetitionStatus';
 import { CompetitionRule } from '../objects/CompetitionRule.object';
 import { randomUUID } from 'crypto';
 import { IRoundPlain, RoundEntity } from './Round.entity';
-import { ApiError, CompetitionErrors, DomainErrors } from 'src/error/ApiError';
+import {
+  ApiError,
+  CompetitionErrors,
+  DomainErrors,
+  TeamErrors,
+} from 'src/error/ApiError';
 import { CompetitionSettings } from '../objects/CompetitionSettings';
 import { RoundStatus } from 'src/types/RoundStatus';
 import { CompetitionRegistrationStarted } from '../events/CompetititonRegistrationStarted.event';
@@ -594,14 +599,24 @@ export class CompetitionEntity extends Entity {
     const minTeamSize = this.settings.get('minTeamMembers');
 
     if (team.members.length > maxTeamSize || team.members.length < minTeamSize)
-      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(TeamErrors.TEAM_NOT_ALIGNED_WITH_SETTINGS);
 
     const maxTeams = this.settings.get('maxTeams');
     if (maxTeams < this.teams.length + 1)
-      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(TeamErrors.TEAM_NOT_ALIGNED_WITH_SETTINGS);
 
     if (this.status != CompetitionStatus.REGISTRATION)
-      ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
+      ApiError.throw(TeamErrors.TEAM_NOT_ALIGNED_WITH_SETTINGS);
+
+    //ensure other teams hasn't got duplicates
+
+    const existingMemberIds = new Set(this.teams.flatMap((t) => t.members));
+
+    const hasDuplicate = team.members.some((m) => existingMemberIds.has(m));
+
+    if (hasDuplicate) {
+      ApiError.throw(TeamErrors.MEMBER_ALREADY_IN_COMPETITION);
+    }
   }
 
   public addTeam(team: TeamEntity) {

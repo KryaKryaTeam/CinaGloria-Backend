@@ -401,6 +401,55 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: "The user doesn't have enough rights to access this feature",
     status: 403,
   },
+  TEAM_001: {
+    message: 'Team cannot can be changed in competition',
+    status: 403,
+  },
+  TEAM_002: {
+    message: 'Status flow breaks',
+    status: 400,
+  },
+  TEAM_003: {
+    message: 'This member must accept invite to be added',
+    status: 400,
+  },
+  TEAM_004: {
+    message: 'User already has member invite or already in the team',
+    status: 400,
+  },
+  TEAM_005: {
+    message: 'This member is undefined!',
+    status: 400,
+  },
+  TEAM_006: {
+    message:
+      'To invite member for a competition team must be in the registration status',
+    status: 400,
+  },
+  TEAM_007: {
+    message: 'User has no invites',
+    status: 400,
+  },
+  TEAM_008: {
+    message: 'Team has member invites, cannot start a registration',
+    status: 400,
+  },
+  TEAM_009: {
+    message: 'Cannot end registration of the team',
+    status: 400,
+  },
+  TEAM_010: {
+    message: 'Team is undefined',
+    status: 404,
+  },
+  TEAM_011: {
+    message: 'One of members is already in competition',
+    status: 400,
+  },
+  TEAM_012: {
+    message: "Team isn't aligned with setting",
+    status: 400,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -518,6 +567,21 @@ export const FileErrors = {
   AVATAR_FETCH_FAILED: 'FILE_017',
   FILE_UNPROCESSED: 'FILE_018',
   FILE_TOO_LARGE: 'FILE_019',
+} as const;
+
+export const TeamErrors = {
+  RESTRICTED_CHANGE: 'TEAM_001',
+  STATUS_FLOW_BREAK: 'TEAM_002',
+  MEMBER_MUST_ACCEPT_INVITE: 'TEAM_003',
+  USER_ALREADY_MEMBER_OR_INVITED: 'TEAM_004',
+  MEMBER_UNDEFINED: 'TEAM_005',
+  REGISTRATION_REQUIRED_FOR_INVITE: 'TEAM_006',
+  NO_INVITES_FOUND: 'TEAM_007',
+  PENDING_INVITES_EXIST: 'TEAM_008',
+  CANNOT_END_REGISTRATION: 'TEAM_009',
+  TEAM_UNDEFINED: 'TEAM_010',
+  MEMBER_ALREADY_IN_COMPETITION: 'TEAM_011',
+  TEAM_NOT_ALIGNED_WITH_SETTINGS: 'TEAM_012',
 } as const;
 
 export const StorageErrors = {

@@ -12,6 +12,12 @@ import { RegisterTeamCommand } from './application/commands/RegisterTeam.command
 import { TeamController } from './infrastructure/controllers/team.controller';
 import { DeleteTeamCommand } from './application/commands/DeleteTeam.command';
 import { ChangeCaptainCommand } from './application/commands/ChangeCaptain.command';
+import { CaptainChangedHandler } from './infrastructure/handlers /CaptainChanged.handler';
+import { MemberAcceptedInviteHandler } from './infrastructure/handlers /MemberAcceptedInvite.handler';
+import { MemberAcceptedInviteForCompetitionHandler } from './infrastructure/handlers /MemberAcceptedInviteForCompetition.handler';
+import { MemberDeletedHandler } from './infrastructure/handlers /MemberDeleted.handler';
+import { MemberInvitedHandler } from './infrastructure/handlers /MemberInvited.handler';
+import { MemberInvitedForCompetitionHandler } from './infrastructure/handlers /MemberInvitedForCompetition.handler';
 
 const providers: Provider[] = [
   {
@@ -46,6 +52,12 @@ const providers: Provider[] = [
     provide: CommandTokens.ChangeCaptainCommand,
     useClass: ChangeCaptainCommand,
   },
+  CaptainChangedHandler,
+  MemberAcceptedInviteHandler,
+  MemberAcceptedInviteForCompetitionHandler,
+  MemberDeletedHandler,
+  MemberInvitedHandler,
+  MemberInvitedForCompetitionHandler,
 ];
 
 @Module({

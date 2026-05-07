@@ -5,7 +5,6 @@ import {
   Logger,
   Param,
   Post,
-  Query,
   Req,
   Version,
 } from '@nestjs/common';

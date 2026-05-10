@@ -5,7 +5,13 @@ import { RoundReviewRepository } from 'src/common/infrastructure/repositories/Ro
 import { ScoreRepository } from 'src/common/infrastructure/repositories/ScoreRepository';
 import { SubmitionRepository } from 'src/common/infrastructure/repositories/SubmitionRepotisory';
 import { ReposTokens } from 'src/common/Tokens';
-import { ApiError, RoundReviewErrors } from 'src/error/ApiError';
+import {
+  ApiError,
+  RoundErrors,
+  RoundReviewErrors,
+  ScoreErrors,
+  SubmitionErrors,
+} from 'src/error/ApiError';
 import { RoundReviewEntity } from 'src/judging/domain/entities/RoundReview.entity';
 import { CreateRoundReviewDto } from 'src/judging/infrastructure/dtos/CreateRoundReview.dto';
 import { RoundStatus } from 'src/types/RoundStatus';
@@ -29,7 +35,7 @@ export class CreateRoundReviewCommand extends Command<
 
   async implementation(data: CreateRoundReviewDto): Promise<void> {
     const round = await this.roundRepository.findById(data.round);
-    if (!round) ApiError.throw(RoundReviewErrors.ROUND_NOT_FOUND);
+    if (!round) ApiError.throw(RoundErrors.ROUND_NOT_FOUND);
 
     if (round.status != RoundStatus.ON_JUDGING)
       ApiError.throw(RoundReviewErrors.CANNOT_CREATE_REVIEW);
@@ -37,8 +43,7 @@ export class CreateRoundReviewCommand extends Command<
     const relatedScores = await Promise.all(
       data.relatedScores.map(async (score) => {
         const relatedScore = await this.scoreRepository.findById(score);
-        if (!relatedScore)
-          ApiError.throw(RoundReviewErrors.RELATED_SCORES_NOT_FOUND);
+        if (!relatedScore) ApiError.throw(ScoreErrors.SCORE_NOT_FOUND);
         return relatedScore;
       }),
     );
@@ -46,7 +51,7 @@ export class CreateRoundReviewCommand extends Command<
     const submission = await this.submissionRepository.findById(
       data.submission,
     );
-    if (!submission) ApiError.throw(RoundReviewErrors.SUBMISSION_NOT_FOUND);
+    if (!submission) ApiError.throw(SubmitionErrors.SUBMITION_NOT_FOUND);
 
     const review = RoundReviewEntity.create({
       ...data,

@@ -1,4 +1,4 @@
-import { Module, Provider } from '@nestjs/common';
+import { forwardRef, Module, Provider } from '@nestjs/common';
 import { CommandTokens, MapperTokens } from 'src/common/Tokens';
 import { CriteriaMapper } from './application/mappers/CriteriaMapper';
 import { SubmitionMapper } from './application/mappers/SubmitionMapper';
@@ -21,11 +21,12 @@ const providers: Provider[] = [
     provide: CommandTokens.CreateRoundReviewCommand,
     useClass: CreateRoundReviewCommand,
   },
+  RoundReviewMapper,
 ];
 
 @Module({
   providers,
-  imports: [CompetitionsModule],
+  imports: [forwardRef(() => CompetitionsModule)],
   exports: [...providers],
   controllers: [SubmissionController, ScoreController, RoundReviewController],
 })

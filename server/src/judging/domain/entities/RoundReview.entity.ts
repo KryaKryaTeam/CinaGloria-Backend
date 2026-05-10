@@ -1,7 +1,7 @@
 import { Entity } from 'src/common/domain/Entity';
 import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
 import { ScoreEntity } from './Score.entity';
-import { ApiError, RoundReviewErrors } from 'src/error/ApiError';
+import { ApiError, RoundReviewErrors, ScoreErrors } from 'src/error/ApiError';
 import { SubmitionEntity } from './Submition.entity';
 import { randomUUID } from 'crypto';
 
@@ -133,7 +133,7 @@ export class RoundReviewEntity extends Entity {
 
   removeScore(id: string) {
     const score = this._relatedScores.findIndex((score) => score.id == id);
-    if (score === -1) ApiError.throw(RoundReviewErrors.SCORE_NOT_FOUND);
+    if (score === -1) ApiError.throw(ScoreErrors.SCORE_NOT_FOUND);
 
     this._relatedScores.splice(score, 1);
   }

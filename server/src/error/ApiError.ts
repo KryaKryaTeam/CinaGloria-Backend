@@ -453,13 +453,13 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'Round is already due. Cannot create submissions',
     status: 400,
   },
-  LEADERBOARD_001: {
-    message: 'The place value is not valid. Must be 1 or bigger',
+  ROUND_REVIEW_001: {
+    message: "Cannot create review of this round since it hasn't finished yet",
     status: 400,
   },
-  LEADERBOARD_002: {
-    message: 'This leaderboard was not found',
-    status: 404,
+  ROUND_REVIEW_002: {
+    message: 'There are no scores provided',
+    status: 400,
   },
 } as const;
 
@@ -621,9 +621,9 @@ export const LeaderboardErrors = {
   LEADERBOARD_NOT_FOUND: 'LEADERBOARD_002',
 };
 
-export const LeaderboardErrors = {
-  INVALID_PLACE_VALUE: 'LEADERBOARD_001',
-  LEADERBOARD_NOT_FOUND: 'LEADERBOARD_002',
+export const RoundReviewErrors = {
+  CANNOT_CREATE_REVIEW: 'ROUND_REVIEW_001',
+  NO_SCORES_PROVIDED: 'ROUND_REVIEW_002',
 };
 
 export type ApiErrorCode = keyof typeof ApiErrorsCodeVal;

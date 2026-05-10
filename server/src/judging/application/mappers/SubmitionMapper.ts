@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Mapper } from 'src/common/infrastructure/Mapper';
 import { MapperTokens } from 'src/common/Tokens';
 import { RoundMapper } from 'src/competitions/application/mapper/Round.mapper';
@@ -11,7 +11,7 @@ export class SubmitionMapper extends Mapper<SubmitionSchema, SubmitionEntity> {
   @Inject(MapperTokens.RoundMapper)
   private readonly roundMapper: RoundMapper;
 
-  @Inject(MapperTokens.RoundReviewMapper)
+  @Inject(forwardRef(() => RoundReviewMapper))
   private readonly roundReviewMapper: RoundReviewMapper;
 
   public toEntity(schema: SubmitionSchema): SubmitionEntity {

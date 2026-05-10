@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString } from 'class-validator';
-import { PlainRoundDto } from 'src/competitions/infrastructure/dto/PlainRound.dto';
 
 export class CreateSubmissionDto {
   @ApiProperty({

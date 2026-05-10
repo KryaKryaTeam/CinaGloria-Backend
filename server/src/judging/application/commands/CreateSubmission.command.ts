@@ -3,7 +3,6 @@ import { Command } from 'src/common/application/Command';
 import { RoundRepository } from 'src/common/infrastructure/repositories/RoundRepository';
 import { SubmitionRepository } from 'src/common/infrastructure/repositories/SubmitionRepotisory';
 import { ReposTokens } from 'src/common/Tokens';
-import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
 import { ApiError, RoundErrors } from 'src/error/ApiError';
 import { SubmitionEntity } from 'src/judging/domain/entities/Submition.entity';
 import { CreateSubmissionDto } from 'src/judging/infrastructure/dtos/CreateSubmission.dto';
@@ -24,9 +23,11 @@ export class CreateSubmissionCommand extends Command<
     if (!round) ApiError.throw(RoundErrors.ROUND_NOT_FOUND);
 
     const entity = SubmitionEntity.create({
-      ...data,
-      relatedRound: RoundEntity.load(round),
+      githubURL: data.githubURL,
+      youtubeURL: data.youtubeURL,
+      relatedRound: round,
       assignedToJury: undefined,
+      review: undefined,
     });
 
     await this.submissionRepository.save(entity);

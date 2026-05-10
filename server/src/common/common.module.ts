@@ -37,6 +37,8 @@ import { CriteriaSchema } from 'src/schemas/Criteria.schema';
 import { ScoreSchema } from 'src/schemas/Score.schema';
 import { JudgingModule } from 'src/judging/judging.module';
 import { LeaderboardRepository } from './infrastructure/repositories/LeaderboardRepotisory';
+import { LeaderboardModule } from 'src/leaderboard/leaderboard.module';
+import { RoundReviewRepository } from './infrastructure/repositories/RoundReviewRepository';
 
 const providers: Provider[] = [
   { provide: BaseTokens.EventDispatcher, useClass: EventDispatcher },
@@ -72,6 +74,10 @@ const providers: Provider[] = [
   {
     provide: ReposTokens.LeaderboardRepository,
     useClass: LeaderboardRepository,
+  },
+  {
+    provide: ReposTokens.RoundReviewRepository,
+    useClass: RoundReviewRepository,
   },
 ];
 
@@ -109,6 +115,7 @@ const providers: Provider[] = [
     forwardRef(() => CompetitionsModule),
     forwardRef(() => TeamsModule),
     forwardRef(() => JudgingModule),
+    forwardRef(() => LeaderboardModule),
   ],
 })
 export class CommonModule {}

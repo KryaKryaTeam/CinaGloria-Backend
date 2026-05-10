@@ -14,7 +14,7 @@ export class CheckTimedOutRounds {
   async handleCheckTimedOutRounds() {
     const action =
       "distributing juries and changing rounds' statuses to ON_JUDGING";
-    this.logger.log(`Starting ${action}`);
+    this.logger.log(`Started ${action}`);
     const startTime = Date.now();
 
     try {

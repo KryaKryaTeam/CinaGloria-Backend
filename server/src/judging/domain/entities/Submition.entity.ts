@@ -2,12 +2,14 @@ import { Entity } from 'src/common/domain/Entity';
 import { randomUUID } from 'crypto';
 import { ApiError, SubmitionErrors } from 'src/error/ApiError';
 import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
+import { RoundReviewEntity } from './RoundReview.entity';
 
 export interface ICreateSubmition {
   githubURL: string;
   youtubeURL: string;
   assignedToJury: string | undefined;
   relatedRound: RoundEntity;
+  review: RoundReviewEntity | undefined;
 }
 
 export interface ISubmitionPlain {
@@ -17,6 +19,7 @@ export interface ISubmitionPlain {
   youtubeURL: string;
   assignedToJury: string | undefined;
   relatedRound: RoundEntity;
+  review: RoundReviewEntity | undefined;
 }
 
 export interface ISubmitionEntityJSON {
@@ -26,6 +29,7 @@ export interface ISubmitionEntityJSON {
   youtubeURL: string;
   assignedToJury: string | undefined;
   relatedRound: RoundEntity;
+  review: RoundReviewEntity | undefined;
 }
 
 export class SubmitionEntity extends Entity {
@@ -35,6 +39,7 @@ export class SubmitionEntity extends Entity {
   public _youtubeURL: string;
   public _assignedToJury: string | undefined;
   public _relatedRound: RoundEntity;
+  public _review: RoundReviewEntity | undefined;
 
   private constructor(data: ISubmitionPlain) {
     super();
@@ -45,6 +50,7 @@ export class SubmitionEntity extends Entity {
     this._youtubeURL = data.youtubeURL;
     this._assignedToJury = data.assignedToJury;
     this._relatedRound = data.relatedRound;
+    this._review = data.review;
   }
 
   static validate(
@@ -117,6 +123,14 @@ export class SubmitionEntity extends Entity {
     this._relatedRound = value;
   }
 
+  get review(): RoundReviewEntity | undefined {
+    return this._review;
+  }
+
+  set review(value: RoundReviewEntity) {
+    this._review = value;
+  }
+
   toJSON(): ISubmitionEntityJSON {
     return {
       id: this.id,
@@ -125,6 +139,7 @@ export class SubmitionEntity extends Entity {
       githubURL: this.githubURL,
       youtubeURL: this.youtubeURL,
       relatedRound: this.relatedRound,
+      review: this.review,
     };
   }
 }

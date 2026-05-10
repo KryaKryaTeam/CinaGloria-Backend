@@ -3,7 +3,7 @@ import type { Config } from 'jest';
 const config: Config = {
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.',
-  testRegex: '.*\\.spec\\.ts$',
+  testRegex: '.*\\.(e2e-)?spec\\.ts$',
   setupFilesAfterEnv: ['<rootDir>/test/jestSetup.ts'],
 
   // 1. ПРАВИЛЬНЕ МІСЦЕ ДЛЯ transformIgnorePatterns

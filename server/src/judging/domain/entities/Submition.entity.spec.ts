@@ -1,8 +1,10 @@
+import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
 import { SubmitionEntity } from './Submition.entity';
 import { TaskEntity } from 'src/competitions/domain/entities/Task.entity';
+import { RoundReviewEntity } from './RoundReview.entity';
 
 describe('SubmitionEntity', () => {
-  const tasks = [{} as TaskEntity];
+  const round = {} as RoundEntity;
 
   const validData = {
     id: '11111111-2222-3333-4444-555555555555',
@@ -10,7 +12,8 @@ describe('SubmitionEntity', () => {
     githubURL: 'https://github.com/test',
     youtubeURL: 'https://youtube.com/test',
     assignedToJury: 'jury-1',
-    relatedTasks: tasks,
+    relatedRound: round,
+    review: {} as RoundReviewEntity,
   };
 
   describe('load', () => {
@@ -22,7 +25,7 @@ describe('SubmitionEntity', () => {
       expect(entity.githubURL).toBe(validData.githubURL);
       expect(entity.youtubeURL).toBe(validData.youtubeURL);
       expect(entity.assignedToJury).toBe(validData.assignedToJury);
-      expect(entity.relatedTasks).toBe(validData.relatedTasks);
+      expect(entity.relatedRound).toBe(validData.relatedRound);
     });
 
     it('should throw if githubURL is empty', () => {
@@ -56,7 +59,7 @@ describe('SubmitionEntity', () => {
       expect(() =>
         SubmitionEntity.load({
           ...validData,
-          relatedTasks: [],
+          relatedRound: {} as RoundEntity,
         }),
       ).toThrow();
     });
@@ -68,7 +71,8 @@ describe('SubmitionEntity', () => {
         githubURL: validData.githubURL,
         youtubeURL: validData.youtubeURL,
         assignedToJury: validData.assignedToJury,
-        relatedTasks: validData.relatedTasks,
+        relatedRound: validData.relatedRound,
+        review: validData.review,
       });
 
       expect(entity.id).toBeDefined();
@@ -82,7 +86,8 @@ describe('SubmitionEntity', () => {
           githubURL: '',
           youtubeURL: validData.youtubeURL,
           assignedToJury: validData.assignedToJury,
-          relatedTasks: validData.relatedTasks,
+          relatedRound: validData.relatedRound,
+          review: validData.review,
         }),
       ).toThrow();
     });
@@ -93,19 +98,19 @@ describe('SubmitionEntity', () => {
       const entity = SubmitionEntity.load(validData);
 
       const newDate = new Date('2025-01-01');
-      const newTasks = [{} as TaskEntity, {} as TaskEntity];
+      const newRound = {} as RoundEntity;
 
       entity.createdAt = newDate;
       entity.githubURL = 'https://github.com/new';
       entity.youtubeURL = 'https://youtube.com/new';
       entity.assignedToJury = 'jury-2';
-      entity.relatedTasks = newTasks;
+      entity.relatedRound = newRound;
 
       expect(entity.createdAt).toEqual(newDate);
       expect(entity.githubURL).toBe('https://github.com/new');
       expect(entity.youtubeURL).toBe('https://youtube.com/new');
       expect(entity.assignedToJury).toBe('jury-2');
-      expect(entity.relatedTasks).toBe(newTasks);
+      expect(entity.relatedRound).toBe(newRound);
     });
   });
 

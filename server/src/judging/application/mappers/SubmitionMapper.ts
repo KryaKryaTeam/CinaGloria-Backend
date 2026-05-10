@@ -4,11 +4,15 @@ import { MapperTokens } from 'src/common/Tokens';
 import { RoundMapper } from 'src/competitions/application/mapper/Round.mapper';
 import { SubmitionEntity } from 'src/judging/domain/entities/Submition.entity';
 import { SubmitionSchema } from 'src/schemas/Submition.schema';
+import { RoundReviewMapper } from './RoundReviewMapper';
 
 @Injectable()
 export class SubmitionMapper extends Mapper<SubmitionSchema, SubmitionEntity> {
   @Inject(MapperTokens.RoundMapper)
   private readonly roundMapper: RoundMapper;
+
+  @Inject(MapperTokens.RoundReviewMapper)
+  private readonly roundReviewMapper: RoundReviewMapper;
 
   public toEntity(schema: SubmitionSchema): SubmitionEntity {
     return SubmitionEntity.load({
@@ -18,6 +22,9 @@ export class SubmitionMapper extends Mapper<SubmitionSchema, SubmitionEntity> {
       relatedRound: this.roundMapper.toEntity(schema.relatedRound),
       assignedToJury: schema.assignedToJury ?? undefined,
       createdAt: schema.createdAt,
+      review: schema.review
+        ? this.roundReviewMapper.toEntity(schema.review)
+        : undefined,
     });
   }
 
@@ -30,6 +37,9 @@ export class SubmitionMapper extends Mapper<SubmitionSchema, SubmitionEntity> {
     sch.youtubeURL = entity.youtubeURL;
     sch.relatedRound = this.roundMapper.toSchema(entity.relatedRound);
     sch.createdAt = entity.createdAt;
+    if (entity.review) {
+      sch.review = this.roundReviewMapper.toSchema(entity.review);
+    }
 
     return sch;
   }

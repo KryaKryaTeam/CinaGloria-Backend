@@ -10,6 +10,11 @@ import { RoundReviewMapper } from './application/mappers/RoundReviewMapper';
 import { ScoreController } from './infrastructure/controllers/score.controller';
 import { RoundReviewController } from './infrastructure/controllers/roundReview.controller';
 import { CreateRoundReviewCommand } from './application/commands/CreateRoundReview.command';
+import { CreateSubmissionCommand } from './application/commands/CreateSubmission.command';
+import { UpdateSubmissionCommand } from './application/commands/UpdateSubmission.command';
+import { FindSubmissionByIdCommand } from './application/commands/FindSubmissionById.command';
+import { Command } from 'nest-commander';
+import { DeleteSubmissionCommand } from './application/commands/DeleteSubmission.command';
 
 const providers: Provider[] = [
   { provide: MapperTokens.CriteriaMapper, useClass: CriteriaMapper },
@@ -22,6 +27,22 @@ const providers: Provider[] = [
     useClass: CreateRoundReviewCommand,
   },
   RoundReviewMapper,
+  {
+    provide: CommandTokens.CreateSubmissionCommand,
+    useClass: CreateSubmissionCommand,
+  },
+  {
+    provide: CommandTokens.UpdateSubmissionCommand,
+    useClass: UpdateSubmissionCommand,
+  },
+  {
+    provide: CommandTokens.FindSubmissionByIdCommand,
+    useClass: FindSubmissionByIdCommand,
+  },
+  {
+    provide: CommandTokens.DeleteSubmissionCommand,
+    useClass: DeleteSubmissionCommand,
+  },
 ];
 
 @Module({

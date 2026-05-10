@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Auto1778441337856 implements MigrationInterface {
-    name = 'Auto1778441337856'
+export class Auto1778446141341 implements MigrationInterface {
+    name = 'Auto1778446141341'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`DROP INDEX "public"."user_email_trgm_idx"`);

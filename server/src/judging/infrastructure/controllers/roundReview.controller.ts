@@ -1,4 +1,4 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, Inject, Post, Version } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { Secure } from 'src/authorization/infrastructure/guards/auth/auth.guard';
 import { AllowRoles } from 'src/authorization/infrastructure/guards/role/role.guard';
@@ -16,6 +16,7 @@ export class RoundReviewController {
   @Secure()
   @AllowRoles([RoleEnum.JUDGE])
   @ApiResponse({ status: 201 })
+  @Version('1')
   async create(@Body() dto: CreateRoundReviewDto) {
     await this.createRoundReviewCommand.execute(dto);
   }

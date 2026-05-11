@@ -12,35 +12,21 @@ services:
       - CinaGloriaDB:/var/lib/postgresql/${DB_VERSION}/docker
     ports:
       - "${DB_PORT}:5432"
-    networks:
-      - db
   app:
-    build:
-      context: ./server
-      dockerfile: Dockerfile.dev
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-      - WATCHPACK_POLLING=true
+    build: ./server
     depends_on:
       - db
     volumes:
-      - ./server:/app:rw
-      - /app/node_modules
-      - ./server/uploads:/app/uploads:rw
+      - ./server:/app/src:rw
+      - CinaGloriaDeps:/app/src/node_modules:rw
     env_file:
       - ./.env
     command: >
-      sh -c "if [ \"$NODE_ENV\" = \"PRODUCTION\" ];
-      then npm run start;
-      else npx nest start --watch;
+      sh -c "if [ \"$NODE_ENV\" = \"PRODUCTION\" ]; 
+      then npm run start; 
+      else npm run start:dev; 
       fi"
-    networks:
-      - db
-    ports:
-      - ${PORT}:${PORT}
-      - ${WEBSOCKET_PORT}:${WEBSOCKET_PORT}
 
 volumes:
   CinaGloriaDB:
-networks:
-  db:
+  CinaGloriaDeps:

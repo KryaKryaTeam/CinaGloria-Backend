@@ -33,10 +33,4 @@ export default tseslint.config(
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
     },
   },
-  {
-    files: ['./src/**/*.*.spec.ts', './src/**/*.spec.ts'],
-    rules: {
-      '@typescript-eslint/unbound-method': 'off',
-    },
-  },
 );

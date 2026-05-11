@@ -1,6 +1,0 @@
-export enum RoundStatus {
-  CREATED = 'CREATED',
-  IN_PROGRESS = 'IN_PROGRESS',
-  ON_JUDGING = 'ON_JUDGING',
-  FINISHED = 'FINISHED',
-}

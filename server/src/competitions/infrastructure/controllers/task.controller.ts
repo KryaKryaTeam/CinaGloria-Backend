@@ -13,6 +13,7 @@ import { CommandTokens } from 'src/common/Tokens';
 import { CreateTaskCommand } from 'src/competitions/application/commands/CreateTask.command';
 import { UserId } from 'src/authorization/infrastructure/decorators/user.decorator';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
+import { Secure } from 'src/authorization/infrastructure/guards/auth/auth.guard';
 
 @Controller('task')
 export class TaskController {
@@ -21,6 +22,7 @@ export class TaskController {
 
   @Post('create')
   @Version('1')
+  @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   async createTask(
     @Body(new ValidationPipe()) dto: CreateTaskDto,

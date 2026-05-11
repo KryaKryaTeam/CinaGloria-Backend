@@ -88,7 +88,7 @@ export class TeamController {
   async updateTeam(
     @Body() dto: UpdateTeamDto,
     @UserId() user: UserEntity,
-    @Param('teamId') teamId: TeamIdDto,
+    @Param() teamId: TeamIdDto,
   ) {
     return await this.patchteamcommand.execute({
       teamData: dto,

@@ -13,3 +13,13 @@ jest.mock(
   }),
   { virtual: true },
 );
+
+jest.mock(
+  'marked',
+  () => ({
+    marked: {
+      parse: jest.fn(() => '<p>mocked markdown</p>'),
+    },
+  }),
+  { virtual: true },
+);

@@ -18,10 +18,4 @@ export class TaskSchema {
 
   @ManyToOne(() => RoundSchema, (round) => round.relatedTasks)
   round: RoundSchema;
-
-  @ManyToOne(() => SubmitionSchema, (submition) => submition.relatedTasks, {
-    onDelete: 'CASCADE',
-    cascade: true,
-  })
-  submition: SubmitionSchema;
 }

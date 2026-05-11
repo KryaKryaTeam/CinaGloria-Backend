@@ -9,4 +9,5 @@ export interface IRoundRepository {
   findAllEndedButNotProcessed(): Promise<RoundEntity[]>;
   findAllStartedButNotProcessed(): Promise<RoundEntity[]>;
   getParentCompetitionId(round: RoundEntity): Promise<string | null>;
+  findAllTimedOut(): Promise<RoundEntity[]>;
 }

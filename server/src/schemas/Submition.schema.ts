@@ -2,10 +2,11 @@ import {
   Column,
   Entity,
   JoinColumn,
-  OneToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { TaskSchema } from './Task.schema';
+import { RoundSchema } from './Round.schema';
+import { RoundReviewSchema } from './RoundReview.schema';
 
 @Entity()
 export class SubmitionSchema {
@@ -21,10 +22,15 @@ export class SubmitionSchema {
   @Column()
   youtubeURL: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', nullable: true })
   @JoinColumn()
-  assignedToJury: string;
+  assignedToJury?: string;
 
-  @OneToMany(() => TaskSchema, (task) => task.submition)
-  relatedTasks: TaskSchema[];
+  @ManyToOne(() => RoundSchema, (round) => round.submission)
+  relatedRound: RoundSchema;
+
+  @ManyToOne(() => RoundReviewSchema, (roundReview) => roundReview.submission, {
+    nullable: true,
+  })
+  review?: RoundReviewSchema;
 }

@@ -6,7 +6,6 @@ import { RoundSchema } from 'src/schemas/Round.schema';
 import { RoundMapper } from 'src/competitions/application/mapper/Round.mapper';
 import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
 import { RoundStatus } from 'src/types/RoundStatus';
-import { LessThan } from 'typeorm';
 import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
 import { CompetitionMapper } from 'src/competitions/application/mapper/Competition.mapper';
 
@@ -86,5 +85,14 @@ export class RoundRepository
     if (!roundSchema) return null;
 
     return this.competitionMapper.toEntity(roundSchema.competition);
+  }
+
+  async findAllTimedOut(): Promise<RoundEntity[]> {
+    const schema = await this.repository
+      .createQueryBuilder('round')
+      .where('round.taskTimeout < :now', { now: new Date() })
+      .getMany();
+
+    return schema.map((el) => this.mapper.toEntity(el));
   }
 }

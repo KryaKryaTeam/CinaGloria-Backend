@@ -18,6 +18,7 @@ export enum MapperTokens {
   CriteriaMapper = 'CRITERIA_MAPPER',
   SubmitionMapper = 'SUBMITION_MAPPER',
   LeaderboardMapper = 'LEADERBOARD_MAPPER',
+  RoundReviewMapper = 'ROUND_REVIEW_MAPPER',
 }
 
 export enum ReposTokens {
@@ -34,6 +35,7 @@ export enum ReposTokens {
   CriteriaRepository = 'CRITERIA_REPOSTORY',
   SubmitionRepository = 'SUBMITION_REPOSITORY',
   LeaderboardRepository = 'LEADERBOARD_REPOSITORY',
+  RoundReviewRepository = 'ROUND_REVIEW_REPOSITORY',
 }
 
 export enum CommandTokens {
@@ -104,6 +106,15 @@ export enum CommandTokens {
   CreateSuperUserCommand = 'CREATE_SUPER_USER_COMMAND',
   SetRoleToAUserCommand = 'SET_ROLE_TO_A_USER_COMMAND',
   GetUsersByEmailQuery = 'GET_USERS_BY_EMAIL_QUERY',
+
+  // --- JUDGING ---
+  RoundOnJudgingCommand = 'ROUND_ON_JUDGING_COMMAND',
+  CreateSubmissionCommand = 'CREATE_SUBMISSION_COMMAND',
+  UpdateSubmissionCommand = 'UPDATE_SUBMISSION_COMMAND',
+  FindSubmissionByIdCommand = 'FIND_SUBMISSION_BY_ID_COMMAND',
+  DeleteSubmissionCommand = 'DELETE_SUBMISSION_COMMAND',
+  CreateScoreCommand = 'CREATE_SCORE_COMMAND',
+  CreateRoundReviewCommand = 'CREATE_ROUND_REVIEW_COMMAND',
 }
 
 export enum ServiceTokens {

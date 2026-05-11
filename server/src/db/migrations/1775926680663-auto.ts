@@ -1,0 +1,26 @@
+import { MigrationInterface, QueryRunner } from 'typeorm';
+
+export class Auto1775926680663 implements MigrationInterface {
+  name = 'Auto1775926680663';
+
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `ALTER TABLE "competition" ADD "settings" jsonb NOT NULL DEFAULT '{}'`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "competition" ALTER COLUMN "settings" SET DEFAULT '{}'`,
+    );
+
+    await queryRunner.query(`
+            UPDATE "competition" 
+            SET "settings" = '{}'::jsonb 
+            WHERE "settings" IS NULL OR "settings" = '{}'::jsonb
+        `);
+  }
+
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(
+      `ALTER TABLE "competition" ALTER COLUMN "settings" DROP DEFAULT`,
+    );
+  }
+}

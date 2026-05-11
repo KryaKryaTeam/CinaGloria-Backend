@@ -1,0 +1,59 @@
+import {
+  BaseAuthorizationProvider,
+  IHandshakeOutput,
+} from './BaseAuthorizationProvider';
+import { AuthorizationProvider } from '../services/AuthorizationProviderService';
+import { AuthorizationProviderTypes } from 'src/types/AuthorizationProvidersTypes';
+import { AuthProviderEntity } from 'src/authorization/domain/entities/AuthProvider.entity';
+import { randomUUID } from 'crypto';
+import { AvatarURL } from 'src/authorization/domain/objects/AvatarURL.object';
+import { ConfigService } from '@nestjs/config';
+import { Inject } from '@nestjs/common';
+import { ApiError, UserErrors } from 'src/error/ApiError';
+
+interface LocalLoginData {
+  email: string;
+  password: string;
+}
+
+@AuthorizationProvider(AuthorizationProviderTypes.LOCAL)
+export class LocalAuthorizationProvider extends BaseAuthorizationProvider<LocalLoginData> {
+  protected type: AuthorizationProviderTypes = AuthorizationProviderTypes.LOCAL;
+  @Inject()
+  private readonly configService: ConfigService;
+
+  createProvider(loginData: string): AuthProviderEntity {
+    return new AuthProviderEntity({
+      id: randomUUID(),
+      passwordHash: loginData,
+      providerId: '',
+      type: AuthorizationProviderTypes.LOCAL,
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async handshake(loginData: LocalLoginData): Promise<IHandshakeOutput> {
+    return {
+      email: loginData.email,
+      avatarURL: AvatarURL.generate(
+        this.configService.getOrThrow('avatar.list'),
+      ).value,
+      authorizationData: loginData.password,
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/require-await
+  async validate(loginData: LocalLoginData): Promise<boolean> {
+    if (!loginData.password || !loginData.email) return false;
+
+    if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(
+        loginData.password,
+      )
+    ) {
+      ApiError.throw(UserErrors.PASSWORD_IS_INCORRECT);
+    }
+
+    return true;
+  }
+}

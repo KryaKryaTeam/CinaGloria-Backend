@@ -35,6 +35,7 @@ describe('TeamEntity', () => {
     expect(team.status).toBe(TeamStatus.IDLE);
     expect(team.avatar.url).toBe('test-avatar-url');
     expect(team.banner.url).toBe('test-banner-url');
+    expect(team.round).toBe(undefined);
   });
 
   it('should change the status of a team entity correctly', () => {

@@ -4,11 +4,15 @@ import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
 import { RoundSchema } from 'src/schemas/Round.schema';
 import { TaskMapper } from './Task.mapper';
 import { MapperTokens } from 'src/common/Tokens';
+import { TeamMapper } from 'src/teams/application/mappers/team.mapper';
 
 @Injectable()
 export class RoundMapper extends Mapper<RoundSchema, RoundEntity> {
   @Inject(MapperTokens.TaskMapper)
   private readonly taskMapper: TaskMapper;
+
+  @Inject(MapperTokens.TeamMapper)
+  private readonly teamMapper: TeamMapper;
 
   public toEntity(schema: RoundSchema) {
     const tasks = schema.relatedTasks.map((task) =>
@@ -26,6 +30,9 @@ export class RoundMapper extends Mapper<RoundSchema, RoundEntity> {
       icon: schema.icon,
       relatedTasks: tasks,
       status: schema.status,
+      teams: schema.teams
+        ? schema.teams.map((team) => this.teamMapper.toEntity(team))
+        : [],
     });
   }
 
@@ -44,6 +51,7 @@ export class RoundMapper extends Mapper<RoundSchema, RoundEntity> {
     schema.relatedTasks = entity.relatedTasks.map((task) =>
       this.taskMapper.toSchema(task),
     );
+    schema.teams = entity.teams.map((team) => this.teamMapper.toSchema(team));
 
     return schema;
   }

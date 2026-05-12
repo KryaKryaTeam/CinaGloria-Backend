@@ -15,6 +15,7 @@ describe('RoundEntity', () => {
     endOfRound: new Date(baseDate.getTime() + 100000),
     relatedTasks: [],
     hidden: false,
+    teams: [],
   };
 
   describe('create/load', () => {

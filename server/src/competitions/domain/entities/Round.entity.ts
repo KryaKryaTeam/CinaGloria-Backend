@@ -4,6 +4,7 @@ import { Icons } from 'src/types/Icons';
 import { RoundStatus } from 'src/types/RoundStatus';
 import { TaskEntity } from './Task.entity';
 import { ApiError, DomainErrors, RoundErrors } from 'src/error/ApiError';
+import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
 
 export interface ICreateRound {
   name: string;
@@ -27,6 +28,7 @@ export interface IRoundPlain {
   taskTimeout: Date;
   relatedTasks: TaskEntity[];
   status: RoundStatus;
+  teams: TeamEntity[];
 }
 
 export class RoundEntity extends Entity {
@@ -40,6 +42,7 @@ export class RoundEntity extends Entity {
   private _endOfRound: Date;
   private _relatedTasks: TaskEntity[];
   private _status: RoundStatus;
+  private _teams: TeamEntity[];
 
   private constructor(plain: IRoundPlain) {
     RoundEntity.validate(plain);
@@ -54,6 +57,7 @@ export class RoundEntity extends Entity {
     this._endOfRound = plain.endOfRound;
     this._relatedTasks = plain.relatedTasks;
     this._status = plain.status;
+    this._teams = plain.teams;
   }
 
   public static validate(plain: IRoundPlain): void {
@@ -78,6 +82,7 @@ export class RoundEntity extends Entity {
       ...data,
       id: randomUUID(),
       status: RoundStatus.CREATED,
+      teams: [],
     });
   }
 
@@ -97,6 +102,7 @@ export class RoundEntity extends Entity {
       taskTimeout: new Date(Date.now() + 1500000),
       relatedTasks: [],
       status: RoundStatus.CREATED,
+      teams: [],
     };
 
     return RoundEntity.load(fakeData);
@@ -121,6 +127,17 @@ export class RoundEntity extends Entity {
 
   public show() {
     this._hidden = false;
+  }
+
+  public addTeam(team: TeamEntity) {
+    this._teams.push(team);
+  }
+
+  public removeTeam(team: TeamEntity) {
+    const i = this._teams.findIndex((el) => el.id == team.id);
+    if (i == -1) ApiError.throw(RoundErrors.TEAM_NOT_FOUND);
+
+    this._teams.splice(i, 1);
   }
 
   set name(name: string) {
@@ -214,6 +231,10 @@ export class RoundEntity extends Entity {
     return this._hidden;
   }
 
+  get teams() {
+    return this._teams;
+  }
+
   addTask(task: TaskEntity) {
     this._relatedTasks.push(task);
   }
@@ -237,6 +258,7 @@ export class RoundEntity extends Entity {
       endOfRound: this.endOfRound,
       icon: this.icon,
       relatedTasks: this.relatedTasks,
+      teams: this.teams,
     };
   }
 }

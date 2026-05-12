@@ -448,7 +448,7 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
   },
   TEAM_012: {
     message: "Team isn't aligned with setting",
-    status: 400
+    status: 400,
   },
   SCORE_001: {
     message: 'This score was not found',
@@ -509,6 +509,10 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
   ROUND_REVIEW_002: {
     message: 'There are no scores provided',
     status: 400,
+  },
+  ROUND_011: {
+    message: 'This team was not found in participants of this round',
+    status: 404,
   },
 } as const;
 
@@ -598,6 +602,7 @@ export const RoundErrors = {
   ROUND_NOT_FOUND: 'ROUND_008',
   SPAN_IS_INVALID: 'ROUND_009',
   ROUND_IS_HIDDEN: 'ROUND_010',
+  TEAM_NOT_FOUND: 'ROUND_011',
 } as const;
 
 export const TaskErrors = {

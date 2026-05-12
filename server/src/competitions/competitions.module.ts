@@ -22,6 +22,7 @@ import { DeleteRoundCommand } from './application/commands/DeleteRound.command';
 import { PatchRoundCommand } from './application/commands/PatchRound.command';
 import { CreateTaskCommand } from './application/commands/CreateTask.command';
 import { TeamsModule } from 'src/teams/teams.module';
+import { PullTeamsToNextRoundCommand } from './application/commands/PullTeamsToNextRound.command';
 
 const providers: Provider[] = [
   {
@@ -80,6 +81,10 @@ const providers: Provider[] = [
   { provide: CommandTokens.DeleteRoundCommand, useClass: DeleteRoundCommand },
   { provide: CommandTokens.PatchRoundCommand, useClass: PatchRoundCommand },
   { provide: CommandTokens.CreateTaskCommand, useClass: CreateTaskCommand },
+  {
+    provide: CommandTokens.PullTeamsToNextRound,
+    useClass: PullTeamsToNextRoundCommand,
+  },
 ];
 
 @Module({

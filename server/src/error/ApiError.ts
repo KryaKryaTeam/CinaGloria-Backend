@@ -522,6 +522,10 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'This round review was not found',
     status: 404,
   },
+  TEAM_013: {
+    message: 'This team was not found',
+    status: 404,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -656,6 +660,7 @@ export const TeamErrors = {
   TEAM_UNDEFINED: 'TEAM_010',
   MEMBER_ALREADY_IN_COMPETITION: 'TEAM_011',
   TEAM_NOT_ALIGNED_WITH_SETTINGS: 'TEAM_012',
+  TEAM_NOT_FOUND: 'TEAM_013',
 } as const;
 
 export const StorageErrors = {

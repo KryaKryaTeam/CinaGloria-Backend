@@ -15,6 +15,7 @@ import { UpdateSubmissionCommand } from './application/commands/UpdateSubmission
 import { FindSubmissionByIdCommand } from './application/commands/FindSubmissionById.command';
 import { Command } from 'nest-commander';
 import { DeleteSubmissionCommand } from './application/commands/DeleteSubmission.command';
+import { TeamsModule } from 'src/teams/teams.module';
 
 const providers: Provider[] = [
   { provide: MapperTokens.CriteriaMapper, useClass: CriteriaMapper },
@@ -47,7 +48,7 @@ const providers: Provider[] = [
 
 @Module({
   providers,
-  imports: [forwardRef(() => CompetitionsModule)],
+  imports: [forwardRef(() => CompetitionsModule), TeamsModule],
   exports: [...providers],
   controllers: [SubmissionController, ScoreController, RoundReviewController],
 })

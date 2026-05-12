@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsString, IsUUID } from 'class-validator';
 
 export class CreateSubmissionDto {
   @ApiProperty({
@@ -21,4 +21,7 @@ export class CreateSubmissionDto {
   })
   @IsString()
   relatedRound: string;
+
+  @IsUUID()
+  teamId: string;
 }

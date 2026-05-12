@@ -4,10 +4,21 @@ import { Query } from 'src/common/application/Query';
 import { ReposTokens } from 'src/common/Tokens';
 import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
 import type { ITeamRepository } from '../bounds/TeamRepository';
+import { TeamStatus } from 'src/types/TeamStatus';
+
+export interface ITeamSearchParams {
+  name?: string;
+  minMembers?: number;
+  maxMembers?: number;
+  isCaptain?: boolean;
+  status?: TeamStatus;
+  hasInvites?: boolean;
+}
 
 export interface GetMyTeamsPageInput {
   page: number;
   actor: UserEntity;
+  searchParams: ITeamSearchParams;
 }
 
 export interface GetMyTeamsPageOutput {
@@ -26,6 +37,7 @@ export class GetMyTeamsPage extends Query<
     const teams = await this.teamRepo.findByMemberPage(
       data.actor.id,
       data.page,
+      data.searchParams,
     );
 
     return { teams };

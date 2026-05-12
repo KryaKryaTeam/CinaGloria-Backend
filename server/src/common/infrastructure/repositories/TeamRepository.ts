@@ -9,6 +9,7 @@ import { MapperTokens } from 'src/common/Tokens';
 import { CompetitionMapper } from 'src/competitions/application/mapper/Competition.mapper';
 import { UserMapper } from 'src/authorization/application/mappers/UserMapper';
 import { TeamMapper } from 'src/teams/application/mappers/team.mapper';
+import { ITeamSearchParams } from 'src/teams/application/commands/GetMyTeamsPage.query';
 
 export class TeamRepository
   extends BaseRepository<TeamSchema>
@@ -53,19 +54,63 @@ export class TeamRepository
     const members = team.members.map((sch) => this.userMapper.toEntity(sch));
     return members;
   }
-  async findByMemberPage(userId: string, page: number): Promise<TeamEntity[]> {
-    const teams = await this.repository.find({
-      where: {
-        members: {
-          id: userId,
+  async findByMemberPage(
+    userId: string,
+    page: number,
+    searchParams: ITeamSearchParams,
+  ): Promise<TeamEntity[]> {
+    const query = this.repository
+      .createQueryBuilder('team')
+      .innerJoin('team.members', 'member')
+      .where('member.id = :userId', { userId });
+
+    if (searchParams.name) {
+      query.andWhere(
+        '(team.name ILIKE :namePattern OR team.name % :nameInput)',
+        {
+          namePattern: `%${searchParams.name}%`,
+          nameInput: searchParams.name,
         },
-      },
-      take: 20,
-      skip: page * 20,
-      order: {
-        createdAt: 'DESC',
-      },
-    });
+      );
+      query.addOrderBy(`similarity(team.name, :nameInput)`, 'DESC');
+    }
+
+    if (searchParams.minMembers !== undefined) {
+      query.andWhere('team.membersCount >= :min', {
+        min: searchParams.minMembers,
+      });
+    }
+    if (searchParams.maxMembers !== undefined) {
+      query.andWhere('team.membersCount <= :max', {
+        max: searchParams.maxMembers,
+      });
+    }
+    if (searchParams.isCaptain !== undefined) {
+      if (searchParams.isCaptain) {
+        query.andWhere('team.captainId = :userId', { userId });
+      } else {
+        query.andWhere('team.captainId != :userId', { userId });
+      }
+    }
+
+    if (searchParams.status) {
+      query.andWhere('team.status = :status', { status: searchParams.status });
+    }
+
+    if (searchParams.hasInvites !== undefined) {
+      if (searchParams.hasInvites) {
+        query.andWhere("team.memberInvites != '[]'::jsonb");
+      } else {
+        query.andWhere("team.memberInvites = '[]'::jsonb");
+      }
+    }
+
+    // Default Sorting & Pagination
+    const teams = await query
+      .addOrderBy('team.createdAt', 'DESC')
+      .skip(page * 20)
+      .take(20)
+      .getMany();
 
     return teams.map((sch) => this.mapper.toEntity(sch));
   }

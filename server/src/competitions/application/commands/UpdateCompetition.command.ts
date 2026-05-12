@@ -11,6 +11,8 @@ import { AppSlotCode } from 'src/types/RelationSlots';
 import { LinkerApplicationService } from 'src/files/application/services/Linker.appService';
 import type { IFileRepository } from 'src/files/application/bounds/IFileRepository';
 import { ApiError, CompetitionErrors } from 'src/error/ApiError';
+import { CompetitionRule } from 'src/competitions/domain/objects/CompetitionRule.object';
+import { Icons } from 'src/types/Icons';
 
 interface UpdateCompetitionCommandInput {
   competitionId: string;
@@ -91,6 +93,15 @@ export class UpdateCompetitionCommand extends Command<
         socialMedia: mappedFiles['competition:socialMedia'] as
           | InternalFile<'competition:socialMedia'>
           | undefined,
+        rules: data.competitionData.rules
+          ? data.competitionData.rules.map((el) =>
+              CompetitionRule.define(
+                el.name,
+                el.description,
+                el.icon as unknown as Icons,
+              ),
+            )
+          : undefined,
       },
       data.user,
     );

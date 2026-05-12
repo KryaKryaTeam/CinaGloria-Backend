@@ -76,11 +76,12 @@ export class CreateCompetitionCommand extends Command<
       }),
     );
 
-    data.competition.rules.forEach((el) => {
-      comp.addRule(
-        CompetitionRule.define(el.name, el.description, el.icon as Icons),
-      );
-    });
+    if (data.competition.rules)
+      data.competition.rules.forEach((el) => {
+        comp.addRule(
+          CompetitionRule.define(el.name, el.description, el.icon as Icons),
+        );
+      });
 
     await this.competitionRepository.save(comp);
 

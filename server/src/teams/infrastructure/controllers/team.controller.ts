@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { Secure } from 'src/authorization/infrastructure/guards/auth/auth.guard';
@@ -32,6 +33,7 @@ import { RegistrationDto } from '../dtos/Registration.dto';
 import { RegisterTeamCommand } from 'src/teams/application/commands/RegisterTeam.command';
 import { CancelRegistrationOfTeamsCommand } from 'src/teams/application/commands/CancelRegistrationOfTeams.command';
 import { AcceptMemberInviteCommand } from 'src/teams/application/commands/AcceptMemberInvite.command';
+import { TeamSearchParamsDto } from '../dtos/TeamSearchParams.dto';
 
 @Controller('teams')
 export class TeamController {
@@ -68,10 +70,15 @@ export class TeamController {
   @Get('me/:page')
   @Secure()
   @ApiResponse({ status: 200, type: [TeamEntityDto] })
-  async getMyTeams(@Param() dto: PageQueryDto, @UserId() user: UserEntity) {
+  async getMyTeams(
+    @Param() dto: PageQueryDto,
+    @UserId() user: UserEntity,
+    @Query() searchParams: TeamSearchParamsDto,
+  ) {
     return await this.getMyTeamsPageQuery.execute({
       actor: user,
       page: dto.page,
+      searchParams,
     });
   }
 

@@ -581,6 +581,11 @@ export class CompetitionEntity extends Entity {
     this._rules.splice(index, 1);
   }
 
+  public setRules(rules: CompetitionRule[]) {
+    this.canChangeCheck();
+    this._rules = rules;
+  }
+
   public addRound(round: RoundEntity) {
     this.canChangeCheck();
     this._rounds.push(round);

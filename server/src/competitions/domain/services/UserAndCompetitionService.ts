@@ -7,6 +7,7 @@ import { RoleEnum } from 'src/types/RoleEnum';
 import { ApiError, CompetitionErrors } from 'src/error/ApiError';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionSettings } from '../objects/CompetitionSettings';
+import { CompetitionRule } from '../objects/CompetitionRule.object';
 
 export interface ICompetitionChangeFields {
   name?: string;
@@ -19,6 +20,7 @@ export interface ICompetitionChangeFields {
   dateOfEnd?: Date;
   dateOfStartRegistration?: Date;
   dateOfEndRegistration?: Date;
+  rules?: CompetitionRule[];
 }
 
 export class UserAndCompetitionService {
@@ -53,6 +55,7 @@ export class UserAndCompetitionService {
       competition.dateOfStartRegistration = data.dateOfStartRegistration;
     if (data.dateOfEndRegistration)
       competition.dateOfEndRegistration = data.dateOfEndRegistration;
+    if (data.rules) competition.setRules(data.rules);
   }
 
   static schedulePublishing(

@@ -514,6 +514,14 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'This team was not found in participants of this round',
     status: 404,
   },
+  COMPETITION_019: {
+    message: 'This comeptition was not found',
+    status: 404,
+  },
+  ROUND_REVIEW_003: {
+    message: 'This round review was not found',
+    status: 404,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -586,9 +594,10 @@ export const CompetitionErrors = {
   CANNOT_EDIT: 'COMPETITION_013',
   UNDEFINED: 'COMPETITION_014',
   PAGE_NOT_FOUND: 'COMPETITION_015',
-  NOT_ALL_SETTINGS_PROVIDED: 'COMPETITION_16',
-  SETTING_TYPE_NOT_VALID: 'COMPETITION_17',
-  SETTING_IS_INVALID: 'COMPETITION_18',
+  NOT_ALL_SETTINGS_PROVIDED: 'COMPETITION_016',
+  SETTING_TYPE_NOT_VALID: 'COMPETITION_017',
+  SETTING_IS_INVALID: 'COMPETITION_018',
+  COMPETITION_NOT_FOUND: 'COMPETITION_019',
 } as const;
 
 export const RoundErrors = {
@@ -693,6 +702,7 @@ export const LeaderboardErrors = {
 export const RoundReviewErrors = {
   CANNOT_CREATE_REVIEW: 'ROUND_REVIEW_001',
   NO_SCORES_PROVIDED: 'ROUND_REVIEW_002',
+  ROUND_REVIEW_NOT_FOUND: 'ROUND_REVIEW_003',
 };
 
 export type ApiErrorCode = keyof typeof ApiErrorsCodeVal;

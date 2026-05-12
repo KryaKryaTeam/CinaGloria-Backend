@@ -3,6 +3,7 @@ import { randomUUID } from 'crypto';
 import { ApiError, SubmitionErrors } from 'src/error/ApiError';
 import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
 import { RoundReviewEntity } from './RoundReview.entity';
+import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
 
 export interface ICreateSubmition {
   githubURL: string;
@@ -10,6 +11,7 @@ export interface ICreateSubmition {
   assignedToJury: string | undefined;
   relatedRound: RoundEntity;
   review: RoundReviewEntity | undefined;
+  team: TeamEntity;
 }
 
 export interface ISubmitionPlain {
@@ -20,6 +22,7 @@ export interface ISubmitionPlain {
   assignedToJury: string | undefined;
   relatedRound: RoundEntity;
   review: RoundReviewEntity | undefined;
+  team: TeamEntity;
 }
 
 export interface ISubmitionEntityJSON {
@@ -30,6 +33,7 @@ export interface ISubmitionEntityJSON {
   assignedToJury: string | undefined;
   relatedRound: RoundEntity;
   review: RoundReviewEntity | undefined;
+  team: TeamEntity;
 }
 
 export class SubmitionEntity extends Entity {
@@ -40,6 +44,7 @@ export class SubmitionEntity extends Entity {
   public _assignedToJury: string | undefined;
   public _relatedRound: RoundEntity;
   public _review: RoundReviewEntity | undefined;
+  public _team: TeamEntity;
 
   private constructor(data: ISubmitionPlain) {
     super();
@@ -51,6 +56,7 @@ export class SubmitionEntity extends Entity {
     this._assignedToJury = data.assignedToJury;
     this._relatedRound = data.relatedRound;
     this._review = data.review;
+    this._team = data.team;
   }
 
   static validate(
@@ -119,6 +125,10 @@ export class SubmitionEntity extends Entity {
     return this._relatedRound;
   }
 
+  get team(): TeamEntity {
+    return this._team;
+  }
+
   set relatedRound(value: RoundEntity) {
     this._relatedRound = value;
   }
@@ -140,6 +150,7 @@ export class SubmitionEntity extends Entity {
       youtubeURL: this.youtubeURL,
       relatedRound: this.relatedRound,
       review: this.review,
+      team: this.team,
     };
   }
 }

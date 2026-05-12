@@ -397,6 +397,10 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'The task was not found',
     status: 404,
   },
+  TASK_005: {
+    message: 'Task or related competition is undefined',
+    status: 404,
+  },
   USER_031: {
     message: "The user doesn't have enough rights to access this feature",
     status: 403,
@@ -448,7 +452,7 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
   },
   TEAM_012: {
     message: "Team isn't aligned with setting",
-    status: 400
+    status: 400,
   },
   SCORE_001: {
     message: 'This score was not found',
@@ -605,6 +609,7 @@ export const TaskErrors = {
   DESCRIPTION_LENGTH_RESTRICTION: 'TASK_002',
   INVALID_COLOR: 'TASK_003',
   TASK_NOT_FOUND: 'TASK_004',
+  TASK_OR_COMP_NOT_FOUND: 'TASK_005',
 } as const;
 
 export const FileErrors = {

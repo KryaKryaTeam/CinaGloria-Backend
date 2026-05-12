@@ -8,6 +8,8 @@ import { Inject } from '@nestjs/common';
 import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
 import { ApiError, TaskErrors } from 'src/error/ApiError';
 import { RoundMapper } from 'src/competitions/application/mapper/Round.mapper';
+import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
+import { CompetitionMapper } from 'src/competitions/application/mapper/Competition.mapper';
 
 export class TaskRepository
   extends BaseRepository<TaskSchema>
@@ -19,6 +21,8 @@ export class TaskRepository
   private readonly mapper: TaskMapper;
   @Inject(MapperTokens.RoundMapper)
   private readonly roundMapper: RoundMapper;
+  @Inject(MapperTokens.CompetitionMapper)
+  private readonly competitionMapper: CompetitionMapper;
 
   async save(task: TaskEntity): Promise<void> {
     await this.repository.save(this.mapper.toSchema(task));
@@ -37,5 +41,24 @@ export class TaskRepository
     });
     if (!task) ApiError.throw(TaskErrors.TASK_NOT_FOUND);
     return this.roundMapper.toEntity(task.round);
+  }
+
+  async deleteById(id: string): Promise<void> {
+    await this.repository.delete({ id });
+  }
+
+  async findCompetitionByTaskId(
+    taskId: string,
+  ): Promise<CompetitionEntity | null> {
+    const task = await this.repository
+      .createQueryBuilder('task')
+      .innerJoinAndSelect('task.round', 'round')
+      .innerJoinAndSelect('round.competition', 'competition')
+      .where('task.id = :taskId', { taskId })
+      .getOne();
+
+    return task
+      ? this.competitionMapper.toEntity(task.round.competition)
+      : null;
   }
 }

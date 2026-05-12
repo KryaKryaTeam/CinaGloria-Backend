@@ -16,6 +16,7 @@ import { UserId } from 'src/authorization/infrastructure/decorators/user.decorat
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { TaskIdDto } from '../dto/TaskId.dto';
 import { DeleteTaskCommand } from 'src/competitions/application/commands/DeleteTask.command';
+import { Secure } from 'src/authorization/infrastructure/guards/auth/auth.guard';
 
 @Controller('task')
 export class TaskController {
@@ -25,6 +26,7 @@ export class TaskController {
   private readonly deleteTaskCommand: DeleteTaskCommand;
   @Post('')
   @Version('1')
+  @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   async createTask(@Body() dto: CreateTaskDto, @UserId() user: UserEntity) {
     return await this.createTaskCommand.execute({
@@ -40,6 +42,7 @@ export class TaskController {
 
   @Delete('/:teamId')
   @Version('1')
+  @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
   async deleteTask(@UserId() user: UserEntity, @Param() taskId: TaskIdDto) {
     return await this.deleteTaskCommand.execute({

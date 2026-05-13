@@ -324,6 +324,38 @@ export class CompetitionEntity extends Entity {
       ApiError.throw(CompetitionErrors.COMPETITION_IS_READONLY);
   }
 
+  private validateRoundWithinCompetitionBounds(round: RoundEntity) {
+    if (!this._dateOfStart || !this._dateOfEnd)
+      ApiError.throw(CompetitionErrors.DATES_UNSET);
+
+    const roundStart = round.startOfRound.getTime();
+    const roundEnd = round.endOfRound.getTime();
+    const compStart = this._dateOfStart.getTime();
+    const compEnd = this._dateOfEnd.getTime();
+
+    if (roundStart < compStart || roundEnd > compEnd) {
+      ApiError.throw(CompetitionErrors.ROUND_OUT_OF_BOUNDS);
+    }
+  }
+
+  private validateRoundOverlap(newRound: RoundEntity) {
+    const newStart = newRound.startOfRound.getTime();
+    const newEnd = newRound.endOfRound.getTime();
+
+    const hasOverlap = this._rounds.some((existing) => {
+      if (existing.id === newRound.id) return false;
+
+      const existingStart = existing.startOfRound.getTime();
+      const existingEnd = existing.endOfRound.getTime();
+
+      return newStart < existingEnd && newEnd > existingStart;
+    });
+
+    if (hasOverlap) {
+      ApiError.throw(CompetitionErrors.ROUND_OVERLAP);
+    }
+  }
+
   private static datesValid(
     publishAt: Date | undefined,
     startReg: Date | undefined,

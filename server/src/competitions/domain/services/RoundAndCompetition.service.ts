@@ -9,6 +9,7 @@ import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { RoleEnum } from 'src/types/RoleEnum';
 import { RoundReviewEntity } from 'src/judging/domain/entities/RoundReview.entity';
 import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
+import { LeaderboardEntity } from 'src/leaderboard/domain/entities/Leaderboard.entity';
 
 export class RoundAndCompetitionService {
   static createRound(
@@ -53,10 +54,11 @@ export class RoundAndCompetitionService {
   static countTeamsToEnterNextRound(
     finishedRound: RoundEntity,
     competition: CompetitionEntity,
-    allReviews: RoundReviewEntity[],
+    leaderboard: LeaderboardEntity,
   ): TeamEntity[] {
     const calculateK = (N: number, W: number, R: number): number => {
       if (R <= 0 || N <= 0) return 1;
+
       return Math.pow(W / N, 1 / R);
     };
 
@@ -76,61 +78,39 @@ export class RoundAndCompetitionService {
 
     const defaultPassCount = Math.round(allTeamsCount * K);
 
-    // Group reviews by team
-    const teamScores = new Map<string, number>();
-
-    for (const review of allReviews) {
-      const teamId = review.submission.team.id;
-
-      const current = teamScores.get(teamId) ?? 0;
-
-      teamScores.set(teamId, current + review._summary);
-    }
+    const nodes = leaderboard.nodes;
 
     // Teams with total score 0
-    const teamsWith0Ids = [...teamScores.entries()]
-      .filter(([_, score]) => score === 0)
-      .map(([teamId]) => teamId);
+    const zeroScoreNodes = nodes.filter((node) => node.sumScore === 0);
 
     const intendedEliminations = allTeamsCount - defaultPassCount;
 
-    let viableTeams = allTeams;
+    // Leaderboard is already sorted
+    let viableNodes = nodes;
 
     // Recalculate if too many teams got eliminated naturally
-    if (teamsWith0Ids.length > intendedEliminations) {
-      viableTeams = allTeams.filter((team) => !teamsWith0Ids.includes(team.id));
+    if (zeroScoreNodes.length > intendedEliminations) {
+      viableNodes = nodes.filter((node) => node.sumScore > 0);
 
       const nextRoundsRemaining = roundsRemaining - 1;
 
       if (nextRoundsRemaining <= 0) {
-        return viableTeams.slice(0, winnersCount);
+        return viableNodes.slice(0, winnersCount).map((node) => node.team);
       }
 
       const newK = calculateK(
-        viableTeams.length,
+        viableNodes.length,
         winnersCount,
         nextRoundsRemaining,
       );
 
-      const recalculatedPassCount = Math.round(viableTeams.length * newK);
+      const recalculatedPassCount = Math.round(viableNodes.length * newK);
 
-      return viableTeams
-        .sort((a, b) => {
-          const aScore = teamScores.get(a.id) ?? 0;
-          const bScore = teamScores.get(b.id) ?? 0;
-
-          return bScore - aScore;
-        })
-        .slice(0, recalculatedPassCount);
+      return viableNodes
+        .slice(0, recalculatedPassCount)
+        .map((node) => node.team);
     }
 
-    return allTeams
-      .sort((a, b) => {
-        const aScore = teamScores.get(a.id) ?? 0;
-        const bScore = teamScores.get(b.id) ?? 0;
-
-        return bScore - aScore;
-      })
-      .slice(0, defaultPassCount);
+    return viableNodes.slice(0, defaultPassCount).map((node) => node.team);
   }
 }

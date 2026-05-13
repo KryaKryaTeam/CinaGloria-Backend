@@ -116,6 +116,9 @@ export enum CommandTokens {
   DeleteSubmissionCommand = 'DELETE_SUBMISSION_COMMAND',
   CreateScoreCommand = 'CREATE_SCORE_COMMAND',
   CreateRoundReviewCommand = 'CREATE_ROUND_REVIEW_COMMAND',
+
+  // --- LEADERBOARD ---
+  GenerateLeaderboardCommand = 'GENERATE_LEADERBOARD_COMMAND',
 }
 
 export enum ServiceTokens {

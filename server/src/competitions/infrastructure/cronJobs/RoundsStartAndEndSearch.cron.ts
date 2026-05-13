@@ -21,16 +21,12 @@ export class RoundsStartAndEndSearchCronService {
   @Inject(CommandTokens.HandleCompetitionScheduledEventsCommand as string)
   private readonly handleCompetitionScheduledEventsCommand: HandleCompetitionScheduledEventsCommand;
 
-  @Inject(CommandTokens.PullTeamsToNextRound)
-  private readonly pullTeamsToNextRoundCommand: PullTeamsToNextRoundCommand;
-
   @Cron(CronExpression.EVERY_MINUTE, { waitForCompletion: true })
   async handleRoundsLifecycle() {
     this.logger.log('🚀 Starting rounds lifecycle sync...');
     const startTime = Date.now();
 
     try {
-      await this.pullTeamsToNextRoundCommand.execute();
       await this.runEndEventOnAllEndedRoundsCommand.execute();
       await this.runStartedEventOnAllStartedRoundsCommand.execute();
       await this.handleCompetitionScheduledEventsCommand.execute();

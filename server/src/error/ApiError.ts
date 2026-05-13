@@ -526,6 +526,14 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'This team was not found',
     status: 404,
   },
+  LEADERBOARD_003: {
+    message: 'No summary found in the review',
+    status: 404,
+  },
+  ROUND_012: {
+    message: 'This round is not listed in the competition',
+    status: 404,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -616,6 +624,7 @@ export const RoundErrors = {
   SPAN_IS_INVALID: 'ROUND_009',
   ROUND_IS_HIDDEN: 'ROUND_010',
   TEAM_NOT_FOUND: 'ROUND_011',
+  ROUND_NOT_IN_COMPETITION: 'ROUND_012',
 } as const;
 
 export const TaskErrors = {
@@ -702,6 +711,7 @@ export const SubmitionErrors = {
 export const LeaderboardErrors = {
   INVALID_PLACE_VALUE: 'LEADERBOARD_001',
   LEADERBOARD_NOT_FOUND: 'LEADERBOARD_002',
+  NO_SUMMARY: 'LEADERBOARD_003',
 };
 
 export const RoundReviewErrors = {

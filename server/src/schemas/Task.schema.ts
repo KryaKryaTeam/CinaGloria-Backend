@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { RoundSchema } from './Round.schema';
 
 @Entity({ name: 'task' })
@@ -15,6 +21,7 @@ export class TaskSchema {
   @Column()
   color: string; // ????
 
+  @JoinColumn()
   @ManyToOne(() => RoundSchema, (round) => round.relatedTasks)
   round: RoundSchema;
 }

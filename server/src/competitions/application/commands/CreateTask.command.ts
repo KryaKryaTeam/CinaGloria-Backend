@@ -43,7 +43,6 @@ export class CreateTaskCommand extends Command<
 
     round.addTask(task);
 
-    await this.taskRepository.save(task);
     await this.roundRepository.save(round);
     return task;
   }

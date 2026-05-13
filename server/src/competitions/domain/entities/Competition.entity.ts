@@ -620,6 +620,8 @@ export class CompetitionEntity extends Entity {
 
   public addRound(round: RoundEntity) {
     this.canChangeCheck();
+    this.validateRoundOverlap(round);
+    this.validateRoundWithinCompetitionBounds(round);
     this._rounds.push(round);
   }
 

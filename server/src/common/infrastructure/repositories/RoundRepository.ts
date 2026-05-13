@@ -39,6 +39,7 @@ export class RoundRepository
         statuses: [RoundStatus.IN_PROGRESS, RoundStatus.ON_JUDGING],
       })
       .getMany();
+
     return rounds.map((el) => this.mapper.toEntity(el));
   }
 
@@ -49,9 +50,12 @@ export class RoundRepository
       .andWhere('round.status IN (:...statuses)', {
         statuses: [RoundStatus.CREATED],
       })
+      .orderBy('round.startOfRound', 'ASC')
       .getMany();
+
     return rounds.map((el) => this.mapper.toEntity(el));
   }
+
   async getParentCompetitionId(round: RoundEntity): Promise<string | null> {
     const _round = await this.repository.findOne({ where: { id: round.id } });
     if (!_round) return null;
@@ -65,9 +69,7 @@ export class RoundRepository
       .where('round.endOfRound < :now', { now: new Date() })
       .getMany();
 
-    return schema.map((el) => {
-      return this.mapper.toEntity(el);
-    });
+    return schema.map((el) => this.mapper.toEntity(el));
   }
 
   async delete(id: string): Promise<void> {

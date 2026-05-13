@@ -28,7 +28,7 @@ export class CreateTaskCommand extends Command<CreateTaskCommandInput, void> {
   async implementation(data: CreateTaskCommandInput): Promise<void> {
     const color = Color.define(data.taskCreationData.color);
 
-    const round = await this.taskRepository.findRelatedRound(data.roundId);
+    const round = await this.roundRepository.findById(data.roundId);
     if (!round) ApiError.throw(RoundErrors.ROUND_NOT_FOUND);
 
     const task = RoundAndCompetitionService.createTask({

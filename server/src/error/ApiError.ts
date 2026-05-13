@@ -324,6 +324,18 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'Setting is invalid',
     status: 500,
   },
+  COMPETITION_019: {
+    message: 'You need to set battle bounds first, to create rounds',
+    status: 400,
+  },
+  COMPETITION_020: {
+    message: 'Round is out of bounds',
+    status: 400,
+  },
+  COMPETITION_021: {
+    message: 'Rounds are overlaping',
+    status: 400,
+  },
   ROUND_001: {
     message: 'Start date of round must be in the future',
     status: 400,
@@ -586,9 +598,12 @@ export const CompetitionErrors = {
   CANNOT_EDIT: 'COMPETITION_013',
   UNDEFINED: 'COMPETITION_014',
   PAGE_NOT_FOUND: 'COMPETITION_015',
-  NOT_ALL_SETTINGS_PROVIDED: 'COMPETITION_16',
-  SETTING_TYPE_NOT_VALID: 'COMPETITION_17',
-  SETTING_IS_INVALID: 'COMPETITION_18',
+  NOT_ALL_SETTINGS_PROVIDED: 'COMPETITION_016',
+  SETTING_TYPE_NOT_VALID: 'COMPETITION_017',
+  SETTING_IS_INVALID: 'COMPETITION_018',
+  DATES_UNSET: 'COMPETITION_019',
+  ROUND_OUT_OF_BOUNDS: 'COMPETITION_020',
+  ROUND_OVERLAP: 'COMPETITION_021',
 } as const;
 
 export const RoundErrors = {

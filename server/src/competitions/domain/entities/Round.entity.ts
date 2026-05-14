@@ -5,6 +5,7 @@ import { RoundStatus } from 'src/types/RoundStatus';
 import { TaskEntity } from './Task.entity';
 import { ApiError, DomainErrors, RoundErrors } from 'src/error/ApiError';
 import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
+import { LeaderboardEntity } from 'src/leaderboard/domain/entities/Leaderboard.entity';
 
 export interface ICreateRound {
   name: string;
@@ -15,6 +16,7 @@ export interface ICreateRound {
   endOfRound: Date;
   relatedTasks: TaskEntity[];
   hidden: boolean;
+  leaderboard: LeaderboardEntity | undefined;
 }
 
 export interface IRoundPlain {
@@ -29,6 +31,7 @@ export interface IRoundPlain {
   relatedTasks: TaskEntity[];
   status: RoundStatus;
   teams: TeamEntity[];
+  leaderboard: LeaderboardEntity | undefined;
 }
 
 export class RoundEntity extends Entity {
@@ -43,6 +46,7 @@ export class RoundEntity extends Entity {
   private _relatedTasks: TaskEntity[];
   private _status: RoundStatus;
   private _teams: TeamEntity[];
+  private _leaderboard: LeaderboardEntity | undefined;
 
   private constructor(plain: IRoundPlain) {
     RoundEntity.validate(plain);
@@ -195,6 +199,10 @@ export class RoundEntity extends Entity {
     this._status = status;
   }
 
+  set leaderboard(leaderboard: LeaderboardEntity) {
+    this._leaderboard = LeaderboardEntity;
+  }
+
   get name() {
     return this._name ?? '';
   }
@@ -233,6 +241,10 @@ export class RoundEntity extends Entity {
 
   get teams() {
     return this._teams;
+  }
+
+  get leaderboard() {
+    return this._leaderboard;
   }
 
   addTask(task: TaskEntity) {

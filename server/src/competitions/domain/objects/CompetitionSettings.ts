@@ -6,6 +6,7 @@ interface ISETTINGS_SCHEMA {
   minTeamMembers: number;
   maxTeams: number;
   countOfWinners: number;
+  maxScoreValue: number;
 }
 
 const SETTINGS_SCHEMA: ISETTINGS_SCHEMA = {
@@ -14,6 +15,7 @@ const SETTINGS_SCHEMA: ISETTINGS_SCHEMA = {
   minTeamMembers: 1,
   maxTeams: 100,
   countOfWinners: 1,
+  maxScoreValue: 10,
 } as const;
 
 type SettingKey = keyof typeof SETTINGS_SCHEMA;

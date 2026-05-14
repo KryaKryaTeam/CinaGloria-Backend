@@ -119,6 +119,7 @@ export enum CommandTokens {
 
   // --- LEADERBOARD ---
   GenerateLeaderboardCommand = 'GENERATE_LEADERBOARD_COMMAND',
+  GetLeaderboardCommand = 'GET_LEADERBOARD_COMMAND',
 }
 
 export enum ServiceTokens {

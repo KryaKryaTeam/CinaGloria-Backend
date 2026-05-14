@@ -5,10 +5,7 @@ import { ReposTokens } from 'src/common/Tokens';
 import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
 import { ApiError, LeaderboardErrors } from 'src/error/ApiError';
 import { LeaderboardEntity } from 'src/leaderboard/domain/entities/Leaderboard.entity';
-import {
-  ILeaderboardNodeValue,
-  LeaderboardNode,
-} from 'src/leaderboard/domain/objects/LeaderboardNode.object';
+import { LeaderboardNode } from 'src/leaderboard/domain/objects/LeaderboardNode.object';
 
 @Injectable()
 export class GenerateLeaderboardCommand extends Command<

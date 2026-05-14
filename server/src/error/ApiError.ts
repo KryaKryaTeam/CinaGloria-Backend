@@ -534,6 +534,10 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'This round is not listed in the competition',
     status: 404,
   },
+  SCORE_002: {
+    message: 'Duplicate scores for the same round are not allowed',
+    status: 400,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -690,6 +694,7 @@ export const CommandErrors = {
 
 export const ScoreErrors = {
   SCORE_NOT_FOUND: 'SCORE_001',
+  DUPLICATED_ROUND_SCORE: 'SCORE_002',
 };
 
 export const CriteriaErrors = {

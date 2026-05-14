@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { Command } from 'src/common/application/Command';
 import { ReposTokens } from 'src/common/Tokens';
@@ -11,6 +11,7 @@ interface DeleteTaskCommandInput {
   actor: UserEntity;
 }
 
+@Injectable()
 export class DeleteTaskCommand extends Command<DeleteTaskCommandInput, void> {
   @Inject(ReposTokens.TaskRepository)
   private readonly taskRepo: ITaskRepository;

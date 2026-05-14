@@ -16,7 +16,9 @@ export class FileRelationRepository
   extends BaseRepository<FileRelation>
   implements IFileRelationsRepository
 {
-  protected _entitySchema: new () => FileRelation = FileRelation;
+  constructor() {
+    super(FileRelation);
+  }
 
   @Inject(MapperTokens.FileRelationMapper)
   private readonly fileRelationMapper: FileRelationMapper;

@@ -40,7 +40,7 @@ export class TaskController {
     });
   }
 
-  @Delete('/:teamId')
+  @Delete('/:taskId')
   @Version('1')
   @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])

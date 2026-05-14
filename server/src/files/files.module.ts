@@ -16,6 +16,7 @@ import { UserCreatedHandlerFile } from './infrastructure/handlers/UserCreateHand
 import { CompetitionsModule } from 'src/competitions/competitions.module';
 import { DeleteGarbageCommand } from './application/useCases/DeleteGarbage.command';
 import { GarbageCollectorCronJobService } from './infrastructure/cron/GarbageCollectorCronJob.cron';
+import { TeamsModule } from 'src/teams/teams.module';
 
 const providers: Provider[] = [
   { provide: MapperTokens.FileMapper, useClass: FileMapper },
@@ -47,6 +48,7 @@ const providers: Provider[] = [
     DiscoveryModule,
     forwardRef(() => AuthorizationModule),
     CompetitionsModule,
+    forwardRef(() => TeamsModule),
   ],
   controllers: [FileController],
 })

@@ -12,10 +12,12 @@ export class FileRepository
   extends BaseRepository<FileSchema>
   implements IFileRepository
 {
-  protected _entitySchema: new () => FileSchema = FileSchema;
-
   @Inject(MapperTokens.FileMapper)
   private readonly fileMapper: FileMapper;
+
+  constructor() {
+    super(FileSchema);
+  }
 
   async save(file: FileEntity): Promise<void> {
     await this.repository.save(this.fileMapper.toSchema(file));

@@ -12,10 +12,12 @@ export class CriteriaRepository
   extends BaseRepository<CriteriaSchema>
   implements ICriteriaRepotisory
 {
+  constructor() {
+    super(CriteriaSchema);
+  }
+
   @Inject(MapperTokens.CriteriaMapper)
   mapper: CriteriaMapper;
-
-  protected _entitySchema: new () => CriteriaSchema;
 
   async save(criteria: CriteriaEntity): Promise<void> {
     await this.repository.save(this.mapper.toSchema(criteria));

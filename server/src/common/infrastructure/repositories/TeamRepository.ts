@@ -15,7 +15,9 @@ export class TeamRepository
   extends BaseRepository<TeamSchema>
   implements ITeamRepository
 {
-  protected _entitySchema: new () => TeamSchema;
+  constructor() {
+    super(TeamSchema);
+  }
 
   @Inject(MapperTokens.TeamMapper) private readonly mapper: TeamMapper;
   @Inject(MapperTokens.CompetitionMapper)

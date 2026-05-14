@@ -13,7 +13,10 @@ export class AuthorizationProviderRepository
   @Inject(MapperTokens.AuthorizationProviderMapper)
   private authProviderMapper: AuthorizationProviderMapper;
 
-  protected _entitySchema = AuthorizationProvider;
+  constructor() {
+    super(AuthorizationProvider);
+  }
+
   async save(provider: AuthProviderEntity): Promise<void> {
     await this.repository.save(this.authProviderMapper.toSchema(provider));
   }

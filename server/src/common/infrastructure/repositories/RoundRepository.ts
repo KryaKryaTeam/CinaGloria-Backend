@@ -13,7 +13,9 @@ export class RoundRepository
   extends BaseRepository<RoundSchema>
   implements IRoundRepository
 {
-  protected _entitySchema: new () => RoundSchema = RoundSchema;
+  constructor() {
+    super(RoundSchema);
+  }
 
   @Inject(MapperTokens.RoundMapper)
   private readonly mapper: RoundMapper;

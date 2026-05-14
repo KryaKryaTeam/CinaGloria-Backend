@@ -12,10 +12,12 @@ export class ScoreRepository
   extends BaseRepository<ScoreSchema>
   implements IScoreRepository
 {
+  constructor() {
+    super(ScoreSchema);
+  }
+
   @Inject(MapperTokens.ScoreMapper)
   mapper: ScoreMapper;
-
-  protected _entitySchema: new () => ScoreSchema;
 
   async save(data: ScoreEntity): Promise<void> {
     await this.repository.save(this.mapper.toSchema(data));

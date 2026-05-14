@@ -1,4 +1,12 @@
-import { Body, Controller, Inject, Post, Version } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Inject,
+  Patch,
+  Post,
+  Version,
+} from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { Secure } from 'src/authorization/infrastructure/guards/auth/auth.guard';
 import { AllowRoles } from 'src/authorization/infrastructure/guards/role/role.guard';
@@ -37,7 +45,7 @@ export class RoundController {
     });
   }
 
-  @Post('delete')
+  @Delete()
   @Version('1')
   @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
@@ -46,7 +54,7 @@ export class RoundController {
     return await this.deleteRoundCommand.execute(dto);
   }
 
-  @Post('patch')
+  @Patch()
   @Version('1')
   @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])

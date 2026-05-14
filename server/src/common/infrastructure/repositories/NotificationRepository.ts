@@ -12,12 +12,10 @@ export class NotificationRepository
   extends BaseRepository<NotificationSchema>
   implements INotificationRepository
 {
+  protected _entitySchema: new () => NotificationSchema = NotificationSchema;
+
   @Inject(MapperTokens.NotificationMapper)
   notificationMapper: NotificationMapper;
-
-  constructor() {
-    super(NotificationSchema);
-  }
 
   async save(notification: Notification): Promise<void> {
     await this.repository.save(this.notificationMapper.toSchema(notification));

@@ -15,9 +15,7 @@ export class TaskRepository
   extends BaseRepository<TaskSchema>
   implements ITaskRepository
 {
-  constructor() {
-    super(TaskSchema);
-  }
+  protected _entitySchema: new () => TaskSchema = TaskSchema;
 
   @Inject(MapperTokens.TaskMapper)
   private readonly mapper: TaskMapper;

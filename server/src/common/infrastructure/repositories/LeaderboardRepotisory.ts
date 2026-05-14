@@ -12,12 +12,10 @@ export class LeaderboardRepository
   extends BaseRepository<LeaderboardSchema>
   implements ILeaderboardRepotisory
 {
+  protected _entitySchema: new () => LeaderboardSchema = LeaderboardSchema;
+
   @Inject(MapperTokens.LeaderboardMapper)
   private readonly mapper: LeaderboardMapper;
-
-  constructor() {
-    super(LeaderboardSchema);
-  }
 
   async save(leaderboard: LeaderboardEntity): Promise<void> {
     await this.repository.save(this.mapper.toSchema(leaderboard));

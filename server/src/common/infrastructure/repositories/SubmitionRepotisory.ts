@@ -14,9 +14,7 @@ export class SubmitionRepository
   extends BaseRepository<SubmitionSchema>
   implements ISubmitionRepository
 {
-  constructor() {
-    super(SubmitionSchema);
-  }
+  protected _entitySchema: new () => SubmitionSchema = SubmitionSchema;
 
   @Inject(MapperTokens.SubmitionMapper)
   private readonly mapper: SubmitionMapper;

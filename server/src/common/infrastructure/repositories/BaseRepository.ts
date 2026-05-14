@@ -5,7 +5,7 @@ import { ObjectLiteral, Repository } from 'typeorm';
 
 @Injectable()
 export abstract class BaseRepository<Schema extends ObjectLiteral> {
-  constructor(protected readonly _entitySchema: new () => Schema) {}
+  protected abstract _entitySchema: new () => Schema;
 
   @Inject(BaseTokens.DBContext)
   protected readonly DBContext: IDBContext;

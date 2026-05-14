@@ -11,12 +11,10 @@ export class UserRepository
   extends BaseRepository<UserSchema>
   implements IUserRepository
 {
-  constructor() {
-    super(UserSchema);
-  }
-
   @Inject(MapperTokens.UserMapper)
   private userMapper: UserMapper;
+
+  protected _entitySchema = UserSchema;
 
   async findByEmail(email: string): Promise<UserEntity | null> {
     const res = await this.repository.findOne({

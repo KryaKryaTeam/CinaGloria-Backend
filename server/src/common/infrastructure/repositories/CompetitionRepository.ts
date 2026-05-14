@@ -11,12 +11,10 @@ export class CompetitionRepository
   extends BaseRepository<CompetitionSchema>
   implements ICompetitionRepository
 {
+  protected _entitySchema: new () => CompetitionSchema = CompetitionSchema;
+
   @Inject(MapperTokens.CompetitionMapper)
   private readonly mapper: CompetitionMapper;
-
-  constructor() {
-    super(CompetitionSchema); // Pass it up to the base
-  }
 
   async save(ent: CompetitionEntity): Promise<void> {
     await this.repository.save(this.mapper.toSchema(ent));

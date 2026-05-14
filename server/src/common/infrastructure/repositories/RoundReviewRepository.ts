@@ -11,9 +11,7 @@ export class RoundReviewRepository
   extends BaseRepository<RoundReviewSchema>
   implements IRoundReviewRepository
 {
-  constructor() {
-    super(RoundReviewSchema);
-  }
+  protected _entitySchema: new () => RoundReviewSchema = RoundReviewSchema;
 
   @Inject(MapperTokens.RoundReviewMapper)
   private readonly mapper: RoundReviewMapper;

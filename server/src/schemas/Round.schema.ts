@@ -48,8 +48,7 @@ export class RoundSchema {
   @Column({ type: 'enum', enum: RoundStatus, enumName: 'round_status' })
   status: RoundStatus;
 
-  @ManyToOne(() => CompetitionSchema)
-  @JoinColumn({ name: 'competition_id' })
+  @ManyToOne(() => CompetitionSchema, (competition) => competition.rounds)
   competition: CompetitionSchema;
 
   @OneToOne(() => LeaderboardSchema, (leaderboard) => leaderboard.round, {
@@ -58,8 +57,10 @@ export class RoundSchema {
   })
   leaderboard: LeaderboardSchema;
 
-  @OneToMany(() => SubmitionSchema, (submission) => submission.relatedRound)
-  submission: SubmitionSchema[];
+  @OneToMany(() => SubmitionSchema, (submission) => submission.relatedRound, {
+    nullable: true,
+  })
+  submissions?: SubmitionSchema[];
 
   @OneToMany(() => TeamSchema, (team) => team.round, { nullable: true })
   teams?: TeamSchema[];

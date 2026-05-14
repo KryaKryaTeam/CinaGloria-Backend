@@ -1,4 +1,4 @@
-import { Module, Provider } from '@nestjs/common';
+import { forwardRef, Module, Provider } from '@nestjs/common';
 import { CommandTokens, MapperTokens } from 'src/common/Tokens';
 import { LeaderboardMapper } from './appliaction/mapper/LeaderboardMapper';
 import { CompetitionsModule } from 'src/competitions/competitions.module';
@@ -19,7 +19,7 @@ const providers: Provider[] = [
 ];
 @Module({
   providers,
-  imports: [CompetitionsModule],
+  imports: [forwardRef(() => CompetitionsModule)],
   exports: [...providers],
   controllers: [LederboardController],
 })

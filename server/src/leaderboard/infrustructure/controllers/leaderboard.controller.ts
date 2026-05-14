@@ -4,6 +4,7 @@ import { AllowRoles } from 'src/authorization/infrastructure/guards/role/role.gu
 import { CommandTokens } from 'src/common/Tokens';
 import { GetLeaderboardCommand } from 'src/leaderboard/appliaction/commands/GetLeaderboard.command';
 import { RoleEnum } from 'src/types/RoleEnum';
+import { GetLeaderboardDto } from '../dtos/GetLeaderboard.dto';
 
 @Controller('leaderboard')
 export class LederboardController {
@@ -19,7 +20,7 @@ export class LederboardController {
     RoleEnum.JUDGE,
     RoleEnum.USER,
   ])
-  async getLeaderboard(@Param('roundId') roundId: string) {
-    return await this.getLeaderboadCommand.execute(roundId);
+  async getLeaderboard(@Param() dto: GetLeaderboardDto) {
+    return await this.getLeaderboadCommand.execute(dto.roundId);
   }
 }

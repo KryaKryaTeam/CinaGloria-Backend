@@ -1,11 +1,10 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Exclude } from 'class-transformer';
+import { Exclude, Type } from 'class-transformer';
 import { IsDate, IsEnum, IsString, IsUUID } from 'class-validator';
-import { ICreateRound } from 'src/competitions/domain/entities/Round.entity';
 import { TaskEntity } from 'src/competitions/domain/entities/Task.entity';
 import { Icons } from 'src/types/Icons';
 
-export class CreateRoundInterDto implements ICreateRound {
+export class CreateRoundInterDto {
   @ApiProperty({ example: 'Final Round' })
   @IsString()
   name: string;
@@ -19,14 +18,17 @@ export class CreateRoundInterDto implements ICreateRound {
   icon: Icons;
 
   @ApiProperty({ example: '2026-04-01T10:00:00.000Z' })
+  @Type(() => Date)
   @IsDate()
   startOfRound: Date;
 
-  @ApiProperty({ example: '2026-04-01T10:00:00.000Z' })
+  @ApiProperty({ example: '2026-04-01T11:00:00.000Z' })
+  @Type(() => Date)
   @IsDate()
   taskTimeout: Date;
 
   @ApiProperty({ example: '2026-04-01T12:00:00.000Z' })
+  @Type(() => Date)
   @IsDate()
   endOfRound: Date;
 

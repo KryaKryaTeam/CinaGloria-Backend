@@ -23,6 +23,8 @@ import { PatchRoundCommand } from './application/commands/PatchRound.command';
 import { CreateTaskCommand } from './application/commands/CreateTask.command';
 import { TeamsModule } from 'src/teams/teams.module';
 import { PullTeamsToNextRoundCommand } from './application/commands/PullTeamsToNextRound.command';
+import { LeaderboardModule } from 'src/leaderboard/leaderboard.module';
+import { JudgingModule } from 'src/judging/judging.module';
 
 const providers: Provider[] = [
   {
@@ -90,7 +92,12 @@ const providers: Provider[] = [
 @Module({
   providers,
   exports: [...providers],
-  imports: [forwardRef(() => FilesModule), forwardRef(() => TeamsModule)],
+  imports: [
+    forwardRef(() => FilesModule),
+    forwardRef(() => TeamsModule),
+    forwardRef(() => LeaderboardModule),
+    forwardRef(() => JudgingModule),
+  ],
   controllers: [CompetitionController, RoundController, TaskController],
 })
 export class CompetitionsModule {}

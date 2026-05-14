@@ -45,7 +45,6 @@ export class TeamSchema {
   })
   status: TeamStatus;
 
-  @JoinColumn()
   @ManyToOne(() => CompetitionSchema, (competition) => competition.teams, {
     nullable: true,
     onDelete: 'SET NULL',
@@ -70,6 +69,9 @@ export class TeamSchema {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => RoundSchema, (round) => round.teams, { nullable: true })
+  @ManyToOne(() => RoundSchema, (round) => round.teams, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
   round?: RoundSchema;
 }

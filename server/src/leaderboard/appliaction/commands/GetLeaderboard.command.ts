@@ -15,8 +15,7 @@ export class GetLeaderboardCommand extends Command<string, LeaderboardEntity> {
     if (!round) ApiError.throw(RoundErrors.ROUND_NOT_FOUND);
 
     const leaderboard = round.leaderboard;
-    if (!round.leaderboard)
-      ApiError.throw(LeaderboardErrors.LEADERBOARD_NOT_FOUND);
+    if (!leaderboard) ApiError.throw(LeaderboardErrors.LEADERBOARD_NOT_FOUND);
 
     return leaderboard;
   }

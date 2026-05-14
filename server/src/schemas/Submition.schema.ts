@@ -28,7 +28,7 @@ export class SubmitionSchema {
   @JoinColumn()
   assignedToJury?: string;
 
-  @ManyToOne(() => RoundSchema, (round) => round.submission)
+  @ManyToOne(() => RoundSchema, (round) => round.submissions)
   relatedRound: RoundSchema;
 
   @ManyToOne(() => RoundReviewSchema, (roundReview) => roundReview.submission, {

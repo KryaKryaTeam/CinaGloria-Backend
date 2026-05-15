@@ -4,14 +4,8 @@ import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionSchema } from 'src/schemas/Competition.schema';
 import { UserSchema } from 'src/schemas/User.schema';
-import { forwardRef, Inject } from '@nestjs/common';
-import { MapperTokens } from 'src/common/Tokens';
-import { RoundMapper } from 'src/competitions/application/mapper/Round.mapper';
 
 export class TeamMapper extends Mapper<TeamSchema, TeamEntity> {
-  @Inject(forwardRef(() => MapperTokens.RoundMapper))
-  private readonly roundMapper: RoundMapper;
-
   public toEntity(schema: TeamSchema): TeamEntity {
     return TeamEntity.load({
       ...schema,
@@ -26,8 +20,7 @@ export class TeamMapper extends Mapper<TeamSchema, TeamEntity> {
         'team:banner',
         'team:banner',
       ),
-      members: schema.members.map((usr) => usr.id),
-      round: schema.round ? this.roundMapper.toEntity(schema.round) : undefined,
+      members: schema.members ? schema.members.map((usr) => usr.id) : [],
     });
   }
   public toSchema(entity: TeamEntity): TeamSchema {
@@ -43,19 +36,16 @@ export class TeamMapper extends Mapper<TeamSchema, TeamEntity> {
       entity.banner as unknown as InternalFile<'team:banner'>
     ).value;
     sch.captain = entity.captain;
-    sch.members = entity.members.map(
-      (id) => ({ id: id }) as unknown as UserSchema,
-    );
-    sch.history = entity.history.map((el) => el.toJSON());
+    sch.members = entity.members
+      ? entity.members.map((id) => ({ id: id }) as unknown as UserSchema)
+      : [];
+    sch.history = entity.history ? entity.history.map((el) => el.toJSON()) : [];
     sch.memberInvites = entity.invites;
     sch.registrationTimeout = entity.registrationTimeout as unknown as
       | Date
       | undefined;
     sch.id = entity.id;
     sch.status = entity.status;
-    sch.round = entity.round
-      ? this.roundMapper.toSchema(entity.round)
-      : undefined;
 
     return sch;
   }

@@ -324,6 +324,22 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'Setting is invalid',
     status: 500,
   },
+   COMPETITION_019: {
+    message: 'You need to set battle bounds first, to create rounds',
+    status: 400,
+  },
+  COMPETITION_020: {
+    message: 'Competition is undefined',
+    status: 400,
+  },
+  COMPETITION_021: {
+    message: 'Round is out of bounds',
+    status: 400,
+  },
+  COMPETITION_022: {
+    message: 'Rounds are overlaping',
+    status: 400,
+  },
   ROUND_001: {
     message: 'Start date of round must be in the future',
     status: 400,
@@ -614,6 +630,9 @@ export const CompetitionErrors = {
   SETTING_TYPE_NOT_VALID: 'COMPETITION_017',
   SETTING_IS_INVALID: 'COMPETITION_018',
   COMPETITION_NOT_FOUND: 'COMPETITION_019',
+  DATES_UNSET: 'COMPETITION_020',
+  ROUND_OUT_OF_BOUNDS: 'COMPETITION_021',
+  ROUND_OVERLAP: 'COMPETITION_022',
 } as const;
 
 export const RoundErrors = {
@@ -627,8 +646,6 @@ export const RoundErrors = {
   ROUND_NOT_FOUND: 'ROUND_008',
   SPAN_IS_INVALID: 'ROUND_009',
   ROUND_IS_HIDDEN: 'ROUND_010',
-  TEAM_NOT_FOUND: 'ROUND_011',
-  ROUND_NOT_IN_COMPETITION: 'ROUND_012',
 } as const;
 
 export const TaskErrors = {
@@ -673,7 +690,6 @@ export const TeamErrors = {
   TEAM_UNDEFINED: 'TEAM_010',
   MEMBER_ALREADY_IN_COMPETITION: 'TEAM_011',
   TEAM_NOT_ALIGNED_WITH_SETTINGS: 'TEAM_012',
-  TEAM_NOT_FOUND: 'TEAM_013',
 } as const;
 
 export const StorageErrors = {
@@ -694,7 +710,6 @@ export const CommandErrors = {
 
 export const ScoreErrors = {
   SCORE_NOT_FOUND: 'SCORE_001',
-  DUPLICATED_ROUND_SCORE: 'SCORE_002',
 };
 
 export const CriteriaErrors = {
@@ -716,13 +731,11 @@ export const SubmitionErrors = {
 export const LeaderboardErrors = {
   INVALID_PLACE_VALUE: 'LEADERBOARD_001',
   LEADERBOARD_NOT_FOUND: 'LEADERBOARD_002',
-  NO_SUMMARY: 'LEADERBOARD_003',
 };
 
 export const RoundReviewErrors = {
   CANNOT_CREATE_REVIEW: 'ROUND_REVIEW_001',
   NO_SCORES_PROVIDED: 'ROUND_REVIEW_002',
-  ROUND_REVIEW_NOT_FOUND: 'ROUND_REVIEW_003',
 };
 
 export type ApiErrorCode = keyof typeof ApiErrorsCodeVal;

@@ -7,6 +7,7 @@ import { TeamStatus } from 'src/types/TeamStatus';
 
 export class TeamEntityHelperService {
   static checkRights(team: TeamEntity, actor: UserEntity) {
+    console.log(team.isCaptain(actor.id), team, actor);
     if (!team.isCaptain(actor.id))
       ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
   }

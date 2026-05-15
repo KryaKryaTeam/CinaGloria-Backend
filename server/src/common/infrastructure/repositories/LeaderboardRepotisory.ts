@@ -6,8 +6,6 @@ import { LeaderboardEntity } from 'src/leaderboard/domain/entities/Leaderboard.e
 import { MapperTokens } from 'src/common/Tokens';
 import { LeaderboardMapper } from 'src/leaderboard/appliaction/mapper/LeaderboardMapper';
 import { ApiError, LeaderboardErrors } from 'src/error/ApiError';
-import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
-import { RoundMapper } from 'src/competitions/application/mapper/Round.mapper';
 
 @Injectable()
 export class LeaderboardRepository
@@ -19,9 +17,6 @@ export class LeaderboardRepository
   @Inject(MapperTokens.LeaderboardMapper)
   private readonly mapper: LeaderboardMapper;
 
-  @Inject(MapperTokens.RoundMapper)
-  private readonly roundMapper: RoundMapper;
-
   async save(leaderboard: LeaderboardEntity): Promise<void> {
     await this.repository.save(this.mapper.toSchema(leaderboard));
   }
@@ -31,14 +26,5 @@ export class LeaderboardRepository
     if (!schema) ApiError.throw(LeaderboardErrors.LEADERBOARD_NOT_FOUND);
 
     return this.mapper.toEntity(schema);
-  }
-
-  async findByRound(round: RoundEntity): Promise<LeaderboardEntity | void> {
-    const schema = await this.repository.findOne({
-      where: { round: this.roundMapper.toSchema(round) },
-      relations: { round: true },
-    });
-
-    if (schema) return this.mapper.toEntity(schema);
   }
 }

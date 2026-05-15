@@ -89,6 +89,7 @@ export enum CommandTokens {
   GetCompetitionPageQuery = 'GET_COMPETITION_PAGE_QUERY',
   GetPublicCompetitionsPageQuery = 'GET_PUBLIC_COMPETITIONS_PAGE_QUERY',
   UpdateSettingsOfCompetitionCommand = 'UPDATE_SETTINGS_OF_COMPETITION_COMMAND',
+  GetPrivateCompetitionByIdCommand = 'GET_PRIVATE_COMPETITION_BY_ID_COMMAND',
 
   // --- ROUNDS & TASKS ---
   CreateRoundCommand = 'CREATE_ROUND_COMMAND',
@@ -97,6 +98,7 @@ export enum CommandTokens {
   ReadRoundCommand = 'READ_ROUND_COMMAND',
   CreateTaskCommand = 'CREATE_TASK_COMMAND',
   PullTeamsToNextRound = 'PULL_TEAMS_TO_NEXT_ROUND_COMMAND',
+  DeleteTaskCommand = 'DELETE_TASK_COMMAND',
 
   // --- AUTOMATION & EVENTS ---
   RunEndEventOnAllEndedRoundsCommand = 'RUN_END_EVENT_ON_ALL_ENDED_ROUNDS_COMMAND',
@@ -116,10 +118,6 @@ export enum CommandTokens {
   DeleteSubmissionCommand = 'DELETE_SUBMISSION_COMMAND',
   CreateScoreCommand = 'CREATE_SCORE_COMMAND',
   CreateRoundReviewCommand = 'CREATE_ROUND_REVIEW_COMMAND',
-
-  // --- LEADERBOARD ---
-  GenerateLeaderboardCommand = 'GENERATE_LEADERBOARD_COMMAND',
-  GetLeaderboardCommand = 'GET_LEADERBOARD_COMMAND',
 }
 
 export enum ServiceTokens {

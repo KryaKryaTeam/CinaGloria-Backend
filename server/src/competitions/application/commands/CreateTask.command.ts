@@ -33,7 +33,6 @@ export class CreateTaskCommand extends Command<CreateTaskCommandInput, void> {
 
     const task = RoundAndCompetitionService.createTask({
       ...data.taskCreationData,
-      round,
       color,
     });
     if (!task) ApiError.throw(TaskErrors.TASK_NOT_FOUND);

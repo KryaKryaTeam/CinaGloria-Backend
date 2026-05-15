@@ -5,7 +5,6 @@ import { RoundMapper } from 'src/competitions/application/mapper/Round.mapper';
 import { SubmitionEntity } from 'src/judging/domain/entities/Submition.entity';
 import { SubmitionSchema } from 'src/schemas/Submition.schema';
 import { RoundReviewMapper } from './RoundReviewMapper';
-import { TeamMapper } from 'src/teams/application/mappers/team.mapper';
 
 @Injectable()
 export class SubmitionMapper extends Mapper<SubmitionSchema, SubmitionEntity> {
@@ -14,9 +13,6 @@ export class SubmitionMapper extends Mapper<SubmitionSchema, SubmitionEntity> {
 
   @Inject(forwardRef(() => RoundReviewMapper))
   private readonly roundReviewMapper: RoundReviewMapper;
-
-  @Inject(MapperTokens.TeamMapper)
-  private readonly teamMapper: TeamMapper;
 
   public toEntity(schema: SubmitionSchema): SubmitionEntity {
     return SubmitionEntity.load({
@@ -29,7 +25,6 @@ export class SubmitionMapper extends Mapper<SubmitionSchema, SubmitionEntity> {
       review: schema.review
         ? this.roundReviewMapper.toEntity(schema.review)
         : undefined,
-      team: this.teamMapper.toEntity(schema.team),
     });
   }
 
@@ -45,7 +40,6 @@ export class SubmitionMapper extends Mapper<SubmitionSchema, SubmitionEntity> {
     if (entity.review) {
       sch.review = this.roundReviewMapper.toSchema(entity.review);
     }
-    sch.team = this.teamMapper.toSchema(entity.team);
 
     return sch;
   }

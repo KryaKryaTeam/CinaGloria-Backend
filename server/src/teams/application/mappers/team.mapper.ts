@@ -4,14 +4,8 @@ import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { CompetitionSchema } from 'src/schemas/Competition.schema';
 import { UserSchema } from 'src/schemas/User.schema';
-import { forwardRef, Inject } from '@nestjs/common';
-import { MapperTokens } from 'src/common/Tokens';
-import { RoundMapper } from 'src/competitions/application/mapper/Round.mapper';
 
 export class TeamMapper extends Mapper<TeamSchema, TeamEntity> {
-  @Inject(forwardRef(() => MapperTokens.RoundMapper))
-  private readonly roundMapper: RoundMapper;
-
   public toEntity(schema: TeamSchema): TeamEntity {
     return TeamEntity.load({
       ...schema,
@@ -27,7 +21,6 @@ export class TeamMapper extends Mapper<TeamSchema, TeamEntity> {
         'team:banner',
       ),
       members: schema.members.map((usr) => usr.id),
-      round: schema.round ? this.roundMapper.toEntity(schema.round) : undefined,
     });
   }
   public toSchema(entity: TeamEntity): TeamSchema {
@@ -53,9 +46,6 @@ export class TeamMapper extends Mapper<TeamSchema, TeamEntity> {
       | undefined;
     sch.id = entity.id;
     sch.status = entity.status;
-    sch.round = entity.round
-      ? this.roundMapper.toSchema(entity.round)
-      : undefined;
 
     return sch;
   }

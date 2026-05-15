@@ -40,7 +40,6 @@ export class SubmissionController {
   @Secure()
   @Version('1')
   @AllowRoles([RoleEnum.USER])
-  @ApiResponse({ status: 201 })
   async create(@Body() dto: CreateSubmissionDto) {
     await this.createSubmissionCommand.execute(dto);
   }

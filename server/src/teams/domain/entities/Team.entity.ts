@@ -16,7 +16,6 @@ import {
 import { TeamRegistartionEndedEvent } from '../events/TeamRegistartionEnded.event';
 import { TeamRegistarationCanceledEvent } from '../events/TeamRegistarationCanceled.event';
 import { TeamStatus } from 'src/types/TeamStatus';
-import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
 
 export interface ITeamPlain {
   id: string;
@@ -35,7 +34,6 @@ export interface ITeamPlain {
     competition?: string;
     accepted: boolean;
   }[];
-  round: RoundEntity | undefined;
 }
 
 export interface ICreateTeam {
@@ -56,7 +54,6 @@ export class TeamEntity extends Entity {
   private _activeCompetition?: string; // uuid
   private _registrationTimeout?: Date; // now + 1 hour
   private _history: TeamHistoryObject[];
-  private _round: RoundEntity | undefined;
 
   // invites
   private _memberInvites: {
@@ -82,7 +79,6 @@ export class TeamEntity extends Entity {
     this._memberInvites = plain.memberInvites;
     this._status = plain.status;
     this._registrationTimeout = plain.registrationTimeout;
-    this._round = plain.round;
   }
 
   static create(createData: ICreateTeam) {
@@ -97,7 +93,6 @@ export class TeamEntity extends Entity {
       history: [],
       memberInvites: [],
       name: createData.name,
-      round: undefined,
     });
   }
 
@@ -122,7 +117,6 @@ export class TeamEntity extends Entity {
       history: [],
       memberInvites: [],
       name: 'Team B',
-      round: undefined,
     });
   }
 
@@ -188,10 +182,6 @@ export class TeamEntity extends Entity {
         (a) => a.member == uuid && a.forCompetition == true,
       ) != -1
     );
-  }
-
-  get round(): RoundEntity | undefined {
-    return this._round;
   }
 
   // methods
@@ -378,10 +368,6 @@ export class TeamEntity extends Entity {
     this._banner = new_;
   }
 
-  set round(value: RoundEntity) {
-    this._round = value;
-  }
-
   toJSON(): ITeamPlain {
     return {
       id: this.id,
@@ -394,7 +380,6 @@ export class TeamEntity extends Entity {
       history: this._history.map((node) => node.toJSON()),
       status: this._status,
       memberInvites: this._memberInvites,
-      round: this._round,
     };
   }
 }

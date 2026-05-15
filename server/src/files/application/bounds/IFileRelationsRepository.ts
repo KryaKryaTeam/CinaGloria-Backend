@@ -3,7 +3,6 @@ import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.
 import { FileEntity } from 'src/files/domain/entities/File.entity';
 import { FileRelationEntity } from 'src/files/domain/entities/FileRelation.entity';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
-import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
 
 export interface IFileRelationsRepository {
   save(relation: FileRelationEntity): Promise<void>;
@@ -26,8 +25,4 @@ export interface IFileRelationsRepository {
     competition: CompetitionEntity,
     slot: RelationString,
   ): Promise<FileEntity | null>;
-  deleteRelationByTeamAndScope(
-    team: TeamEntity,
-    scope: RelationString,
-  ): Promise<void>;
 }

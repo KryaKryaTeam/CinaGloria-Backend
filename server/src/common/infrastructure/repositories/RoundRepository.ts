@@ -26,13 +26,7 @@ export class RoundRepository
   }
 
   async findById(id: string): Promise<RoundEntity | null> {
-    const round = await this.repository.findOne({
-      where: { id },
-      relations: {
-        relatedTasks: true,
-        submission: true,
-      },
-    });
+    const round = await this.repository.findOneBy({ id });
     if (!round) return null;
     return this.mapper.toEntity(round);
   }

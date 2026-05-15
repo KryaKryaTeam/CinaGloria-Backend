@@ -8,7 +8,6 @@ import {
   Patch,
   Post,
   Query,
-  Version,
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import { Secure } from 'src/authorization/infrastructure/guards/auth/auth.guard';
@@ -70,7 +69,6 @@ export class TeamController {
 
   @Get('me/:page')
   @Secure()
-  @Version('1')
   @ApiResponse({ status: 200, type: [TeamEntityDto] })
   async getMyTeams(
     @Param() dto: PageQueryDto,
@@ -86,7 +84,6 @@ export class TeamController {
 
   @Post()
   @Secure()
-  @Version('1')
   @ApiResponse({ status: 201, type: TeamEntityDto })
   async createTeam(@Body() dto: CreateTeamDto, @UserId() user: UserEntity) {
     return (await this.createTeamCommand.execute({ teamData: dto, user })).team;
@@ -94,7 +91,6 @@ export class TeamController {
 
   @Patch(':teamId')
   @Secure()
-  @Version('1')
   @ApiResponse({ status: 200 })
   async updateTeam(
     @Body() dto: UpdateTeamDto,
@@ -110,7 +106,6 @@ export class TeamController {
 
   @Delete(':teamId')
   @Secure()
-  @Version('1')
   @ApiResponse({ status: 200 })
   async deleteTeam(@UserId() user: UserEntity, @Param() teamId: TeamIdDto) {
     return await this.deleteTeamCommand.execute({
@@ -121,7 +116,6 @@ export class TeamController {
 
   @Post(':teamId/members')
   @Secure()
-  @Version('1')
   @ApiResponse({ status: 200 })
   async addMember(
     @UserId() user: UserEntity,
@@ -137,7 +131,6 @@ export class TeamController {
 
   @Delete(':teamId/members/:memberId')
   @Secure()
-  @Version('1')
   @ApiResponse({ status: 200 })
   async removeMember(
     @UserId() user: UserEntity,
@@ -152,7 +145,6 @@ export class TeamController {
 
   @Patch(':teamId/captain')
   @Secure()
-  @Version('1')
   @ApiResponse({ status: 200 })
   async changeCaptain(
     @UserId() user: UserEntity,
@@ -168,7 +160,6 @@ export class TeamController {
 
   @Post(':teamId/registration')
   @Secure()
-  @Version('1')
   @ApiResponse({ status: 200 })
   async startRegistration(
     @UserId() user: UserEntity,
@@ -184,7 +175,6 @@ export class TeamController {
 
   @Delete(':teamId/registration')
   @Secure()
-  @Version('1')
   @ApiResponse({ status: 200 })
   async cancelRegistration(
     @UserId() user: UserEntity,
@@ -198,7 +188,6 @@ export class TeamController {
 
   @Post(':teamId/accept')
   @Secure()
-  @Version('1')
   @ApiResponse({ status: 200 })
   async acceptInvite(@UserId() user: UserEntity, @Param() teamId: TeamIdDto) {
     return await this.AcceptMemberInviteCommand.execute({

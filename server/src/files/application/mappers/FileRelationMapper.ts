@@ -8,7 +8,6 @@ import { Injectable, Inject } from '@nestjs/common';
 import { ApiError, FileErrors } from 'src/error/ApiError';
 import { MapperTokens } from 'src/common/Tokens';
 import { CompetitionMapper } from 'src/competitions/application/mapper/Competition.mapper';
-import { TeamMapper } from 'src/teams/application/mappers/team.mapper';
 
 @Injectable()
 export class FileRelationMapper extends Mapper<
@@ -22,8 +21,6 @@ export class FileRelationMapper extends Mapper<
     private readonly fileMapper: FileMapper,
     @Inject(MapperTokens.CompetitionMapper)
     private readonly competitionMapper: CompetitionMapper,
-    @Inject(MapperTokens.TeamMapper)
-    private readonly teamMapper: TeamMapper,
   ) {
     super();
   }
@@ -37,7 +34,6 @@ export class FileRelationMapper extends Mapper<
       competition: schema.competition
         ? this.competitionMapper.toEntity(schema.competition)
         : undefined,
-      team: schema.team ? this.teamMapper.toEntity(schema.team) : undefined,
     });
   }
 
@@ -59,11 +55,6 @@ export class FileRelationMapper extends Mapper<
     if (entity.competition) {
       sch.competition = this.competitionMapper.toSchema(entity.competition);
       sch.competition_id = entity.competition.id;
-    }
-
-    if (entity.team) {
-      sch.team = this.teamMapper.toSchema(entity.team);
-      sch.team_id = entity.team.id;
     }
 
     sch.slot = entity.slot;

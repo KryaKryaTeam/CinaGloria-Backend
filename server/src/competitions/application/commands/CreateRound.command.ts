@@ -6,10 +6,7 @@ import { RoundAndCompetitionService } from 'src/competitions/domain/services/Rou
 import { ApiError, CompetitionErrors, UserErrors } from 'src/error/ApiError';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { RoleEnum } from 'src/types/RoleEnum';
-import {
-  ICreateRound,
-  RoundEntity,
-} from 'src/competitions/domain/entities/Round.entity';
+import { ICreateRound } from 'src/competitions/domain/entities/Round.entity';
 
 interface CreateRoundCommandProps {
   user: UserEntity;
@@ -18,14 +15,11 @@ interface CreateRoundCommandProps {
 }
 
 @Injectable()
-export class CreateRoundCommand extends Command<
-  CreateRoundCommandProps,
-  RoundEntity
-> {
+export class CreateRoundCommand extends Command<CreateRoundCommandProps, void> {
   @Inject(ReposTokens.CompetitionRepository)
   private readonly competitionRepostiory: ICompetitionRepository;
 
-  async implementation(data: CreateRoundCommandProps): Promise<RoundEntity> {
+  async implementation(data: CreateRoundCommandProps) {
     if (
       !(
         data.user.hasRole(RoleEnum.ADMIN) ||
@@ -47,7 +41,5 @@ export class CreateRoundCommand extends Command<
 
     competition.addRound(round);
     await this.competitionRepostiory.save(competition);
-
-    return round;
   }
 }

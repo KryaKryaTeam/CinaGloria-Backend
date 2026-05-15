@@ -14,7 +14,7 @@ export class SubmitionRepository
   extends BaseRepository<SubmitionSchema>
   implements ISubmitionRepository
 {
-  protected _entitySchema: new () => SubmitionSchema = SubmitionSchema;
+  protected _entitySchema: new () => SubmitionSchema;
 
   @Inject(MapperTokens.SubmitionMapper)
   private readonly mapper: SubmitionMapper;
@@ -23,7 +23,7 @@ export class SubmitionRepository
   private readonly roundMapper: RoundMapper;
 
   async save(data: SubmitionEntity): Promise<void> {
-    await this.repository.save(this.mapper.toSchema(data));
+    this.repository.save(this.mapper.toSchema(data));
   }
 
   async findById(id: string): Promise<SubmitionEntity | null> {

@@ -355,7 +355,7 @@ export class TeamEntity extends Entity {
   //generateCert() {} <--- futured functionality
 
   set name(new_: string) {
-    if (new_.trim().length == 0 || new_.trim().length < 255)
+    if (new_.trim().length == 0 || new_.trim().length > 255)
       ApiError.throw(DomainErrors.RESTRICTED_CHANGE);
     this._name = new_.trim();
   }

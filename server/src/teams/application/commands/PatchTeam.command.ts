@@ -50,7 +50,7 @@ export class PatchTeamCommand extends Command<PatchTeamCommandInput, void> {
       await this.fileLinkerService.linkFileToTeamSlot(
         bannerFile,
         team,
-        RelationString.define('team:avatar'),
+        RelationString.define('team:banner'),
       );
     }
 
@@ -75,6 +75,7 @@ export class PatchTeamCommand extends Command<PatchTeamCommandInput, void> {
     );
 
     team.pullEvents(this.eventDispatcher);
+
     await this.teamRepo.save(team);
   }
 }

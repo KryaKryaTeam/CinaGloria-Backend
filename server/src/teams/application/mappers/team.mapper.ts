@@ -20,7 +20,7 @@ export class TeamMapper extends Mapper<TeamSchema, TeamEntity> {
         'team:banner',
         'team:banner',
       ),
-      members: schema.members.map((usr) => usr.id),
+      members: schema.members ? schema.members.map((usr) => usr.id) : [],
     });
   }
   public toSchema(entity: TeamEntity): TeamSchema {
@@ -36,10 +36,10 @@ export class TeamMapper extends Mapper<TeamSchema, TeamEntity> {
       entity.banner as unknown as InternalFile<'team:banner'>
     ).value;
     sch.captain = entity.captain;
-    sch.members = entity.members.map(
-      (id) => ({ id: id }) as unknown as UserSchema,
-    );
-    sch.history = entity.history.map((el) => el.toJSON());
+    sch.members = entity.members
+      ? entity.members.map((id) => ({ id: id }) as unknown as UserSchema)
+      : [];
+    sch.history = entity.history ? entity.history.map((el) => el.toJSON()) : [];
     sch.memberInvites = entity.invites;
     sch.registrationTimeout = entity.registrationTimeout as unknown as
       | Date

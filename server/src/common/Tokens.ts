@@ -89,6 +89,7 @@ export enum CommandTokens {
   GetCompetitionPageQuery = 'GET_COMPETITION_PAGE_QUERY',
   GetPublicCompetitionsPageQuery = 'GET_PUBLIC_COMPETITIONS_PAGE_QUERY',
   UpdateSettingsOfCompetitionCommand = 'UPDATE_SETTINGS_OF_COMPETITION_COMMAND',
+  GetPrivateCompetitionByIdCommand = 'GET_PRIVATE_COMPETITION_BY_ID_COMMAND',
 
   // --- ROUNDS & TASKS ---
   CreateRoundCommand = 'CREATE_ROUND_COMMAND',

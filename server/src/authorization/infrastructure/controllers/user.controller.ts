@@ -82,7 +82,6 @@ export class UserController {
   @Get('/users/:page')
   @Version('1')
   @Secure()
-  @AllowRoles([RoleEnum.ADMIN])
   async getUsersPage(
     @Param() pageDto: PageQueryDto,
     @Query() dto: GetUsersPageFilterDto,

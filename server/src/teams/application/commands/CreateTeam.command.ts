@@ -56,6 +56,8 @@ export class CreateTeamCommand extends Command<
       name: data.teamData.name,
     });
 
+    await this.teamRepo.save(team);
+
     await this.fileLinkerService.linkFileToTeamSlot(
       avatarFile,
       team,

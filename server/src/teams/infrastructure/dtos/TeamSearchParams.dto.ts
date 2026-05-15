@@ -48,10 +48,11 @@ export class TeamSearchParamsDto {
   })
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => {
+  @Transform(({ obj }) => {
+    const value = (obj as unknown as { isCaptain: string }).isCaptain;
     if (value === 'true' || value === '1') return true;
     if (value === 'false' || value === '0') return false;
-    return value as boolean;
+    return value as unknown as boolean;
   })
   isCaptain?: boolean;
 
@@ -69,6 +70,12 @@ export class TeamSearchParamsDto {
   })
   @IsOptional()
   @IsBoolean()
-  @Transform(({ value }) => value === 'true' || value === '1')
+  @Transform(({ obj }) => {
+    console.log('Has invites value', obj);
+    const value = (obj as unknown as { hasInvites: string }).hasInvites;
+    if (value === 'true' || value === '1') return true;
+    if (value === 'false' || value === '0') return false;
+    return value as unknown as boolean;
+  })
   hasInvites?: boolean;
 }

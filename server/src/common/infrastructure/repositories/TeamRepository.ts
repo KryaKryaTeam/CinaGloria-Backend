@@ -30,7 +30,24 @@ export class TeamRepository
     return finded;
   }
   async save(ent: TeamEntity): Promise<void> {
-    await this.repository.save(this.mapper.toSchema(ent));
+    const schema = this.mapper.toSchema(ent);
+
+    // Спробуємо оновити існуючий запис
+    const result = await this.repository.update(schema.id, {
+      name: schema.name,
+      avatar: schema.avatar,
+      banner: schema.banner,
+      status: schema.status,
+      captain: schema.captain,
+      memberInvites: schema.memberInvites,
+      registrationTimeout: schema.registrationTimeout,
+      history: schema.history,
+    });
+
+    // Якщо нічого не оновилось (affected === 0), значить це нова команда — тоді save
+    if (result.affected === 0) {
+      await this.repository.save(schema);
+    }
   }
   async findById(id: string): Promise<TeamEntity | undefined> {
     const finded = await this.repository.findOneBy({ id });
@@ -62,6 +79,7 @@ export class TeamRepository
     const query = this.repository
       .createQueryBuilder('team')
       .innerJoin('team.members', 'member')
+      .leftJoinAndSelect('team.members', 'allMembers')
       .where('member.id = :userId', { userId });
 
     if (searchParams.name) {
@@ -72,30 +90,41 @@ export class TeamRepository
           nameInput: searchParams.name,
         },
       );
-      query.addOrderBy(`similarity(team.name, :nameInput)`, 'DESC');
+      query.addSelect(`similarity(team.name, :nameInput)`, 'team_similarity');
+      query.addOrderBy('team_similarity', 'DESC');
     }
 
-    if (searchParams.minMembers !== undefined) {
-      query.andWhere('team.membersCount >= :min', {
-        min: searchParams.minMembers,
-      });
-    }
-    if (searchParams.maxMembers !== undefined) {
-      query.andWhere('team.membersCount <= :max', {
-        max: searchParams.maxMembers,
-      });
+    if (
+      searchParams.minMembers !== undefined ||
+      searchParams.maxMembers !== undefined
+    ) {
+      const subQuery = query
+        .subQuery()
+        .select('COUNT(tm.userId)')
+        .from('UserRelTeamMember', 'tm')
+        .where('tm.teamId = team.id')
+        .getQuery();
+
+      if (searchParams.minMembers !== undefined) {
+        query.andWhere(`${subQuery} >= :min`, { min: searchParams.minMembers });
+      }
+      if (searchParams.maxMembers !== undefined) {
+        query.andWhere(`${subQuery} <= :max`, { max: searchParams.maxMembers });
+      }
     }
     if (searchParams.isCaptain !== undefined) {
       if (searchParams.isCaptain) {
-        query.andWhere('team.captainId = :userId', { userId });
+        query.andWhere('team.captain::uuid = :userId', { userId });
       } else {
-        query.andWhere('team.captainId != :userId', { userId });
+        query.andWhere('team.captain::uuid != :userId', { userId });
       }
     }
 
     if (searchParams.status) {
       query.andWhere('team.status = :status', { status: searchParams.status });
     }
+
+    console.log(searchParams);
 
     if (searchParams.hasInvites !== undefined) {
       if (searchParams.hasInvites) {

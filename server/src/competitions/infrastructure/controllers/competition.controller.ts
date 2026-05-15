@@ -33,6 +33,7 @@ import { PlainCompetitionDto } from '../dto/PlainCompetition.dto';
 import { PublicInListCompetitionDto } from '../dto/PublicInListCompetition.dto';
 import { CompetitionSettingsDto } from '../dto/CompetitionSettings.dto';
 import { UpdateSettingsOfCompetitionCommand } from 'src/competitions/application/commands/UpdateSettingsOfCompetition.command';
+import { GetPrivateCompetitionByIdCommand } from 'src/competitions/application/commands/GetPrivateCompetitionById.command';
 
 @Controller('/competition')
 export class CompetitionController {
@@ -66,6 +67,9 @@ export class CompetitionController {
   @Inject(CommandTokens.UpdateSettingsOfCompetitionCommand)
   private readonly updateSettingsOfCompetitionCommand: UpdateSettingsOfCompetitionCommand;
 
+  @Inject(CommandTokens.GetPrivateCompetitionByIdCommand)
+  private readonly getPrivateCompetitionByIdCommand: GetPrivateCompetitionByIdCommand;
+
   @Get('/private/:page')
   @Version('1')
   @Secure()
@@ -78,6 +82,21 @@ export class CompetitionController {
     return (
       await this.getCompetitionPageQuery.execute({ page: pageDto.page, user })
     ).competitions;
+  }
+
+  @Get('/private/single/:competitionId')
+  @Version('1')
+  @Secure()
+  @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
+  @ApiResponse({ status: 200, type: PlainCompetitionDto })
+  async getPrivateCompetitionById(
+    @Param('competitionId') competitionId: string,
+    @UserId() user: UserEntity,
+  ) {
+    return await this.getPrivateCompetitionByIdCommand.execute({
+      actor: user,
+      competitionId,
+    });
   }
 
   @Get('/public/page/:page')

@@ -21,25 +21,16 @@ export interface GetMyTeamsPageInput {
   searchParams: ITeamSearchParams;
 }
 
-export interface GetMyTeamsPageOutput {
-  teams: TeamEntity[];
-}
-
-export class GetMyTeamsPage extends Query<
-  GetMyTeamsPageInput,
-  GetMyTeamsPageOutput
-> {
+export class GetMyTeamsPage extends Query<GetMyTeamsPageInput, TeamEntity[]> {
   @Inject(ReposTokens.TeamRepository)
   private readonly teamRepo: ITeamRepository;
-  async implementation(
-    data: GetMyTeamsPageInput,
-  ): Promise<GetMyTeamsPageOutput> {
+  async implementation(data: GetMyTeamsPageInput): Promise<TeamEntity[]> {
     const teams = await this.teamRepo.findByMemberPage(
       data.actor.id,
       data.page,
       data.searchParams,
     );
 
-    return { teams };
+    return teams;
   }
 }

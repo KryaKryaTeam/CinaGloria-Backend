@@ -23,6 +23,7 @@ import { PatchRoundCommand } from './application/commands/PatchRound.command';
 import { CreateTaskCommand } from './application/commands/CreateTask.command';
 import { TeamsModule } from 'src/teams/teams.module';
 import { DeleteTaskCommand } from './application/commands/DeleteTask.command';
+import { GetPrivateCompetitionByIdCommand } from './application/commands/GetPrivateCompetitionById.command';
 
 const providers: Provider[] = [
   {
@@ -82,6 +83,10 @@ const providers: Provider[] = [
   { provide: CommandTokens.PatchRoundCommand, useClass: PatchRoundCommand },
   { provide: CommandTokens.CreateTaskCommand, useClass: CreateTaskCommand },
   { provide: CommandTokens.DeleteTaskCommand, useClass: DeleteTaskCommand },
+  {
+    provide: CommandTokens.GetPrivateCompetitionByIdCommand,
+    useClass: GetPrivateCompetitionByIdCommand,
+  },
 ];
 
 @Module({

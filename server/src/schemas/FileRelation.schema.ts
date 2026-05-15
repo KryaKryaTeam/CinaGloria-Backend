@@ -8,6 +8,7 @@ import {
 import { FileSchema } from './File.schema';
 import { UserSchema } from './User.schema';
 import { CompetitionSchema } from './Competition.schema';
+import { TeamSchema } from './Team.schema';
 
 @Entity({ name: 'file_relation' })
 export class FileRelation {
@@ -36,4 +37,11 @@ export class FileRelation {
 
   @Column({ nullable: true })
   competition_id?: string;
+
+  @ManyToOne(() => TeamSchema, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'team_id' })
+  team: TeamSchema;
+
+  @Column({ nullable: true })
+  team_id?: string;
 }

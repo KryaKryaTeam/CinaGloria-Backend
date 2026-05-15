@@ -1,9 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Inject,
+  Param,
   Post,
-  ValidationPipe,
   Version,
 } from '@nestjs/common';
 import { AllowRoles } from 'src/authorization/infrastructure/guards/role/role.guard';
@@ -13,29 +14,40 @@ import { CommandTokens } from 'src/common/Tokens';
 import { CreateTaskCommand } from 'src/competitions/application/commands/CreateTask.command';
 import { UserId } from 'src/authorization/infrastructure/decorators/user.decorator';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
+import { TaskIdDto } from '../dto/TaskId.dto';
+import { DeleteTaskCommand } from 'src/competitions/application/commands/DeleteTask.command';
 import { Secure } from 'src/authorization/infrastructure/guards/auth/auth.guard';
 
 @Controller('task')
 export class TaskController {
   @Inject(CommandTokens.CreateTaskCommand)
   private readonly createTaskCommand: CreateTaskCommand;
-
-  @Post('create')
+  @Inject(CommandTokens.DeleteTaskCommand)
+  private readonly deleteTaskCommand: DeleteTaskCommand;
+  @Post('')
   @Version('1')
   @Secure()
   @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
-  async createTask(
-    @Body(new ValidationPipe()) dto: CreateTaskDto,
-    @UserId() user: UserEntity,
-  ) {
+  async createTask(@Body() dto: CreateTaskDto, @UserId() user: UserEntity) {
     return await this.createTaskCommand.execute({
       roundId: dto.roundId,
       user,
       taskCreationData: {
         name: dto.name,
-        description: dto.descrpition,
+        description: dto.description,
         color: dto.color,
       },
+    });
+  }
+
+  @Delete('/:taskId')
+  @Version('1')
+  @Secure()
+  @AllowRoles([RoleEnum.ADMIN, RoleEnum.ORGANIZER])
+  async deleteTask(@UserId() user: UserEntity, @Param() taskId: TaskIdDto) {
+    return await this.deleteTaskCommand.execute({
+      actor: user,
+      taskId: taskId.taskId,
     });
   }
 }

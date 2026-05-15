@@ -11,6 +11,7 @@ import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
 import { FileMapper } from 'src/files/application/mappers/FileMapper';
 import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
+import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
 
 export class FileRelationRepository
   extends BaseRepository<FileRelation>
@@ -106,5 +107,14 @@ export class FileRelationRepository
     if (!relation) return null;
 
     return this.fileMapper.toEntity(relation.file);
+  }
+  async deleteRelationByTeamAndScope(
+    team: TeamEntity,
+    scope: RelationString,
+  ): Promise<void> {
+    await this.repository.delete({
+      team_id: team.id,
+      slot: scope.value,
+    });
   }
 }

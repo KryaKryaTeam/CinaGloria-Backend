@@ -41,7 +41,10 @@ export class RoundSchema {
   @Column({ type: 'timestamp with time zone' })
   endOfRound: Date;
 
-  @OneToMany(() => TaskSchema, (task) => task.round, { onDelete: 'CASCADE' })
+  @OneToMany(() => TaskSchema, (task) => task.round, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
   relatedTasks: TaskSchema[];
 
   // fire engineering

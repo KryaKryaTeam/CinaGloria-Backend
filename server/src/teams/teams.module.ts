@@ -19,6 +19,7 @@ import { MemberDeletedHandler } from './infrastructure/handlers /MemberDeleted.h
 import { MemberInvitedHandler } from './infrastructure/handlers /MemberInvited.handler';
 import { MemberInvitedForCompetitionHandler } from './infrastructure/handlers /MemberInvitedForCompetition.handler';
 import { CompetitionsModule } from 'src/competitions/competitions.module';
+import { FilesModule } from 'src/files/files.module';
 
 const providers: Provider[] = [
   {
@@ -64,6 +65,7 @@ const providers: Provider[] = [
 @Module({
   providers,
   imports: [forwardRef(() => CompetitionsModule)],
+  imports: [forwardRef(() => FilesModule)],
   exports: [...providers],
   controllers: [TeamController],
 })

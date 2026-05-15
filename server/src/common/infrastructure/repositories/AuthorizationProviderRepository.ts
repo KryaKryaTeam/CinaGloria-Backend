@@ -14,6 +14,7 @@ export class AuthorizationProviderRepository
   private authProviderMapper: AuthorizationProviderMapper;
 
   protected _entitySchema = AuthorizationProvider;
+
   async save(provider: AuthProviderEntity): Promise<void> {
     await this.repository.save(this.authProviderMapper.toSchema(provider));
   }

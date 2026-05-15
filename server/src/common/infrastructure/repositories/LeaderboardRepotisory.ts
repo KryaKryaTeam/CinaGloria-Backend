@@ -14,7 +14,7 @@ export class LeaderboardRepository
   extends BaseRepository<LeaderboardSchema>
   implements ILeaderboardRepotisory
 {
-  protected _entitySchema: new () => LeaderboardSchema;
+  protected _entitySchema: new () => LeaderboardSchema = LeaderboardSchema;
 
   @Inject(MapperTokens.LeaderboardMapper)
   private readonly mapper: LeaderboardMapper;

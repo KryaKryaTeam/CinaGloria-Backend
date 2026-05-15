@@ -25,6 +25,7 @@ import { TeamsModule } from 'src/teams/teams.module';
 import { PullTeamsToNextRoundCommand } from './application/commands/PullTeamsToNextRound.command';
 import { LeaderboardModule } from 'src/leaderboard/leaderboard.module';
 import { JudgingModule } from 'src/judging/judging.module';
+import { DeleteTaskCommand } from './application/commands/DeleteTask.command';
 
 const providers: Provider[] = [
   {
@@ -87,6 +88,7 @@ const providers: Provider[] = [
     provide: CommandTokens.PullTeamsToNextRound,
     useClass: PullTeamsToNextRoundCommand,
   },
+  { provide: CommandTokens.DeleteTaskCommand, useClass: DeleteTaskCommand },
 ];
 
 @Module({

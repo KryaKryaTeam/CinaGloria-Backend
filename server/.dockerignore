@@ -8,7 +8,7 @@ npm-debug.log
 .gitignore
 
 # Environment secrets (very important!)
-.env
+# .env
 *.local
 
 # Build outputs

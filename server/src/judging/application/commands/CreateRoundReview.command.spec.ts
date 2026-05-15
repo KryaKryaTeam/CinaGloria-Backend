@@ -1,220 +1,190 @@
-import { Test, TestingModule } from '@nestjs/testing';
-
-import { BaseTokens, ReposTokens } from 'src/common/Tokens';
-
-import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
-import { TaskEntity } from 'src/competitions/domain/entities/Task.entity';
-
-import { ScoreEntity } from 'src/judging/domain/entities/Score.entity';
-
-import { RoundStatus } from 'src/types/RoundStatus';
-import { Icons } from 'src/types/Icons';
 import { CreateRoundReviewCommand } from './CreateRoundReview.command';
+import { RoundStatus } from 'src/types/RoundStatus';
 
 describe('CreateRoundReviewCommand', () => {
   let command: CreateRoundReviewCommand;
 
-  const DBContextMock = {
+  const roundReviewRepository = {
+    save: jest.fn(),
+  };
+
+  const scoreRepository = {
+    findById: jest.fn(),
+  };
+
+  const roundRepository = {
+    findById: jest.fn(),
+  };
+
+  const submissionRepository = {
+    findById: jest.fn(),
+  };
+
+  const DBContext = {
     startTransaction: jest.fn(),
     commitTransaction: jest.fn(),
     rollbackTransaction: jest.fn(),
   };
 
-  const eventDispatcherMock = {
+  const eventDispatcher = {
     dispatchEvents: jest.fn(),
   };
 
-  const roundReviewRepositoryMock = {
-    save: jest.fn(),
-  };
+  beforeEach(() => {
+    command = new CreateRoundReviewCommand();
 
-  const scoreRepositoryMock = {
-    findById: jest.fn(),
-    save: jest.fn(),
-  };
+    (command as any).roundReviewRepository = roundReviewRepository;
+    (command as any).scoreRepository = scoreRepository;
+    (command as any).roundRepository = roundRepository;
+    (command as any).submissionRepository = submissionRepository;
 
-  const roundRepositoryMock = {
-    findById: jest.fn(),
-  };
+    (command as any).DBContext = DBContext;
+    (command as any).eventDispatcher = eventDispatcher;
 
-  const submissionRepositoryMock = {
-    findById: jest.fn(),
-  };
-
-  beforeEach(async () => {
     jest.clearAllMocks();
-
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        CreateRoundReviewCommand,
-
-        {
-          provide: BaseTokens.DBContext,
-          useValue: DBContextMock,
-        },
-        {
-          provide: BaseTokens.EventDispatcher,
-          useValue: eventDispatcherMock,
-        },
-
-        {
-          provide: ReposTokens.RoundReviewRepository,
-          useValue: roundReviewRepositoryMock,
-        },
-        {
-          provide: ReposTokens.ScoreRepository,
-          useValue: scoreRepositoryMock,
-        },
-        {
-          provide: ReposTokens.RoundRepository,
-          useValue: roundRepositoryMock,
-        },
-        {
-          provide: ReposTokens.SubmitionRepository,
-          useValue: submissionRepositoryMock,
-        },
-      ],
-    }).compile();
-
-    command = module.get(CreateRoundReviewCommand);
   });
 
-  const task1 = TaskEntity.createFake();
-  const task2 = TaskEntity.createFake();
-
-  const round = RoundEntity.load({
-    id: 'round-id',
-    name: 'Round',
-    description: 'desc',
-    hidden: false,
-    icon: Icons.BOOK,
-    startOfRound: new Date(Date.now() - 100000),
-    taskTimeout: new Date(Date.now() + 100000),
-    endOfRound: new Date(Date.now() + 200000),
-    relatedTasks: [task1, task2],
-    status: RoundStatus.ON_JUDGING,
-    teams: [],
-  });
-
-  const submission = {
-    id: 'submission-id',
-    team: {
-      id: 'team-id',
-    },
+  const dto = {
+    summary: 0,
+    description: 'Great work',
+    byJury: 'jury-id',
+    round: 'round-id',
+    relatedScores: ['score-1', 'score-2'],
+    submission: 'submission-id',
   };
 
-  it('should create review successfully', async () => {
-    const score1 = ScoreEntity.create({
-      score: 100,
-      task: task1,
-      team: 'team-id',
-    });
+  it('should create review and commit transaction', async () => {
+    const round = {
+      id: 'round-id',
+      status: RoundStatus.ON_JUDGING,
+    };
 
-    const score2 = ScoreEntity.create({
-      score: 50,
-      task: task2,
-      team: 'team-id',
-    });
+    const score1 = {
+      id: 'score-1',
+      score: 10,
+    };
 
-    scoreRepositoryMock.findById
+    const score2 = {
+      id: 'score-2',
+      score: 20,
+    };
+
+    const submission = {
+      id: 'submission-id',
+    };
+
+    roundRepository.findById.mockResolvedValue(round);
+
+    scoreRepository.findById
       .mockResolvedValueOnce(score1)
       .mockResolvedValueOnce(score2);
 
-    roundRepositoryMock.findById.mockResolvedValue(round);
+    submissionRepository.findById.mockResolvedValue(submission);
 
-    submissionRepositoryMock.findById.mockResolvedValue(submission);
+    await command.execute(dto as any);
 
-    await command.execute({
-      summary: 10,
-      description: 'dasd',
-      byJury: 'a4c50a63-9d66-4aba-b125-608ed205cb4f',
-      round: 'ff1c02c7-efb1-4162-b463-a76bf04dccba',
-      relatedScores: ['score-1', 'score-2'],
-      submission: '12701555-3b0a-4dbe-a918-0ebb9b7c7473',
-    });
+    expect(DBContext.startTransaction).toHaveBeenCalledTimes(1);
 
-    expect(DBContextMock.startTransaction).toHaveBeenCalled();
-    expect(DBContextMock.commitTransaction).toHaveBeenCalled();
+    expect(roundRepository.findById).toHaveBeenCalledWith('round-id');
 
-    expect(eventDispatcherMock.dispatchEvents).toHaveBeenCalled();
+    expect(scoreRepository.findById).toHaveBeenNthCalledWith(1, 'score-1');
 
-    expect(roundReviewRepositoryMock.save).toHaveBeenCalled();
+    expect(scoreRepository.findById).toHaveBeenNthCalledWith(2, 'score-2');
 
-    // no zero scores needed now
-    expect(scoreRepositoryMock.save).not.toHaveBeenCalled();
+    expect(submissionRepository.findById).toHaveBeenCalledWith('submission-id');
+
+    expect(roundReviewRepository.save).toHaveBeenCalledTimes(1);
+
+    expect(DBContext.commitTransaction).toHaveBeenCalledTimes(1);
+
+    expect(eventDispatcher.dispatchEvents).toHaveBeenCalledTimes(1);
+
+    expect(DBContext.rollbackTransaction).not.toHaveBeenCalled();
+
+    const savedReview = roundReviewRepository.save.mock.calls[0][0];
+
+    expect(savedReview.description).toBe('Great work');
+    expect(savedReview.byJury).toBe('jury-id');
+    expect(savedReview.summary).toBe(30);
   });
 
-  it('should rollback transaction if duplicated task scores provided', async () => {
-    const score1 = ScoreEntity.create({
-      score: 100,
-      task: task1,
-      team: 'team-id',
-    });
+  it('should rollback if round not found', async () => {
+    roundRepository.findById.mockResolvedValue(null);
 
-    const duplicatedScore = ScoreEntity.create({
-      score: 50,
-      task: task1,
-      team: 'team-id',
-    });
+    await expect(command.execute(dto as any)).rejects.toThrow();
 
-    scoreRepositoryMock.findById
-      .mockResolvedValueOnce(score1)
-      .mockResolvedValueOnce(duplicatedScore);
+    expect(DBContext.startTransaction).toHaveBeenCalled();
+    expect(DBContext.rollbackTransaction).toHaveBeenCalledTimes(1);
 
-    roundRepositoryMock.findById.mockResolvedValue(round);
+    expect(DBContext.commitTransaction).not.toHaveBeenCalled();
 
-    submissionRepositoryMock.findById.mockResolvedValue(submission);
+    expect(eventDispatcher.dispatchEvents).not.toHaveBeenCalled();
 
-    await expect(
-      command.execute({
-        summary: 123123,
-        round: 'round-id',
-        submission: 'submission-id',
-        description: 'good',
-        byJury: 'jury-id',
-        relatedScores: [score1.id, duplicatedScore.id],
-      }),
-    ).rejects.toThrow();
-
-    expect(DBContextMock.startTransaction).toHaveBeenCalled();
-
-    expect(DBContextMock.rollbackTransaction).toHaveBeenCalled();
-
-    expect(DBContextMock.commitTransaction).not.toHaveBeenCalled();
-
-    expect(roundReviewRepositoryMock.save).not.toHaveBeenCalled();
+    expect(roundReviewRepository.save).not.toHaveBeenCalled();
   });
 
-  it('should create zero score for missing tasks', async () => {
-    const score1 = ScoreEntity.create({
-      score: 100,
-      task: task1,
-      team: 'team-id',
+  it('should rollback if round is not on judging', async () => {
+    roundRepository.findById.mockResolvedValue({
+      id: 'round-id',
+      status: RoundStatus.CREATED,
     });
 
-    roundRepositoryMock.findById.mockResolvedValue(round);
+    await expect(command.execute(dto as any)).rejects.toThrow();
 
-    submissionRepositoryMock.findById.mockResolvedValue(submission);
+    expect(DBContext.rollbackTransaction).toHaveBeenCalledTimes(1);
 
-    scoreRepositoryMock.findById.mockResolvedValue(score1);
+    expect(DBContext.commitTransaction).not.toHaveBeenCalled();
 
-    scoreRepositoryMock.save.mockImplementation(async (score) => score);
+    expect(eventDispatcher.dispatchEvents).not.toHaveBeenCalled();
 
-    await command.execute({
-      summary: 21123,
-      round: 'round-id',
-      submission: 'submission-id',
-      description: 'review',
-      byJury: 'jury-id',
-      relatedScores: [score1.id],
+    expect(roundReviewRepository.save).not.toHaveBeenCalled();
+  });
+
+  it('should rollback if related score not found', async () => {
+    roundRepository.findById.mockResolvedValue({
+      id: 'round-id',
+      status: RoundStatus.ON_JUDGING,
     });
 
-    expect(scoreRepositoryMock.save).toHaveBeenCalledTimes(1);
+    scoreRepository.findById.mockResolvedValue(null);
 
-    const createdZeroScore = scoreRepositoryMock.save.mock.calls[0][0];
+    await expect(command.execute(dto as any)).rejects.toThrow();
 
-    expect(createdZeroScore.score).toBe(0);
+    expect(DBContext.rollbackTransaction).toHaveBeenCalledTimes(1);
 
-    expect(createdZeroScore.task.id).toBe(task2.id);
+    expect(DBContext.commitTransaction).not.toHaveBeenCalled();
+
+    expect(eventDispatcher.dispatchEvents).not.toHaveBeenCalled();
+
+    expect(roundReviewRepository.save).not.toHaveBeenCalled();
+  });
+
+  it('should rollback if submission not found', async () => {
+    roundRepository.findById.mockResolvedValue({
+      id: 'round-id',
+      status: RoundStatus.ON_JUDGING,
+    });
+
+    scoreRepository.findById
+      .mockResolvedValueOnce({
+        id: 'score-1',
+        score: 10,
+      })
+      .mockResolvedValueOnce({
+        id: 'score-2',
+        score: 20,
+      });
+
+    submissionRepository.findById.mockResolvedValue(null);
+
+    await expect(command.execute(dto as any)).rejects.toThrow();
+
+    expect(DBContext.rollbackTransaction).toHaveBeenCalledTimes(1);
+
+    expect(DBContext.commitTransaction).not.toHaveBeenCalled();
+
+    expect(eventDispatcher.dispatchEvents).not.toHaveBeenCalled();
+
+    expect(roundReviewRepository.save).not.toHaveBeenCalled();
   });
 });

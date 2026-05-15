@@ -13,7 +13,6 @@ import { CompetitionSchema } from './Competition.schema';
 import { UserSchema } from './User.schema';
 import { ITeamHistoryPlain } from '../teams/domain/objects/TeamHistoryNode.object';
 import { TeamStatus } from '../types/TeamStatus';
-import { RoundSchema } from './Round.schema';
 
 @Entity({
   name: 'team',
@@ -45,6 +44,7 @@ export class TeamSchema {
   })
   status: TeamStatus;
 
+  @JoinColumn()
   @ManyToOne(() => CompetitionSchema, (competition) => competition.teams, {
     nullable: true,
     onDelete: 'SET NULL',
@@ -68,10 +68,4 @@ export class TeamSchema {
 
   @CreateDateColumn()
   createdAt: Date;
-
-  @ManyToOne(() => RoundSchema, (round) => round.teams, {
-    nullable: true,
-    onDelete: 'SET NULL',
-  })
-  round?: RoundSchema;
 }

@@ -19,8 +19,6 @@ export class CreateScoreCommand extends Command<CreateScoreDto, void> {
     const task = await this.taskRepository.findById(data.task);
     if (!task) ApiError.throw(TaskErrors.TASK_NOT_FOUND);
 
-    // const competition = task.
-
     await this.scoreRepository.save(
       ScoreEntity.create({
         score: data.score,

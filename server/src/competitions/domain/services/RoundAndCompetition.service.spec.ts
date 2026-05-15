@@ -8,8 +8,6 @@ import { CompetitionStatus } from 'src/types/CompetitionStatus';
 import { CompetitionSettings } from '../objects/CompetitionSettings';
 import { Color } from '../objects/Color.object';
 import { RoundAndCompetitionService } from './RoundAndCompetition.service';
-import { LeaderboardEntity } from 'src/leaderboard/domain/entities/Leaderboard.entity';
-import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
 
 describe('RoundAndCompetitionService', () => {
   const task = TaskEntity.load({
@@ -17,7 +15,6 @@ describe('RoundAndCompetitionService', () => {
     name: 'test',
     description: 'test',
     color: Color.define('#000000'),
-    round: {} as RoundEntity,
   });
 
   const round = RoundEntity.load({
@@ -31,8 +28,6 @@ describe('RoundAndCompetitionService', () => {
     endOfRound: new Date(Date.now() + 3000000),
     status: RoundStatus.CREATED,
     relatedTasks: [{} as unknown as TaskEntity],
-    leaderboard: {} as LeaderboardEntity,
-    teams: [{}, {}] as TeamEntity[],
   });
 
   const competition = CompetitionEntity.load({

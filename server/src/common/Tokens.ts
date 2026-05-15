@@ -97,6 +97,7 @@ export enum CommandTokens {
   PatchRoundCommand = 'PATCH_ROUND_COMMAND',
   ReadRoundCommand = 'READ_ROUND_COMMAND',
   CreateTaskCommand = 'CREATE_TASK_COMMAND',
+  PullTeamsToNextRound = 'PULL_TEAMS_TO_NEXT_ROUND_COMMAND',
   DeleteTaskCommand = 'DELETE_TASK_COMMAND',
 
   // --- AUTOMATION & EVENTS ---

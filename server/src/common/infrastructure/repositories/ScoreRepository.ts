@@ -15,7 +15,7 @@ export class ScoreRepository
   @Inject(MapperTokens.ScoreMapper)
   mapper: ScoreMapper;
 
-  protected _entitySchema: new () => ScoreSchema = ScoreSchema;
+  protected _entitySchema: new () => ScoreSchema;
 
   async save(data: ScoreEntity): Promise<void> {
     await this.repository.save(this.mapper.toSchema(data));

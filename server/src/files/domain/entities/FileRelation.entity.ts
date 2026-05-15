@@ -5,7 +5,6 @@ import { randomUUID } from 'crypto';
 import { ApiError, FileErrors } from 'src/error/ApiError';
 import { RelationString } from '../objects/RelationSlots';
 import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
-import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
 
 interface IFileRelationEntity {
   id: string;
@@ -13,7 +12,6 @@ interface IFileRelationEntity {
   slot?: RelationString;
   user?: UserEntity;
   competition?: CompetitionEntity;
-  team?: TeamEntity;
 }
 
 export class FileRelationEntity extends Entity {
@@ -22,7 +20,6 @@ export class FileRelationEntity extends Entity {
   private _slot?: RelationString;
   private _user?: UserEntity;
   private _competition?: CompetitionEntity;
-  private _team?: TeamEntity;
 
   private constructor(partial: IFileRelationEntity) {
     super();
@@ -31,7 +28,6 @@ export class FileRelationEntity extends Entity {
     this._file = partial.file;
     this._user = partial.user;
     this._competition = partial.competition;
-    this._team = partial.team;
   }
 
   static load(partial: IFileRelationEntity) {
@@ -71,16 +67,9 @@ export class FileRelationEntity extends Entity {
     this._competition = value;
   }
 
-  public set team(value: TeamEntity) {
-    if (this.relatedToEntity) ApiError.throw(FileErrors.RELATION_IMMUTABLE);
-
-    this._team = value;
-  }
-
   private get relatedToEntity() {
     if (typeof this._user !== 'undefined') return true;
     if (typeof this._competition !== 'undefined') return true;
-    if (typeof this._team !== 'undefined') return true;
     return false;
   }
 
@@ -90,10 +79,6 @@ export class FileRelationEntity extends Entity {
 
   public get competition(): CompetitionEntity | undefined {
     return this._competition;
-  }
-
-  public get team(): TeamEntity | undefined {
-    return this._team;
   }
 
   public get file() {

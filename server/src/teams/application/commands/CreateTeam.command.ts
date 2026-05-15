@@ -1,20 +1,16 @@
 import { Inject } from '@nestjs/common';
 import { UserEntity } from 'src/authorization/domain/entities/User.entity';
 import { Command } from 'src/common/application/Command';
-import { ReposTokens, ServiceTokens } from 'src/common/Tokens';
+import { ReposTokens } from 'src/common/Tokens';
 import { InternalFile } from 'src/files/domain/objects/InternalFile.object';
 import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
 import type { ITeamRepository } from '../bounds/TeamRepository';
-import { LinkerApplicationService } from 'src/files/application/services/Linker.appService';
-import type { IFileRepository } from 'src/files/application/bounds/IFileRepository';
-import { ApiError, DomainErrors } from 'src/error/ApiError';
-import { RelationString } from 'src/files/domain/objects/RelationSlots';
 
 interface CreateTeamCommandInput {
   user: UserEntity;
   teamData: {
-    avatar: string;
-    banner: string;
+    avatar: InternalFile<'team:avatar'>;
+    banner: InternalFile<'team:banner'>;
     name: string;
   };
 }
@@ -27,10 +23,6 @@ export class CreateTeamCommand extends Command<
   CreateTeamCommandOutput
 > {
   @Inject(ReposTokens.TeamRepository) teamRepo: ITeamRepository;
-  @Inject(ServiceTokens.FileLinkerService)
-  fileLinkerService: LinkerApplicationService;
-  @Inject(ReposTokens.FileRepository)
-  private readonly fileRepository: IFileRepository;
   async implementation(
     data: CreateTeamCommandInput,
   ): Promise<CreateTeamCommandOutput> {

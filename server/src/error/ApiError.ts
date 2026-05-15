@@ -324,15 +324,19 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'Setting is invalid',
     status: 500,
   },
-  COMPETITION_019: {
+   COMPETITION_019: {
     message: 'You need to set battle bounds first, to create rounds',
     status: 400,
   },
   COMPETITION_020: {
-    message: 'Round is out of bounds',
+    message: 'Competition is undefined',
     status: 400,
   },
   COMPETITION_021: {
+    message: 'Round is out of bounds',
+    status: 400,
+  },
+  COMPETITION_022: {
     message: 'Rounds are overlaping',
     status: 400,
   },
@@ -407,10 +411,6 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
   },
   TASK_004: {
     message: 'The task was not found',
-    status: 404,
-  },
-  TASK_005: {
-    message: 'Task or related competition is undefined',
     status: 404,
   },
   USER_031: {
@@ -526,6 +526,34 @@ export const ApiErrorsCodeVal: Record<string, ErrorCodeComp> = {
     message: 'There are no scores provided',
     status: 400,
   },
+  ROUND_011: {
+    message: 'This team was not found in participants of this round',
+    status: 404,
+  },
+  COMPETITION_019: {
+    message: 'This comeptition was not found',
+    status: 404,
+  },
+  ROUND_REVIEW_003: {
+    message: 'This round review was not found',
+    status: 404,
+  },
+  TEAM_013: {
+    message: 'This team was not found',
+    status: 404,
+  },
+  LEADERBOARD_003: {
+    message: 'No summary found in the review',
+    status: 404,
+  },
+  ROUND_012: {
+    message: 'This round is not listed in the competition',
+    status: 404,
+  },
+  SCORE_002: {
+    message: 'Duplicate scores for the same round are not allowed',
+    status: 400,
+  },
 } as const;
 
 export const DomainErrors = {
@@ -601,9 +629,10 @@ export const CompetitionErrors = {
   NOT_ALL_SETTINGS_PROVIDED: 'COMPETITION_016',
   SETTING_TYPE_NOT_VALID: 'COMPETITION_017',
   SETTING_IS_INVALID: 'COMPETITION_018',
-  DATES_UNSET: 'COMPETITION_019',
-  ROUND_OUT_OF_BOUNDS: 'COMPETITION_020',
-  ROUND_OVERLAP: 'COMPETITION_021',
+  COMPETITION_NOT_FOUND: 'COMPETITION_019',
+  DATES_UNSET: 'COMPETITION_020',
+  ROUND_OUT_OF_BOUNDS: 'COMPETITION_021',
+  ROUND_OVERLAP: 'COMPETITION_022',
 } as const;
 
 export const RoundErrors = {
@@ -624,7 +653,6 @@ export const TaskErrors = {
   DESCRIPTION_LENGTH_RESTRICTION: 'TASK_002',
   INVALID_COLOR: 'TASK_003',
   TASK_NOT_FOUND: 'TASK_004',
-  TASK_OR_COMP_NOT_FOUND: 'TASK_005',
 } as const;
 
 export const FileErrors = {

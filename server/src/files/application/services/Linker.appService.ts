@@ -8,7 +8,6 @@ import { RelationSlots } from 'src/types/RelationSlots';
 import type { IFileRelationsRepository } from '../bounds/IFileRelationsRepository';
 import { RelationString } from 'src/files/domain/objects/RelationSlots';
 import { CompetitionEntity } from 'src/competitions/domain/entities/Competition.entity';
-import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
 
 @Injectable()
 export class LinkerApplicationService {
@@ -20,12 +19,6 @@ export class LinkerApplicationService {
       user,
       RelationString.define(RelationSlots.user.avatar),
     );
-  }
-
-  private async unlinkSlotFromTeam(team: TeamEntity, slot: RelationString) {
-    if (slot.family !== 'team') ApiError.throw(FileErrors.ENTITY_MISMATCH);
-
-    await this.relationRepository.deleteRelationByTeamAndScope(team, slot);
   }
 
   private async unlinkSlotFromCompetition(
@@ -62,20 +55,6 @@ export class LinkerApplicationService {
     const relation = FileRelationEntity.create(file);
 
     relation.competition = competition;
-    relation.slot = slot;
-
-    await this.relationRepository.save(relation);
-  }
-
-  async linkFileToTeamSlot(
-    file: FileEntity,
-    team: TeamEntity,
-    slot: RelationString,
-  ) {
-    await this.unlinkSlotFromTeam(team, slot);
-
-    const relation = FileRelationEntity.create(file);
-    relation.team = team;
     relation.slot = slot;
 
     await this.relationRepository.save(relation);

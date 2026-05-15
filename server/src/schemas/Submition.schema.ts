@@ -3,10 +3,12 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { RoundSchema } from './Round.schema';
 import { RoundReviewSchema } from './RoundReview.schema';
+import { TeamSchema } from './Team.schema';
 
 @Entity()
 export class SubmitionSchema {
@@ -26,11 +28,15 @@ export class SubmitionSchema {
   @JoinColumn()
   assignedToJury?: string;
 
-  @ManyToOne(() => RoundSchema, (round) => round.submission)
+  @ManyToOne(() => RoundSchema, (round) => round.submissions)
   relatedRound: RoundSchema;
 
   @ManyToOne(() => RoundReviewSchema, (roundReview) => roundReview.submission, {
     nullable: true,
   })
   review?: RoundReviewSchema;
+
+  @OneToOne(() => TeamSchema)
+  @JoinColumn()
+  team: TeamSchema;
 }

@@ -1,10 +1,12 @@
 import { TaskEntity } from 'src/competitions/domain/entities/Task.entity';
+import { RoundEntity } from './Round.entity';
 
 describe('TaskEntity', () => {
   const validData = {
     name: 'Task 1',
     description: 'Some description',
     color: 'RED' as any,
+    round: {} as RoundEntity,
   };
 
   describe('create/load', () => {

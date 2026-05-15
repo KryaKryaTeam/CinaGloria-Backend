@@ -2,11 +2,13 @@ import { Entity } from '../../../common/domain/Entity';
 import { Color } from '../objects/Color.object';
 import { randomUUID } from 'crypto';
 import { ApiError, TaskErrors } from '../../../error/ApiError';
+import { RoundEntity } from './Round.entity';
 
 export interface ICreateTask {
   name: string;
   description: string;
   color: Color;
+  round: RoundEntity;
 }
 
 export interface ITaskPlain {
@@ -14,6 +16,7 @@ export interface ITaskPlain {
   name: string;
   description: string;
   color: Color;
+  round: RoundEntity;
 }
 
 export class TaskEntity extends Entity {
@@ -21,6 +24,7 @@ export class TaskEntity extends Entity {
   private _name: string;
   private _description: string;
   private _color: Color;
+  private _round: RoundEntity;
 
   private constructor(data: ITaskPlain) {
     super();
@@ -52,6 +56,18 @@ export class TaskEntity extends Entity {
     return new TaskEntity(data);
   }
 
+  public static createFake(additionalData?: ITaskPlain) {
+    const data = {
+      id: randomUUID(),
+      name: 'fake task',
+      description: 'fake task',
+      color: Color.define('#000000'),
+      round: {} as RoundEntity,
+    };
+
+    return new TaskEntity({ ...data, ...additionalData });
+  }
+
   get name() {
     return this._name;
   }
@@ -62,6 +78,10 @@ export class TaskEntity extends Entity {
 
   get color() {
     return this._color;
+  }
+
+  get round() {
+    return this._round;
   }
 
   set name(name: string) {
@@ -89,6 +109,7 @@ export class TaskEntity extends Entity {
       color: this.color,
       description: this.description,
       name: this.name,
+      round: this.round,
     };
   }
 }

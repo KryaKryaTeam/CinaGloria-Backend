@@ -22,6 +22,9 @@ import { DeleteRoundCommand } from './application/commands/DeleteRound.command';
 import { PatchRoundCommand } from './application/commands/PatchRound.command';
 import { CreateTaskCommand } from './application/commands/CreateTask.command';
 import { TeamsModule } from 'src/teams/teams.module';
+import { PullTeamsToNextRoundCommand } from './application/commands/PullTeamsToNextRound.command';
+import { LeaderboardModule } from 'src/leaderboard/leaderboard.module';
+import { JudgingModule } from 'src/judging/judging.module';
 import { DeleteTaskCommand } from './application/commands/DeleteTask.command';
 
 const providers: Provider[] = [
@@ -81,13 +84,22 @@ const providers: Provider[] = [
   { provide: CommandTokens.DeleteRoundCommand, useClass: DeleteRoundCommand },
   { provide: CommandTokens.PatchRoundCommand, useClass: PatchRoundCommand },
   { provide: CommandTokens.CreateTaskCommand, useClass: CreateTaskCommand },
+  {
+    provide: CommandTokens.PullTeamsToNextRound,
+    useClass: PullTeamsToNextRoundCommand,
+  },
   { provide: CommandTokens.DeleteTaskCommand, useClass: DeleteTaskCommand },
 ];
 
 @Module({
   providers,
   exports: [...providers],
-  imports: [forwardRef(() => FilesModule), forwardRef(() => TeamsModule)],
+  imports: [
+    forwardRef(() => FilesModule),
+    forwardRef(() => TeamsModule),
+    forwardRef(() => LeaderboardModule),
+    forwardRef(() => JudgingModule),
+  ],
   controllers: [CompetitionController, RoundController, TaskController],
 })
 export class CompetitionsModule {}

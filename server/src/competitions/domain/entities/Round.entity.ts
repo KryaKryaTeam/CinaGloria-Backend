@@ -3,7 +3,15 @@ import { Entity } from 'src/common/domain/Entity';
 import { Icons } from 'src/types/Icons';
 import { RoundStatus } from 'src/types/RoundStatus';
 import { TaskEntity } from './Task.entity';
-import { ApiError, DomainErrors, RoundErrors } from 'src/error/ApiError';
+import {
+  ApiError,
+  DomainErrors,
+  RoundErrors,
+  SubmitionErrors,
+} from 'src/error/ApiError';
+import { TeamEntity } from 'src/teams/domain/entities/Team.entity';
+import { LeaderboardEntity } from 'src/leaderboard/domain/entities/Leaderboard.entity';
+import { SubmitionEntity } from 'src/judging/domain/entities/Submition.entity';
 
 export interface ICreateRound {
   name: string;
@@ -14,6 +22,8 @@ export interface ICreateRound {
   endOfRound: Date;
   relatedTasks: TaskEntity[];
   hidden: boolean;
+  leaderboard?: LeaderboardEntity;
+  submissions?: SubmitionEntity[];
 }
 
 export interface IRoundPlain {
@@ -27,6 +37,9 @@ export interface IRoundPlain {
   taskTimeout: Date;
   relatedTasks: TaskEntity[];
   status: RoundStatus;
+  teams: TeamEntity[];
+  leaderboard: LeaderboardEntity | undefined;
+  submissions: SubmitionEntity[] | undefined;
 }
 
 export class RoundEntity extends Entity {
@@ -40,6 +53,9 @@ export class RoundEntity extends Entity {
   private _endOfRound: Date;
   private _relatedTasks: TaskEntity[];
   private _status: RoundStatus;
+  private _teams: TeamEntity[];
+  private _leaderboard: LeaderboardEntity | undefined;
+  private _submissions: SubmitionEntity[] | undefined;
 
   private constructor(plain: IRoundPlain) {
     RoundEntity.validate(plain);
@@ -54,6 +70,9 @@ export class RoundEntity extends Entity {
     this._endOfRound = plain.endOfRound;
     this._relatedTasks = plain.relatedTasks;
     this._status = plain.status;
+    this._teams = plain.teams;
+    this._leaderboard = plain.leaderboard;
+    this._submissions = plain.submissions;
   }
 
   public static validate(plain: IRoundPlain): void {
@@ -76,8 +95,11 @@ export class RoundEntity extends Entity {
   public static create(data: ICreateRound) {
     return new RoundEntity({
       ...data,
+      leaderboard: data.leaderboard ?? undefined,
       id: randomUUID(),
       status: RoundStatus.CREATED,
+      teams: [],
+      submissions: data.submissions ?? undefined,
     });
   }
 
@@ -97,6 +119,9 @@ export class RoundEntity extends Entity {
       taskTimeout: new Date(Date.now() + 1500000),
       relatedTasks: [],
       status: RoundStatus.CREATED,
+      teams: [],
+      leaderboard: undefined,
+      submissions: undefined,
     };
 
     return RoundEntity.load(fakeData);
@@ -121,6 +146,32 @@ export class RoundEntity extends Entity {
 
   public show() {
     this._hidden = false;
+  }
+
+  public addTeam(team: TeamEntity) {
+    this._teams.push(team);
+  }
+
+  public removeTeam(team: TeamEntity) {
+    const i = this._teams.findIndex((el) => el.id == team.id);
+    if (i == -1) ApiError.throw(RoundErrors.TEAM_NOT_FOUND);
+
+    this._teams.splice(i, 1);
+  }
+
+  public addSubmission(submission: SubmitionEntity) {
+    this._submissions?.push(submission);
+  }
+
+  public removeSubmission(submission: SubmitionEntity) {
+    if (!this._submissions) ApiError.throw(SubmitionErrors.SUBMITION_NOT_FOUND);
+
+    const i = this._submissions.findIndex((s) => {
+      if (submission.id == s.id) return true;
+    });
+    if (i == -1) ApiError.throw(SubmitionErrors.SUBMITION_NOT_FOUND);
+
+    this._submissions.slice(i, 1);
   }
 
   set name(name: string) {
@@ -178,6 +229,10 @@ export class RoundEntity extends Entity {
     this._status = status;
   }
 
+  set leaderboard(leaderboard: LeaderboardEntity) {
+    this._leaderboard = leaderboard;
+  }
+
   get name() {
     return this._name ?? '';
   }
@@ -214,6 +269,18 @@ export class RoundEntity extends Entity {
     return this._hidden;
   }
 
+  get teams() {
+    return this._teams;
+  }
+
+  get leaderboard(): LeaderboardEntity | undefined {
+    return this._leaderboard;
+  }
+
+  get submissions(): SubmitionEntity[] | undefined {
+    return this._submissions;
+  }
+
   addTask(task: TaskEntity) {
     this._relatedTasks.push(task);
   }
@@ -237,6 +304,9 @@ export class RoundEntity extends Entity {
       endOfRound: this.endOfRound,
       icon: this.icon,
       relatedTasks: this.relatedTasks,
+      teams: this.teams,
+      leaderboard: this.leaderboard,
+      submissions: this.submissions,
     };
   }
 }

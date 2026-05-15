@@ -2,6 +2,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CommandTokens } from 'src/common/Tokens';
 import { HandleCompetitionScheduledEventsCommand } from 'src/competitions/application/commands/HandleCompetitionScheduledEvents.command';
+import { PullTeamsToNextRoundCommand } from 'src/competitions/application/commands/PullTeamsToNextRound.command';
 import { RunEndEventOnAllEndedRoundsCommand } from 'src/competitions/application/commands/RunEndEventOnAllEndedRounds.command';
 import { RunStartEventOnAllStartedRoundsCommand } from 'src/competitions/application/commands/RunStartEventOnAllStartedRounds.command';
 

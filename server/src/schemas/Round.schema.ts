@@ -13,6 +13,7 @@ import { CompetitionSchema } from './Competition.schema';
 import { TaskSchema } from './Task.schema';
 import { LeaderboardSchema } from './Leaderboard.schema';
 import { SubmitionSchema } from './Submition.schema';
+import { TeamSchema } from './Team.schema';
 
 @Entity({ name: 'round' })
 export class RoundSchema {
@@ -50,8 +51,7 @@ export class RoundSchema {
   @Column({ type: 'enum', enum: RoundStatus, enumName: 'round_status' })
   status: RoundStatus;
 
-  @ManyToOne(() => CompetitionSchema)
-  @JoinColumn({ name: 'competition_id' })
+  @ManyToOne(() => CompetitionSchema, (competition) => competition.rounds)
   competition: CompetitionSchema;
 
   @OneToOne(() => LeaderboardSchema, (leaderboard) => leaderboard.round, {
@@ -61,8 +61,10 @@ export class RoundSchema {
   leaderboard: LeaderboardSchema;
 
   @OneToMany(() => SubmitionSchema, (submission) => submission.relatedRound, {
-    onDelete: 'CASCADE',
-    cascade: true,
+    nullable: true,
   })
-  submission: SubmitionSchema;
+  submissions?: SubmitionSchema[];
+
+  @OneToMany(() => TeamSchema, (team) => team.round, { nullable: true })
+  teams?: TeamSchema[];
 }

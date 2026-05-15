@@ -1,6 +1,8 @@
+import { RoundEntity } from 'src/competitions/domain/entities/Round.entity';
 import { LeaderboardEntity } from 'src/leaderboard/domain/entities/Leaderboard.entity';
 
 export interface ILeaderboardRepotisory {
   save(leaderboard: LeaderboardEntity): Promise<void>;
   findById(id: string): Promise<LeaderboardEntity | void>;
+  findByRound(round: RoundEntity): Promise<LeaderboardEntity | void>;
 }

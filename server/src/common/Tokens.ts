@@ -96,6 +96,7 @@ export enum CommandTokens {
   PatchRoundCommand = 'PATCH_ROUND_COMMAND',
   ReadRoundCommand = 'READ_ROUND_COMMAND',
   CreateTaskCommand = 'CREATE_TASK_COMMAND',
+  PullTeamsToNextRound = 'PULL_TEAMS_TO_NEXT_ROUND_COMMAND',
   DeleteTaskCommand = 'DELETE_TASK_COMMAND',
 
   // --- AUTOMATION & EVENTS ---
@@ -116,6 +117,10 @@ export enum CommandTokens {
   DeleteSubmissionCommand = 'DELETE_SUBMISSION_COMMAND',
   CreateScoreCommand = 'CREATE_SCORE_COMMAND',
   CreateRoundReviewCommand = 'CREATE_ROUND_REVIEW_COMMAND',
+
+  // --- LEADERBOARD ---
+  GenerateLeaderboardCommand = 'GENERATE_LEADERBOARD_COMMAND',
+  GetLeaderboardCommand = 'GET_LEADERBOARD_COMMAND',
 }
 
 export enum ServiceTokens {
